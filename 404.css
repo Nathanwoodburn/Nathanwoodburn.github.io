@@ -26,7 +26,11 @@ t2 {
   background-color: #000000;
   animation: 0.2s shake infinite alternate;
 }
-
+p.mobile { display: none }
+@media (max-width: 640px) {
+    p.mobile { display: block }
+    p.desktop { display: none }
+}
 @keyframes shake {
   0% { left: 38.43%; }
   2.5% { left: 38.57%; }
