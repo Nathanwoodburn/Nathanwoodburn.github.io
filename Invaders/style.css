@@ -13,7 +13,8 @@ h2 {
   font-weight: 900;
   text-decoration: none;
   color: black;
-  display: inline-block;
+  position: absolute;
+  left: 38.5%;
   background-size: 120% 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
