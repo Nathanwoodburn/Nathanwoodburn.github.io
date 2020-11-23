@@ -28,10 +28,25 @@ t2 {
 }
 
 @keyframes shake {
-  0% { transform: skewX(-15deg); }
-  5% { transform: skewX(15deg); }
-  10% { transform: skewX(-15deg); }
-  15% { transform: skewX(15deg); }
-  20% { transform: skewX(0deg); }
-  100% { transform: skewX(0deg); }  
+  0% { transform: skewX(-7deg); }
+  5% { transform: skewX(7deg); }
+  10% { transform: skewX(-7deg); }
+  15% { transform: skewX(7deg); }
+  20% { transform: skewX(-7deg); }
+  25% { transform: skewX(7deg); }
+  30% { transform: skewX(-7deg); }
+  35% { transform: skewX(7deg); }
+  40% { transform: skewX(-7deg); }
+  45% { transform: skewX(7deg); }
+  50% { transform: skewX(-7deg); }
+  55% { transform: skewX(7deg); }
+  60% { transform: skewX(-7deg); }
+  65% { transform: skewX(7deg); }
+  70% { transform: skewX(-7deg); }
+  75% { transform: skewX(7deg); }
+  80% { transform: skewX(-7deg); }
+  85% { transform: skewX(7deg); }
+  90% { transform: skewX(-7deg); }
+  95% { transform: skewX(7deg); }
+  100% { transform: skewX(-7deg); }
 }
