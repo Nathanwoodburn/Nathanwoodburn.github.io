@@ -400,7 +400,7 @@
 
   function initGameStart() {
     if (window.innerWidth > 1200) {
-      screen.canvas.width = 1200;
+      //screen.canvas.width = 1200;
       screen.canvas.height = 500;
       gameSize = {
         width: 1200,
