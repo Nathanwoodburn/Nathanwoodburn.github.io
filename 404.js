@@ -387,7 +387,7 @@
       loop();
 
     };
-    invaderAsset.src = "/images/invader.gif";
+    invaderAsset.src = "/assets/img/invader.gif";
 
   });
 
