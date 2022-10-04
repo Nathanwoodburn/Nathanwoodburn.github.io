@@ -25,5 +25,5 @@ function FindProxyForURL(url, host) {
       return "DIRECT";
     }
 
-    return "PROXY 192.9.167.104:8575";
+    return "PROXY 192.9.167.104:8576";
 }
