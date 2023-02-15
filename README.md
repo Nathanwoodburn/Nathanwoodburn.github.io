@@ -1,3 +1,2 @@
 # Nathanwoodburn.github.io
-My Website files
-nathan.woodburn.au
+G'day this is where my website files for https://nathan.woodburn.au and https://nathan.woodburn are.  
