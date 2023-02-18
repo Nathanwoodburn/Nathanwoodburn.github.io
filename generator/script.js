@@ -81,6 +81,7 @@ const symbolEl = document.getElementById("symbol");
 
 // Button to generate the password
 const generateBtn = document.getElementById("generate");
+const generateBtntxt = document.getElementById("textgenerate");
 // Button to copy the text
 const copyBtn = document.getElementById("copy-btn");
 // Result viewbox container
@@ -126,7 +127,7 @@ window.addEventListener("resize", e => {
 copyBtn.addEventListener("click", () => {
 	const textarea = document.createElement("textarea");
 	const password = resultEl.innerText;
-	if (!password || password == "CLICK GENERATE") {
+	if (!password || password == "generateBtntxt") {
 		return;
 	}
 	textarea.value = password;
@@ -143,6 +144,21 @@ copyBtn.addEventListener("click", () => {
 
 // When Generate is clicked Password id generated.
 generateBtn.addEventListener("click", () => {
+	const length = +lengthEl.value;
+	const hasLower = lowercaseEl.checked;
+	const hasUpper = uppercaseEl.checked;
+	const hasNumber = numberEl.checked;
+	const hasSymbol = symbolEl.checked;
+	generatedPassword = true;
+	resultEl.innerText = generatePassword(length, hasLower, hasUpper, hasNumber, hasSymbol);
+	copyInfo.style.transform = "translateY(0%)";
+	copyInfo.style.opacity = "0.75";
+	copiedInfo.style.transform = "translateY(200%)";
+	copiedInfo.style.opacity = "0";
+});
+
+// When Generate is clicked Password id generated.
+generateBtntxt.addEventListener("click", () => {
 	const length = +lengthEl.value;
 	const hasLower = lowercaseEl.checked;
 	const hasUpper = uppercaseEl.checked;

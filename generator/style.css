@@ -33,6 +33,7 @@ button {
   margin: 10px -5px;
   margin-bottom: 30px;
   color: #fff;
+  text-align: center;
 }
 
 .result {
@@ -308,4 +309,9 @@ a:hover {
   40%, 80% {
     transform: rotate(10deg);
   }
+}
+button.textgenerate {
+  color: white;
+  background-color: transparent;
+  font-size: larger;
 }
