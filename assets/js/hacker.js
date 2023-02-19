@@ -27,7 +27,7 @@ document.querySelector(".hacker").onmouseover = event => {
     }
     
     iteration += 1 / 3;
-  }, 10);
+  }, 30);
 }
 document.querySelector(".hacker2").onmouseover = event => {  
     let iteration2 = 0;
