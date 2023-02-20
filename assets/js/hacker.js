@@ -7,7 +7,7 @@ let interval3 = null;
 
 window.onload = (event) => {
 
-target = document.querySelector(".navbar-brand");
+target = document.querySelector(".nathanwoodburn");
   let iteration = 0;
   let final = "NATHAN.WOODBURN/";
   clearInterval(interval);
