@@ -1,7 +1,6 @@
 .social-icons {
   color: #313437;
   background-color: #fff;
-  text-align: center;
   padding: 70px 0;
 }
 
@@ -11,9 +10,21 @@
   }
 }
 
+@media (max-width:500px) {
+  img.profile {
+    width: 200px;
+    margin-left: -100px;
+  }
+}
+
+@media (max-width:500px) {
+  .profile-container {
+    height: 200px;
+    margin-top: 2em !important;
+  }
+}
+
 .social-icons i {
-  font-size: 32px;
-  display: inline-block;
   color: #757980;
   margin: 0 10px;
   width: 60px;
@@ -22,5 +33,6 @@
   text-align: center;
   border-radius: 50%;
   line-height: 60px;
+  display: inline-block;
 }
 
