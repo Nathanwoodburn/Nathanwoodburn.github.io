@@ -2,7 +2,7 @@ function slideout() {
     bodydiv = document.querySelector("body");
     bodydiv.style.top = "-100%";
     setTimeout(function() { 
-        window.location.href = "/"
+        window.location.href = "/#about"
         bodydiv.style.top = "0px";
     }, 1000)
 }
