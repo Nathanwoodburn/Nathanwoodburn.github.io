@@ -1,0 +1,8 @@
+.hide_underline {
+  text-decoration: none;
+}
+
+.invert {
+  filter: invert(1);
+}
+
