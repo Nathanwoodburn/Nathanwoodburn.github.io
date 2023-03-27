@@ -6,3 +6,23 @@
   filter: invert(1);
 }
 
+@media screen and (max-width: 800px) {
+  .masthead {
+    padding-top: 0 !important;
+  }
+}
+
+/* For screen under 450 px set the nav icon width 100% */
+
+@media screen and (max-width: 450px) {
+  img.navicon {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 450px) {
+  #navbar {
+    padding-left: 0 !important;
+  }
+}
+
