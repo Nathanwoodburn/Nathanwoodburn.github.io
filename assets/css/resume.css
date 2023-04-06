@@ -82,3 +82,23 @@ img.background2sml {
   z-index: 0;
 }
 
+/* For printing set colour to black */
+
+@media print {
+  div {
+    color: black !important;
+  }
+}
+
+@media print {
+  .noprintbreak {
+    page-break-inside: avoid;
+  }
+}
+
+@media print {
+  .edu-main {
+    page-break-before: always;
+  }
+}
+
