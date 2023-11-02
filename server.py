@@ -1,6 +1,7 @@
 from flask import Flask, make_response, redirect, request, jsonify, render_template, send_from_directory
 import os
 import dotenv
+import requests
 
 app = Flask(__name__)
 dotenv.load_dotenv()
@@ -55,6 +56,28 @@ def handshake():
 @app.route('/generator/')
 def removeTrailingSlash():
     return render_template(request.path.split('/')[-2] + '.html')
+
+@app.route('/.well-known/wallets/<path:path>')
+def wallet(path):
+    # If HNS, redirect to HNS wallet
+    if path == "HNS":
+        # Get from 100.66.107.77:8080 then return result
+        # Check for cookie
+        if request.cookies.get('HNS'):
+            print(request.cookies.get('HNS'))
+            return make_response(request.cookies.get('HNS'), 200, {'Content-Type': 'text/plain'})
+        
+        address = requests.get('http://100.66.107.77:8080')
+        # Set cookie
+        resp = make_response(address.text, 200, {'Content-Type': 'text/plain'})
+        resp.set_cookie('HNS', address.text)
+        return resp
+
+
+
+    return send_from_directory('.well-known/wallets', path, mimetype='text/plain')
+        
+
 
 # Main routes
 @app.route('/')
