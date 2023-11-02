@@ -52,14 +52,16 @@ def handshake():
     # return request.path
     return send_from_directory('templates/assets/js', request.path.split('/')[-1])
 
+@app.route('/generator/')
+def removeTrailingSlash():
+    return render_template(request.path.split('/')[-2] + '.html')
 
 # Main routes
-
 @app.route('/')
 def index():
     handshake_scripts = "<script src=\"https://nathan.woodburn/handshake.js\" domain=\"nathan.woodburn\"></script><script src=\"https://nathan.woodburn/https.js\"></script>"
     # If localhost, don't load handshake
-    if request.host == "localhost:5000" or request.host == "127.0.0.1:5000" or os.getenv('dev') == "true":
+    if request.host == "localhost:5000" or request.host == "127.0.0.1:5000" or os.getenv('dev') == "true" or request.host == "test.nathan.woodburn.au":
         handshake_scripts = ""
     return render_template('index.html', handshake_scripts=handshake_scripts)
 
@@ -68,7 +70,7 @@ def index():
 def catch_all(path):
     handshake_scripts = "<script src=\"https://nathan.woodburn/handshake.js\" domain=\"nathan.woodburn\"></script><script src=\"https://nathan.woodburn/https.js\"></script>"
     # If localhost, don't load handshake
-    if request.host == "localhost:5000" or request.host == "127.0.0.1:5000" or os.getenv('dev') == "true":
+    if request.host == "localhost:5000" or request.host == "127.0.0.1:5000" or os.getenv('dev') == "true" or request.host == "test.nathan.woodburn.au":
         handshake_scripts = ""
     # If file exists, load it
     if os.path.isfile('templates/' + path):
