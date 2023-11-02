@@ -70,7 +70,8 @@ def wallet(path):
         address = requests.get('http://100.66.107.77:8080')
         # Set cookie
         resp = make_response(address.text, 200, {'Content-Type': 'text/plain'})
-        resp.set_cookie('HNS', address.text)
+        # Cookie should last 1 week
+        resp.set_cookie('HNS', address.text, max_age=604800)
         return resp
 
 
