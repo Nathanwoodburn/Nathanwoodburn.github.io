@@ -64,7 +64,6 @@ def wallet(path):
         # Get from 100.66.107.77:8080 then return result
         # Check for cookie
         if request.cookies.get('HNS'):
-            print(request.cookies.get('HNS'))
             return make_response(request.cookies.get('HNS'), 200, {'Content-Type': 'text/plain'})
         
         address = requests.get('http://hip02-server:3000')
@@ -85,7 +84,16 @@ def index():
     # If localhost, don't load handshake
     if request.host == "localhost:5000" or request.host == "127.0.0.1:5000" or os.getenv('dev') == "true" or request.host == "test.nathan.woodburn.au":
         handshake_scripts = ""
-    return render_template('index.html', handshake_scripts=handshake_scripts)
+
+    if request.cookies.get('HNS'):
+            return render_template('index.html', handshake_scripts=handshake_scripts, HNS=request.cookies.get('HNS'))
+        
+    address = requests.get('http://hip02-server:3000')
+    # Set cookie
+    resp = make_response(render_template('index.html', handshake_scripts=handshake_scripts, HNS=address.text), 200, {'Content-Type': 'text/html'})
+    # Cookie should last 1 week
+    resp.set_cookie('HNS', address.text, max_age=604800)
+    return resp
 
 
 @app.route('/<path:path>')
