@@ -67,14 +67,12 @@ def wallet(path):
             print(request.cookies.get('HNS'))
             return make_response(request.cookies.get('HNS'), 200, {'Content-Type': 'text/plain'})
         
-        address = requests.get('http://100.66.107.77:8080')
+        address = requests.get('http://hip02-server:3000')
         # Set cookie
         resp = make_response(address.text, 200, {'Content-Type': 'text/plain'})
         # Cookie should last 1 week
         resp.set_cookie('HNS', address.text, max_age=604800)
         return resp
-
-
 
     return send_from_directory('.well-known/wallets', path, mimetype='text/plain')
         
