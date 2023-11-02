@@ -45,6 +45,13 @@ def favicon():
 def faviconSVG():
     return send_from_directory('templates/assets/img', 'favicon.svg')
 
+@app.route('/https.js')
+@app.route('/handshake.js')
+@app.route('/redirect.js')
+def handshake():
+    # return request.path
+    return send_from_directory('templates/assets/js', request.path.split('/')[-1])
+
 
 # Main routes
 
