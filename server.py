@@ -5,6 +5,13 @@ import dotenv
 app = Flask(__name__)
 dotenv.load_dotenv()
 
+# Custom header
+def add_custom_header(response):
+    response.headers['Onion-Location'] = 'http://wdbrncwefot4hd7bdrz5rzb74mefay7zvrjn2vmkpdm44l7fwnih5ryd.onion/'
+    return response
+app.after_request(add_custom_header)
+
+
 #Assets routes
 @app.route('/assets/<path:path>')
 def send_report(path):

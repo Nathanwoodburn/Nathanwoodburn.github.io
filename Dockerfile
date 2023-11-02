@@ -12,6 +12,6 @@ COPY . /app
 VOLUME /data
 
 ENTRYPOINT ["python3"]
-CMD ["server.py"]
+CMD ["main.py"]
 
 FROM builder as dev-envs
