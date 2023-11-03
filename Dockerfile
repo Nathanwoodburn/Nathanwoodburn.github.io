@@ -9,7 +9,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 COPY . /app
 
 # Add mount point for data volume
-VOLUME /data
+# VOLUME /data
 
 ENTRYPOINT ["python3"]
 CMD ["main.py"]
