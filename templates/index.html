@@ -72,6 +72,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </div>
     </nav>
+    <div class="text-end d-none d-md-block d-lg-block d-xl-block d-xxl-block" id="downtime"><blockquote class="speech bubble"><em>G'day!</em><br>
+Some services are down.<br>
+Check them out here!</blockquote><img class="img-fluid" src="/assets/img/pfront.webp"></div>
     <header class="masthead main" style="background: url(&quot;/assets/img/bg/background.webp&quot;) bottom / cover;position: relative;">
         <div class="intro-body text parallax" style="color: rgb(0,0,0);">
             <h1 class="d-none d-print-inline-block d-sm-inline-block d-md-inline-block d-lg-inline-block d-xl-inline-block d-xxl-inline-block inner-text" style="font-size: 70px;">G'day, Welcome to<br>my Personal Site</h1>
@@ -79,7 +82,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <h2 class="inner-text">Nathan Woodburn</h2>
         </div><img class="fog" src="/assets/img/bg/fog_1.webp" alt="">
     </header>
-    <section class="text-center content-section" id="about" style="padding-bottom: 0px;">
+    <section class="text-center content-section" id="about" style="padding-bottom: 0px;background: black;">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 mx-auto">
@@ -147,7 +150,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </div>
     </section><img class="no-drag" src="/assets/img/tilt.svg" style="width: 100%;background: #363636;transform: rotate(180deg);" alt="">
-    <section class="text-center content-section" id="contact" style="padding-top: 0px;padding-bottom: 3em;">
+    <section class="text-center content-section" id="contact" style="padding-top: 0px;padding-bottom: 3em;background: black;">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 mx-auto">
@@ -229,10 +232,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     hns.addEventListener('click', () => {
         copyToClipboard(hns);
     });
-</script>
+</script>{{custom | safe}}
     <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="/assets/js/script.min.js"></script>
     <script src="/assets/js/hacker.min.js"></script>
+    <script src="/assets/js/downtime.min.js"></script>
 </body>
 
 </html>

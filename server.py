@@ -86,15 +86,26 @@ def index():
     repo_name=git['repo']['name']
     repo_name=repo_name.lower()
     repo_description=git['repo']['description']
+    custom = ""
+
+    # Check for downtime
+    uptime = requests.get('https://uptime.woodburn.au/api/status-page/main/badge')
+    uptime = uptime.content.count(b'Up') > 1
+
+    if uptime:
+        custom += "<style>#downtime{display:none !important;}</style>"
+    else:
+        custom += "<style>#downtime{opacity:1;}</style>"
+
+
+
 
     # Special names
     if repo_name == "nathanwoodburn.github.io":
         repo_name = "Nathan.Woodburn/"
 
     html_url=git['repo']['html_url']
-
     repo = "<a href=\"" + html_url + "\" target=\"_blank\">" + repo_name + "</a>"
-
     handshake_scripts = "<script src=\"https://nathan.woodburn/handshake.js\" domain=\"nathan.woodburn\"></script><script src=\"https://nathan.woodburn/https.js\"></script>"
     # If localhost, don't load handshake
     if request.host == "localhost:5000" or request.host == "127.0.0.1:5000" or os.getenv('dev') == "true" or request.host == "test.nathan.woodburn.au":
@@ -102,14 +113,14 @@ def index():
     
 
     if request.cookies.get('HNS'):
-            return render_template('index.html', handshake_scripts=handshake_scripts, HNS=request.cookies.get('HNS'), repo=repo, repo_description=repo_description)
+            return render_template('index.html', handshake_scripts=handshake_scripts, HNS=request.cookies.get('HNS'), repo=repo, repo_description=repo_description, custom=custom)
     
     if handshake_scripts == "":
         address = "hs1............example"
     else:
         address = requests.get('http://hip02-server:3000').text
     # Set cookie
-    resp = make_response(render_template('index.html', handshake_scripts=handshake_scripts, HNS=address, repo=repo, repo_description=repo_description), 200, {'Content-Type': 'text/html'})
+    resp = make_response(render_template('index.html', handshake_scripts=handshake_scripts, HNS=address, repo=repo, repo_description=repo_description, custom=custom), 200, {'Content-Type': 'text/html'})
     # Cookie should last 1 week
     resp.set_cookie('HNS', address, max_age=604800)
     return resp
