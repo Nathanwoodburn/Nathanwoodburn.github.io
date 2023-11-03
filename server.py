@@ -80,19 +80,38 @@ def wallet(path):
 # Main routes
 @app.route('/')
 def index():
+    git=requests.get('https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1&token=' + os.getenv('git_token'))
+    git = git.json()
+    git = git[0]
+    repo_name=git['repo']['name']
+    repo_name=repo_name.lower()
+    repo_description=git['repo']['description']
+
+    # Special names
+    if repo_name == "nathanwoodburn.github.io":
+        repo_name = "Nathan.Woodburn/"
+
+    html_url=git['repo']['html_url']
+
+    repo = "<a href=\"" + html_url + "\" target=\"_blank\">" + repo_name + "</a>"
+
     handshake_scripts = "<script src=\"https://nathan.woodburn/handshake.js\" domain=\"nathan.woodburn\"></script><script src=\"https://nathan.woodburn/https.js\"></script>"
     # If localhost, don't load handshake
     if request.host == "localhost:5000" or request.host == "127.0.0.1:5000" or os.getenv('dev') == "true" or request.host == "test.nathan.woodburn.au":
         handshake_scripts = ""
+    
 
     if request.cookies.get('HNS'):
-            return render_template('index.html', handshake_scripts=handshake_scripts, HNS=request.cookies.get('HNS'))
-        
-    address = requests.get('http://hip02-server:3000')
+            return render_template('index.html', handshake_scripts=handshake_scripts, HNS=request.cookies.get('HNS'), repo=repo, repo_description=repo_description)
+    
+    if handshake_scripts == "":
+        address = "hs1............example"
+    else:
+        address = requests.get('http://hip02-server:3000').text
     # Set cookie
-    resp = make_response(render_template('index.html', handshake_scripts=handshake_scripts, HNS=address.text), 200, {'Content-Type': 'text/html'})
+    resp = make_response(render_template('index.html', handshake_scripts=handshake_scripts, HNS=address, repo=repo, repo_description=repo_description), 200, {'Content-Type': 'text/html'})
     # Cookie should last 1 week
-    resp.set_cookie('HNS', address.text, max_age=604800)
+    resp.set_cookie('HNS', address, max_age=604800)
     return resp
 
 
