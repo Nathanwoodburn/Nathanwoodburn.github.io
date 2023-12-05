@@ -6,6 +6,8 @@ import requests
 app = Flask(__name__)
 dotenv.load_dotenv()
 
+address = ''
+
 # Custom header
 def add_custom_header(response):
     response.headers['Onion-Location'] = 'http://wdbrncwefot4hd7bdrz5rzb74mefay7zvrjn2vmkpdm44l7fwnih5ryd.onion/'
@@ -66,7 +68,7 @@ def wallet(path):
         if request.cookies.get('HNS'):
             return make_response(request.cookies.get('HNS'), 200, {'Content-Type': 'text/plain'})
         
-        address = requests.get('http://hip02-server:3000')
+        address = getAddress()
         # Set cookie
         resp = make_response(address.text, 200, {'Content-Type': 'text/plain'})
         # Cookie should last 1 week
@@ -115,10 +117,7 @@ def index():
     if request.cookies.get('HNS'):
             return render_template('index.html', handshake_scripts=handshake_scripts, HNS=request.cookies.get('HNS'), repo=repo, repo_description=repo_description, custom=custom)
     
-    if handshake_scripts == "":
-        address = "hs1............example"
-    else:
-        address = requests.get('http://hip02-server:3000').text
+    address = getAddress()
     # Set cookie
     resp = make_response(render_template('index.html', handshake_scripts=handshake_scripts, HNS=address, repo=repo, repo_description=repo_description, custom=custom), 200, {'Content-Type': 'text/html'})
     # Cookie should last 1 week
@@ -141,6 +140,13 @@ def catch_all(path):
         return render_template(path + '.html', handshake_scripts=handshake_scripts)
 
     return render_template('404.html'), 404
+
+def getAddress():
+    global address
+    if address == '':
+        address = requests.get('http://hip02-server:3000').text
+    return address
+
 
 # 404 catch all
 @app.errorhandler(404)
