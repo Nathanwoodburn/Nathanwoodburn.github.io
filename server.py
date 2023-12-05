@@ -70,9 +70,9 @@ def wallet(path):
         
         address = getAddress()
         # Set cookie
-        resp = make_response(address.text, 200, {'Content-Type': 'text/plain'})
+        resp = make_response(address, 200, {'Content-Type': 'text/plain'})
         # Cookie should last 1 week
-        resp.set_cookie('HNS', address.text, max_age=604800)
+        resp.set_cookie('HNS', address, max_age=604800)
         return resp
 
     return send_from_directory('.well-known/wallets', path, mimetype='text/plain')
