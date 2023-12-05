@@ -113,11 +113,13 @@ def index():
     if request.host == "localhost:5000" or request.host == "127.0.0.1:5000" or os.getenv('dev') == "true" or request.host == "test.nathan.woodburn.au":
         handshake_scripts = ""
     
+    
 
     if request.cookies.get('HNS'):
             return render_template('index.html', handshake_scripts=handshake_scripts, HNS=request.cookies.get('HNS'), repo=repo, repo_description=repo_description, custom=custom)
     
-    address = getAddress()
+    if handshake_scripts != "":
+        address = getAddress()
     # Set cookie
     resp = make_response(render_template('index.html', handshake_scripts=handshake_scripts, HNS=address, repo=repo, repo_description=repo_description, custom=custom), 200, {'Content-Type': 'text/html'})
     # Cookie should last 1 week
@@ -144,7 +146,8 @@ def catch_all(path):
 def getAddress():
     global address
     if address == '':
-        address = requests.get('http://hip02-server:3000').text
+        address = 'hs1qv3uu4amv87g7p7h49xez2pmzwjf92am0wzpnh4'
+        # address = requests.get('http://hip02-server:3000').text?
     return address
 
 
