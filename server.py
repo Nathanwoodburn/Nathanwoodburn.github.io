@@ -82,6 +82,7 @@ def wallet(path):
 # Main routes
 @app.route('/')
 def index():
+    global address
     git=requests.get('https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1&token=' + os.getenv('git_token'))
     git = git.json()
     git = git[0]
@@ -118,7 +119,7 @@ def index():
     if request.cookies.get('HNS'):
             return render_template('index.html', handshake_scripts=handshake_scripts, HNS=request.cookies.get('HNS'), repo=repo, repo_description=repo_description, custom=custom)
     
-    if handshake_scripts != "":
+    if address == '':
         address = getAddress()
     # Set cookie
     resp = make_response(render_template('index.html', handshake_scripts=handshake_scripts, HNS=address, repo=repo, repo_description=repo_description, custom=custom), 200, {'Content-Type': 'text/html'})
@@ -157,4 +158,4 @@ def not_found(e):
     return render_template('404.html'), 404
 
 if __name__ == '__main__':
-    app.run(debug=False, port=5000, host='0.0.0.0')
+    app.run(debug=True, port=5000, host='0.0.0.0')
