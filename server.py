@@ -2,6 +2,7 @@ from flask import Flask, make_response, redirect, request, jsonify, render_templ
 import os
 import dotenv
 import requests
+import CloudFlare
 
 app = Flask(__name__)
 dotenv.load_dotenv()
@@ -150,6 +151,39 @@ def getAddress():
         address = 'hs1qv3uu4amv87g7p7h49xez2pmzwjf92am0wzpnh4'
         # address = requests.get('http://hip02-server:3000').text?
     return address
+
+
+@app.route('/hnsdoh-acme', methods=['POST'])
+def hnsdoh_acme():
+    # Get the TXT record from the request
+    if not request.json:
+        return jsonify({'status': 'error', 'error': 'No JSON data provided'})
+    if 'txt' not in request.json or 'auth' not in request.json:
+        return jsonify({'status': 'error', 'error': 'Missing required data'})
+
+    txt = request.json['txt']
+    auth = request.json['auth']
+    if auth != os.getenv('CF_AUTH'):
+        return jsonify({'status': 'error', 'error': 'Invalid auth'})
+
+    cf = CloudFlare.CloudFlare(token=os.getenv('CF_TOKEN'))
+    zone = cf.zones.get(params={'name': 'hnsdoh.com'})
+    zone_id = zone[0]['id']
+    existing_records = cf.zones.dns_records.get(zone_id, params={'type': 'TXT', 'name': '_acme-challenge.hnsdoh.com'})
+    
+    # Delete existing TXT records
+    for record in existing_records:
+        print(record)
+        record_id = record['id']
+        cf.zones.dns_records.delete(zone_id, record_id)
+        
+
+
+
+    record = cf.zones.dns_records.post(zone_id, data={'type': 'TXT', 'name': '_acme-challenge', 'content': txt})
+    print(record)
+    return jsonify({'status': 'success'})
+
 
 
 # 404 catch all
