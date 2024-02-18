@@ -19,6 +19,9 @@ app.after_request(add_custom_header)
 #Assets routes
 @app.route('/assets/<path:path>')
 def send_report(path):
+    if path.endswith('.json'):
+        return send_from_directory('templates/assets', path, mimetype='application/json')
+
     return send_from_directory('templates/assets', path)
 
 
