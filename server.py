@@ -131,6 +131,20 @@ def index():
     resp.set_cookie('HNS', address, max_age=604800)
     return resp
 
+@app.route('/now')
+def now():
+    handshake_scripts = "<script src=\"https://nathan.woodburn/handshake.js\" domain=\"nathan.woodburn\"></script><script src=\"https://nathan.woodburn/https.js\"></script>"
+    # If localhost, don't load handshake
+    if request.host == "localhost:5000" or request.host == "127.0.0.1:5000" or os.getenv('dev') == "true" or request.host == "test.nathan.woodburn.au":
+        handshake_scripts = ""
+    
+    # Get latest now page
+    files = os.listdir('templates/now')
+    # Remove template
+    files = [file for file in files if file != 'template.html']
+    files.sort(reverse=True)
+    return render_template('now/' + files[0], handshake_scripts=handshake_scripts)
+
 
 @app.route('/<path:path>')
 def catch_all(path):
