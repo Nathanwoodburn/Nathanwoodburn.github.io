@@ -1,8 +1,8 @@
 {
-  "name": "Woodburn",
-  "symbol": "WDBRN",
+  "name": "WoodburnTest",
+  "symbol": "WDBRNT",
   "image": "https://nathan.woodburn.au/favicon.png",
-  "description": "Woodburn Token",
+  "description": "Woodburn Test Token",
   "extensions": {
     "website": "https://nathan.woodburn.au"
   },
