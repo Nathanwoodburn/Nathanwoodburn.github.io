@@ -88,6 +88,7 @@ def wallet(path):
 @app.route('/')
 def index():
     global address
+    global handshake_scripts
     git=requests.get('https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1&token=' + os.getenv('git_token'))
     git = git.json()
     git = git[0]
@@ -104,10 +105,6 @@ def index():
         custom += "<style>#downtime{display:none !important;}</style>"
     else:
         custom += "<style>#downtime{opacity:1;}</style>"
-
-
-
-
     # Special names
     if repo_name == "nathanwoodburn.github.io":
         repo_name = "Nathan.Woodburn/"
@@ -133,6 +130,7 @@ def index():
 
 @app.route('/now')
 def now():
+    global handshake_scripts
     
     # If localhost, don't load handshake
     if request.host == "localhost:5000" or request.host == "127.0.0.1:5000" or os.getenv('dev') == "true" or request.host == "test.nathan.woodburn.au":
@@ -148,6 +146,7 @@ def now():
 
 @app.route('/<path:path>')
 def catch_all(path):
+    global handshake_scripts
     # If localhost, don't load handshake
     if request.host == "localhost:5000" or request.host == "127.0.0.1:5000" or os.getenv('dev') == "true" or request.host == "test.nathan.woodburn.au":
         handshake_scripts = ""
