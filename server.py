@@ -8,6 +8,7 @@ app = Flask(__name__)
 dotenv.load_dotenv()
 
 address = ''
+handshake_scripts = '<script src="https://nathan.woodburn/handshake.js" domain="nathan.woodburn" async></script><script src="https://nathan.woodburn/https.js" async></script>'
 
 # Custom header
 def add_custom_header(response):
@@ -113,7 +114,6 @@ def index():
 
     html_url=git['repo']['html_url']
     repo = "<a href=\"" + html_url + "\" target=\"_blank\">" + repo_name + "</a>"
-    handshake_scripts = "<script src=\"https://nathan.woodburn/handshake.js\" domain=\"nathan.woodburn\"></script><script src=\"https://nathan.woodburn/https.js\"></script>"
     # If localhost, don't load handshake
     if request.host == "localhost:5000" or request.host == "127.0.0.1:5000" or os.getenv('dev') == "true" or request.host == "test.nathan.woodburn.au":
         handshake_scripts = ""
@@ -133,7 +133,7 @@ def index():
 
 @app.route('/now')
 def now():
-    handshake_scripts = "<script src=\"https://nathan.woodburn/handshake.js\" domain=\"nathan.woodburn\"></script><script src=\"https://nathan.woodburn/https.js\"></script>"
+    
     # If localhost, don't load handshake
     if request.host == "localhost:5000" or request.host == "127.0.0.1:5000" or os.getenv('dev') == "true" or request.host == "test.nathan.woodburn.au":
         handshake_scripts = ""
@@ -148,7 +148,6 @@ def now():
 
 @app.route('/<path:path>')
 def catch_all(path):
-    handshake_scripts = "<script src=\"https://nathan.woodburn/handshake.js\" domain=\"nathan.woodburn\"></script><script src=\"https://nathan.woodburn/https.js\"></script>"
     # If localhost, don't load handshake
     if request.host == "localhost:5000" or request.host == "127.0.0.1:5000" or os.getenv('dev') == "true" or request.host == "test.nathan.woodburn.au":
         handshake_scripts = ""
