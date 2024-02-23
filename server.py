@@ -141,15 +141,61 @@ def now():
     # Get latest now page
     files = os.listdir('templates/now')
     # Remove template
-    files = [file for file in files if file != 'template.html']
+    files = [file for file in files if file != 'template.html' and file != 'old.html']
     files.sort(reverse=True)
     date = files[0].strip('.html')
     # Convert to date
     date = datetime.datetime.strptime(date, '%y_%m_%d')
     date = date.strftime('%A, %B %d, %Y')
-
-
     return render_template('now/' + files[0], handshake_scripts=handshake_scripts, DATE=date)
+
+@app.route('/now/<path:path>')
+def now_path(path):
+    global handshake_scripts
+    # If localhost, don't load handshake
+    if request.host == "localhost:5000" or request.host == "127.0.0.1:5000" or os.getenv('dev') == "true" or request.host == "test.nathan.woodburn.au":
+        handshake_scripts = ""
+
+    date = path
+    date = date.strip('.html')
+
+    try:
+        # Convert to date
+        date = datetime.datetime.strptime(date, '%y_%m_%d')
+        date = date.strftime('%A, %B %d, %Y')
+    except:
+        date = ""
+
+    # If file exists, load it
+    if os.path.isfile('templates/now/' + path):
+        return render_template('now/' + path, handshake_scripts=handshake_scripts, DATE=date)
+    if os.path.isfile('templates/now/' + path + '.html'):
+        return render_template('now/' + path + '.html', handshake_scripts=handshake_scripts, DATE=date)
+    
+    return render_template('404.html'), 404
+
+@app.route('/now/old')
+@app.route('/now/old/')
+def now_old():
+    global handshake_scripts
+    # If localhost, don't load handshake
+    if request.host == "localhost:5000" or request.host == "127.0.0.1:5000" or os.getenv('dev') == "true" or request.host == "test.nathan.woodburn.au":
+        handshake_scripts = ""
+
+    now_pages = os.listdir('templates/now')
+    now_pages = [page for page in now_pages if page != 'template.html' and page != 'old.html']
+    now_pages.sort(reverse=True)
+    html = '<ul class="list-group">'
+    latest = " (Latest)"
+    for page in now_pages:
+        link = page.strip('.html')
+        date = datetime.datetime.strptime(link, '%y_%m_%d')
+        date = date.strftime('%A, %B %d, %Y')
+        html += f'<a style="text-decoration:none;" href="/now/{link}"><li class="list-group-item" style="background-color:#000000;color:#ffffff;">{date}{latest}</li></a>'
+        latest = ""
+
+    html += '</ul>'
+    return render_template('now/old.html', handshake_scripts=handshake_scripts,now_pages=html)
 
 
 @app.route('/<path:path>')
