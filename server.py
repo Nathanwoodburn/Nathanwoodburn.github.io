@@ -3,6 +3,7 @@ import os
 import dotenv
 import requests
 import CloudFlare
+import datetime
 
 app = Flask(__name__)
 dotenv.load_dotenv()
@@ -129,6 +130,7 @@ def index():
     return resp
 
 @app.route('/now')
+@app.route('/now/')
 def now():
     global handshake_scripts
     
@@ -141,7 +143,13 @@ def now():
     # Remove template
     files = [file for file in files if file != 'template.html']
     files.sort(reverse=True)
-    return render_template('now/' + files[0], handshake_scripts=handshake_scripts)
+    date = files[0].strip('.html')
+    # Convert to date
+    date = datetime.datetime.strptime(date, '%y_%m_%d')
+    date = date.strftime('%A, %B %d, %Y')
+
+
+    return render_template('now/' + files[0], handshake_scripts=handshake_scripts, DATE=date)
 
 
 @app.route('/<path:path>')
@@ -158,13 +166,15 @@ def catch_all(path):
     if os.path.isfile('templates/' + path + '.html'):
         return render_template(path + '.html', handshake_scripts=handshake_scripts)
 
+    if os.path.isfile('templates/' + path.strip('/') + '.html'):
+        return render_template(path.strip('/') + '.html', handshake_scripts=handshake_scripts)
+
     return render_template('404.html'), 404
 
 def getAddress():
     global address
     if address == '':
         address = 'hs1qv3uu4amv87g7p7h49xez2pmzwjf92am0wzpnh4'
-        # address = requests.get('http://hip02-server:3000').text?
     return address
 
 
