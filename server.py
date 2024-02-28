@@ -1,4 +1,5 @@
 from flask import Flask, make_response, redirect, request, jsonify, render_template, send_from_directory
+from flask_cors import CORS
 import os
 import dotenv
 import requests
@@ -6,6 +7,8 @@ import CloudFlare
 import datetime
 
 app = Flask(__name__)
+CORS(app)
+
 dotenv.load_dotenv()
 
 address = ''
