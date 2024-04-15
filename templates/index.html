@@ -47,23 +47,6 @@
     <link rel="stylesheet" href="/assets/css/profile.min.css">
     <link rel="stylesheet" href="/assets/css/swiper.min.css">
 <link rel="me" href="https://mastodon.woodburn.au/@nathanwoodburn" />
-
-<!-- Matomo -->
-<script>
-  var _paq = window._paq = window._paq || [];
-  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-  _paq.push(['trackPageView']);
-  _paq.push(['enableLinkTracking']);
-  (function() {
-    var u="//analytics.woodburn.au/";
-    _paq.push(['setTrackerUrl', u+'matomo.php']);
-    _paq.push(['setSiteId', '1']);
-    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-    g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-  })();
-</script>
-<!-- End Matomo Code -->
-
 <script async src="https://umami.woodburn.au/script.js" data-website-id="6a55028e-aad3-481c-9a37-3e096ff75589"></script>
 </head>
 
@@ -73,7 +56,7 @@
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item nav-link"><a class="nav-link" href="/">Home</a></li>
-                    <li class="nav-item nav-link"><a class="nav-link" href="projects">Projects</a></li>
+                    <li class="nav-item nav-link"><a class="nav-link" href="/projects">Projects</a></li>
                     <li class="nav-item nav-link"><a class="nav-link" href="/now">Now</a></li>
                 </ul>
             </div>
@@ -231,7 +214,7 @@ Check them out here!</blockquote><img class="img-fluid" src="/assets/img/pfront.
                         <li class="list-inline-item">&nbsp;<a class="btn btn-primary btn-lg btn-default" role="button" href="https://github.com/sponsors/Nathanwoodburn" style="width: 170px;" target="_blank"><i class="fab fa-github fa-fw"></i><span class="network-name">&nbsp; Github</span></a></li>
                         <li class="list-inline-item">&nbsp;<a class="btn btn-primary btn-lg btn-default" role="button" href="https://donate.stripe.com/8wM6pv0VD08Xe408ww" style="width: 170px;" target="_blank"><i class="fab fa-stripe-s fa-fw"></i><span class="network-name">&nbsp;Stripe</span></a></li>
                     </ul>
-                    <p>HNS:<br><code data-bs-toggle="tooltip" data-bss-tooltip="" id="hns" class="hns" style="color: rgb(242,90,5);" title="Click to copy">{{HNS}}</code><br>BTC:<br><code data-bs-toggle="tooltip" data-bss-tooltip="" id="btc" class="btc" style="color: rgb(242,90,5);" title="Click to copy">bc1qhs94zzcw64qnwq4hvk056rwxwvgrkd7tq7d4xw</code><br>ETH:<br><code data-bs-toggle="tooltip" data-bss-tooltip="" id="eth" class="eth" style="color: rgb(242,90,5);" title="Click to copy">0x6cB4B39bEc23a921C9a20D061Bf17d4640B0d39e</code></p>
+                    <p>HNS:<br><code data-bs-toggle="tooltip" data-bss-tooltip="" id="hns-domain" class="hns" style="color: rgb(242,90,5);display: block;" title="Click to copy">nathan.woodburn</code><code data-bs-toggle="tooltip" data-bss-tooltip="" id="hns" class="hns" style="color: rgb(242,90,5);display: block;" title="Click to copy">{{HNS}}</code><br>BTC:<br><code data-bs-toggle="tooltip" data-bss-tooltip="" id="btc" class="btc" style="color: rgb(242,90,5);display: block;" title="Click to copy">bc1qhs94zzcw64qnwq4hvk056rwxwvgrkd7tq7d4xw</code><br>SOL:<br><code data-bs-toggle="tooltip" data-bss-tooltip="" id="sol-domain" class="sol" style="color: rgb(242,90,5);display: block;" title="Click to copy">woodburn.sol</code><code data-bs-toggle="tooltip" data-bss-tooltip="" id="sol" class="sol" style="color: rgb(242,90,5);display: block;" title="Click to copy">AJsPEEe6S7XSiVcdZKbeV8GRp1QuhFUsG8mLrqL4XgiU</code><br>ETH:<br><code data-bs-toggle="tooltip" data-bss-tooltip="" id="eth-domain" class="eth" style="color: rgb(242,90,5);display: block;" title="Click to copy">woodburn.au</code><code data-bs-toggle="tooltip" data-bss-tooltip="" id="eth" class="eth" style="color: rgb(242,90,5);display: block;" title="Click to copy">0x6cB4B39bEc23a921C9a20D061Bf17d4640B0d39e</code><a class="btn btn-primary btn-default" role="button" href="/donate" style="width: 170px;">OTHER OPTIONS</a></p>
                 </div>
             </div>
         </div>
@@ -264,6 +247,10 @@ Check them out here!</blockquote><img class="img-fluid" src="/assets/img/pfront.
     const btc = document.getElementById('btc');
     const eth = document.getElementById('eth');
     const hns = document.getElementById('hns');
+    const sol = document.getElementById('sol');
+    const hnsdomain = document.getElementById('hns-domain');
+    const soldomain = document.getElementById('sol-domain');
+    const ethdomain = document.getElementById('eth-domain');
 
     btc.addEventListener('click', () => {
         copyToClipboard(btc);
@@ -273,6 +260,19 @@ Check them out here!</blockquote><img class="img-fluid" src="/assets/img/pfront.
     });
     hns.addEventListener('click', () => {
         copyToClipboard(hns);
+    });
+    sol.addEventListener('click', () => {
+        copyToClipboard(sol);
+    });
+
+    hnsdomain.addEventListener('click', () => {
+        copyToClipboard(hnsdomain);
+    });
+    soldomain.addEventListener('click', () => {
+        copyToClipboard(soldomain);
+    });
+    ethdomain.addEventListener('click', () => {
+        copyToClipboard(ethdomain);
     });
 </script>{{custom | safe}}
     <script src="/assets/bootstrap/js/bootstrap.min.js"></script>

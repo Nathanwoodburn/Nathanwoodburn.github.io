@@ -1,3 +1,4 @@
+import json
 from flask import Flask, make_response, redirect, request, jsonify, render_template, send_from_directory
 from flask_cors import CORS
 import os
@@ -83,8 +84,17 @@ def wallet(path):
         # Cookie should last 1 week
         resp.set_cookie('HNS', address, max_age=604800)
         return resp
+    
+    if path == ".domains":
+        return send_from_directory('.well-known/wallets', path, mimetype='application/json')
+    elif os.path.isfile('.well-known/wallets/' + path):
+        address = ''
+        with open('.well-known/wallets/' + path) as file:
+            address = file.read()
+        address = address.strip()
+        return make_response(address, 200, {'Content-Type': 'text/plain'})
 
-    return send_from_directory('.well-known/wallets', path, mimetype='text/plain')
+    return render_template('404.html'), 404
         
 
 
@@ -93,12 +103,17 @@ def wallet(path):
 def index():
     global address
     global handshake_scripts
-    git=requests.get('https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1&token=' + os.getenv('git_token'))
-    git = git.json()
-    git = git[0]
-    repo_name=git['repo']['name']
-    repo_name=repo_name.lower()
-    repo_description=git['repo']['description']
+    try:
+        git=requests.get('https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1&token=' + os.getenv('git_token'))
+        git = git.json()
+        git = git[0]
+        repo_name=git['repo']['name']
+        repo_name=repo_name.lower()
+        repo_description=git['repo']['description']
+    except:
+        repo_name = "nathanwoodburn.github.io"
+        repo_description = "Personal website"
+        git = {'repo': {'html_url': 'https://example.com', 'name': 'nathanwoodburn.github.io', 'description': 'Personal website'}}
     custom = ""
 
     # Check for downtime
@@ -200,6 +215,87 @@ def now_old():
     html += '</ul>'
     return render_template('now/old.html', handshake_scripts=handshake_scripts,now_pages=html)
 
+
+@app.route('/donate')
+def donate():
+    global handshake_scripts
+    # If localhost, don't load handshake
+    if request.host == "localhost:5000" or request.host == "127.0.0.1:5000" or os.getenv('dev') == "true" or request.host == "test.nathan.woodburn.au":
+        handshake_scripts = ""
+
+    coinList = os.listdir('.well-known/wallets')
+    coinList = [file for file in coinList if file[0] != '.']
+    coinList.sort()
+
+    tokenList = []
+
+    with open('.well-known/wallets/.tokens') as file:
+        tokenList = file.read()
+        tokenList = json.loads(tokenList)
+
+    coinNames = {}
+    with open('.well-known/wallets/.coins') as file:
+        coinNames = file.read()
+        coinNames = json.loads(coinNames)
+
+    coins = ''
+    default_coins = ['btc', 'eth', 'hns','sol','bnb','xrp','ada']
+
+
+    for file in coinList:
+        if file in coinNames:
+            coins += f'<a class="dropdown-item" style="{"display:none;" if file.lower() not in default_coins else ""}" href="?c={file.lower()}">{coinNames[file]}</a>'
+        else:
+            coins += f'<a class="dropdown-item" style="{"display:none;" if file.lower() not in default_coins else ""}" href="?c={file.lower()}">{file}</a>'
+
+    for token in tokenList:
+        coins += f'<a class="dropdown-item" style="display:none;" href="?t={token["symbol"].lower()}&c={token["chain"].lower()}">{token["name"]} ({token["symbol"] + " on " if token["symbol"] != token["name"] else ""}{token["chain"]})</a>'
+
+    crypto = request.args.get('c')
+    if not crypto:
+        instructions = '<br>Donate with cryptocurrency:<br>Select a coin from the dropdown above.'
+        return render_template('donate.html', handshake_scripts=handshake_scripts, coins=coins,default_coins=default_coins, crypto=instructions)
+    crypto = crypto.upper()
+
+    token = request.args.get('t')
+    if token:
+        token = token.upper()
+        for t in tokenList:
+            if t['symbol'].upper() == token and t['chain'].upper() == crypto:
+                token = t
+                break
+
+    address = ''
+    domain = ''
+    cryptoHTML = ''
+    if os.path.isfile(f'.well-known/wallets/{crypto}'):
+        with open(f'.well-known/wallets/{crypto}') as file:
+            address = file.read()
+            if not token:
+                cryptoHTML += f'<br>Donate with {coinNames[crypto] if crypto in coinNames else crypto}:'
+            else:
+                cryptoHTML += f'<br>Donate with {token["name"]} {"("+token["symbol"]+") " if token["symbol"] != token["name"] else ""}on {crypto}:'
+            cryptoHTML += f'<code data-bs-toggle="tooltip" data-bss-tooltip="" id="crypto-address" class="address" style="color: rgb(242,90,5);display: block;" data-bs-original-title="Click to copy">{address}</code>'
+    else:
+        cryptoHTML += f'<br>Invalid coin: {crypto}<br>'
+        
+        
+
+    if os.path.isfile(f'.well-known/wallets/.domains'):
+        # Get json of all domains
+        with open(f'.well-known/wallets/.domains') as file:
+            domains = file.read()
+            domains = json.loads(domains)
+            
+        if crypto in domains:
+            domain = domains[crypto]
+            cryptoHTML += '<br>Or send to this domain on compatible wallets:<br>'
+            cryptoHTML += f'<code data-bs-toggle="tooltip" data-bss-tooltip="" id="crypto-domain" class="address" style="color: rgb(242,90,5);display: block;" data-bs-original-title="Click to copy">{domain}</code>'
+
+    copyScript = '<script>document.getElementById("crypto-address").addEventListener("click", function() {navigator.clipboard.writeText(this.innerText);this.setAttribute("data-bs-original-title", "Copied!");});document.getElementById("crypto-domain").addEventListener("click", function() {navigator.clipboard.writeText(this.innerText);this.setAttribute("data-bs-original-title", "Copied!");});</script>'
+    cryptoHTML += copyScript
+
+    return render_template('donate.html', handshake_scripts=handshake_scripts, crypto=cryptoHTML, coins=coins,default_coins=default_coins)
 
 @app.route('/<path:path>')
 def catch_all(path):

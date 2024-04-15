@@ -1,0 +1,37 @@
+[
+    {
+        "symbol": "USDT",
+        "name": "USDT",
+        "chain": "ETH"
+    },
+    {
+        "symbol": "USDT",
+        "name": "USDT",
+        "chain": "SOL"
+    },
+    {
+        "symbol": "USDC",
+        "name": "USDC",
+        "chain": "ETH"
+    },
+    {
+        "symbol": "USDC",
+        "name": "USDC",
+        "chain": "SOL"
+    },
+    {
+        "symbol": "WDBRN",
+        "name": "Woodburn",
+        "chain": "SOL"
+    },
+    {
+        "symbol": "DAI",
+        "name": "DAI Stablecoin",
+        "chain": "ETH"
+    },
+    {
+        "symbol": "RAY",
+        "name": "Raydium",
+        "chain": "SOL"
+    }
+]

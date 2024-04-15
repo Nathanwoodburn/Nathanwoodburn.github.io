@@ -1,0 +1,20 @@
+{
+    "ADA": "Cardano (ADA)",
+    "ATOM": "Cosmos (ATOM)",
+    "AVAX": "Avalanche (AVAX)",
+    "BNB": "Binance Coin (BNB)",
+    "BTC": "Bitcoin (BTC)",
+    "CRO": "Crypto.com Coin (CRO)",
+    "DOT": "Polkadot (DOT)",
+    "ETH": "Ethereum (ETH)",
+    "HNS": "Handshake (HNS)",
+    "MATIC": "Polygon (MATIC)",
+    "SOL": "Solana (SOL)",
+    "XMR": "Monero (XMR)",
+    "XRP": "Ripple (XRP)",
+    "OSMO": "Osmosis (OSMO)",
+    "STARS": "Stargaze (STARS)",
+    "INJ": "Injective (INJ)",
+    "LIKE": "LikeCoin (LIKE)",
+    "SCRT": "Secret Network (SCRT)"
+}
