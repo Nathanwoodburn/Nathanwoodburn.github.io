@@ -85,7 +85,7 @@ def wallet(path):
         resp.set_cookie('HNS', address, max_age=604800)
         return resp
     
-    if path == ".domains":
+    if path[0] == ".":
         return send_from_directory('.well-known/wallets', path, mimetype='application/json')
     elif os.path.isfile('.well-known/wallets/' + path):
         address = ''
@@ -93,6 +93,9 @@ def wallet(path):
             address = file.read()
         address = address.strip()
         return make_response(address, 200, {'Content-Type': 'text/plain'})
+
+    if os.path.isfile('.well-known/wallets/' + path.upper()):
+        return redirect('/.well-known/wallets/' + path.upper(), code=302)
 
     return render_template('404.html'), 404
         
