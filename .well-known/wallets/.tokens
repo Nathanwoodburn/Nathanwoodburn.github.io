@@ -33,5 +33,30 @@
         "symbol": "RAY",
         "name": "Raydium",
         "chain": "SOL"
+    },
+    {
+        "symbol": "UNI",
+        "name": "Uniswap",
+        "chain": "ETH"
+    },
+    {
+        "symbol": "AAVE",
+        "name": "AAVE",
+        "chain": "ETH"
+    },
+    {
+        "symbol": "1INCH",
+        "name": "1INCH",
+        "chain": "ETH"
+    },
+    {
+        "symbol": "PSP",
+        "name": "ParaSwap",
+        "chain": "ETH"
+    },
+    {
+        "symbol": "CAKE",
+        "name": "PancakeSwap",
+        "chain": "BNB"
     }
 ]

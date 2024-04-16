@@ -16,5 +16,8 @@
     "STARS": "Stargaze (STARS)",
     "INJ": "Injective (INJ)",
     "LIKE": "LikeCoin (LIKE)",
-    "SCRT": "Secret Network (SCRT)"
+    "SCRT": "Secret Network (SCRT)",
+    "LTC": "Litecoin (LTC)",
+    "DOGE": "Dogecoin (DOGE)",
+    "ALGO": "Algorand (ALGO)"
 }

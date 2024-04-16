@@ -267,6 +267,8 @@ def donate():
             if t['symbol'].upper() == token and t['chain'].upper() == crypto:
                 token = t
                 break
+        if not isinstance(token, dict):
+            token = None
 
     address = ''
     domain = ''
