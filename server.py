@@ -304,7 +304,7 @@ def donate():
             cryptoHTML += f'<br>Donate with {token["name"]} {"("+token["symbol"]+")" if token["symbol"] != token["name"] else ""}{" on "+crypto if crypto != "NULL" else ""}:'
             cryptoHTML += f'<code data-bs-toggle="tooltip" data-bss-tooltip="" id="crypto-address" class="address" style="color: rgb(242,90,5);display: block;" data-bs-original-title="Click to copy">{address}</code>'
         else:
-            cryptoHTML += f'<br>Invalid token: {token["name"]} ({token["symbol"]})<br>'
+            cryptoHTML += f'<br>Invalid coin: {crypto}<br>'
     else:
         cryptoHTML += f'<br>Invalid coin: {crypto}<br>'
         
@@ -320,8 +320,8 @@ def donate():
             domain = domains[crypto]
             cryptoHTML += '<br>Or send to this domain on compatible wallets:<br>'
             cryptoHTML += f'<code data-bs-toggle="tooltip" data-bss-tooltip="" id="crypto-domain" class="address" style="color: rgb(242,90,5);display: block;" data-bs-original-title="Click to copy">{domain}</code>'
-
-    cryptoHTML += '<img src="/qrcode/' + address + '" alt="QR Code" style="width: 100%; max-width: 200px; margin: 20px auto;">'
+    if address:
+        cryptoHTML += '<img src="/qrcode/' + address + '" alt="QR Code" style="width: 100%; max-width: 200px; margin: 20px auto;">'
 
 
     copyScript = '<script>document.getElementById("crypto-address").addEventListener("click", function() {navigator.clipboard.writeText(this.innerText);this.setAttribute("data-bs-original-title", "Copied!");});document.getElementById("crypto-domain").addEventListener("click", function() {navigator.clipboard.writeText(this.innerText);this.setAttribute("data-bs-original-title", "Copied!");});</script>'
