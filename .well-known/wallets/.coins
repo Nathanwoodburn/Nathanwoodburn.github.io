@@ -22,5 +22,6 @@
     "ALGO": "Algorand (ALGO)",
     "TON": "Toncoin (TON)",
     "OP": "Optimism (OP)",
-    "IAA": "IRIS (IAA)"
+    "IAA": "IRIS (IAA)",
+    "NEAR": "NEAR Protocol (NEAR)"
 }
