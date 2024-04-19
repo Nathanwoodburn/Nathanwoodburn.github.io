@@ -262,7 +262,10 @@ def donate():
             coins += f'<a class="dropdown-item" style="{"display:none;" if file.lower() not in default_coins else ""}" href="?c={file.lower()}">{file}</a>'
 
     for token in tokenList:
-        coins += f'<a class="dropdown-item" style="display:none;" href="?t={token["symbol"].lower()}&c={token["chain"].lower()}">{token["name"]} ({token["symbol"] + " on " if token["symbol"] != token["name"] else ""}{token["chain"]})</a>'
+        if token["chain"] != 'null':
+            coins += f'<a class="dropdown-item" style="display:none;" href="?t={token["symbol"].lower()}&c={token["chain"].lower()}">{token["name"]} ({token["symbol"] + " on " if token["symbol"] != token["name"] else ""}{token["chain"]})</a>'
+        else:
+           coins += f'<a class="dropdown-item" style="display:none;" href="?t={token["symbol"].lower()}&c={token["chain"].lower()}">{token["name"]} ({token["symbol"] if token["symbol"] != token["name"] else ""})</a>'
 
     crypto = request.args.get('c')
     if not crypto:
@@ -295,6 +298,13 @@ def donate():
             else:
                 cryptoHTML += f'<br>Donate with {token["name"]} {"("+token["symbol"]+") " if token["symbol"] != token["name"] else ""}on {crypto}:'
             cryptoHTML += f'<code data-bs-toggle="tooltip" data-bss-tooltip="" id="crypto-address" class="address" style="color: rgb(242,90,5);display: block;" data-bs-original-title="Click to copy">{address}</code>'
+    elif token:
+        if 'address' in token:
+            address = token['address']
+            cryptoHTML += f'<br>Donate with {token["name"]} {"("+token["symbol"]+")" if token["symbol"] != token["name"] else ""}{" on "+crypto if crypto != "NULL" else ""}:'
+            cryptoHTML += f'<code data-bs-toggle="tooltip" data-bss-tooltip="" id="crypto-address" class="address" style="color: rgb(242,90,5);display: block;" data-bs-original-title="Click to copy">{address}</code>'
+        else:
+            cryptoHTML += f'<br>Invalid token: {token["name"]} ({token["symbol"]})<br>'
     else:
         cryptoHTML += f'<br>Invalid coin: {crypto}<br>'
         

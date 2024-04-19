@@ -58,5 +58,11 @@
         "symbol": "CAKE",
         "name": "PancakeSwap",
         "chain": "BNB"
+    },
+    {
+        "symbol": "BTC",
+        "name": "Bitcoin Lightning",
+        "chain": "null",
+        "address": "hushedmercury55@walletofsatoshi.com"
     }
 ]
