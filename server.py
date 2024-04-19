@@ -1,11 +1,14 @@
 import json
-from flask import Flask, make_response, redirect, request, jsonify, render_template, send_from_directory
+from flask import Flask, make_response, redirect, request, jsonify, render_template, send_from_directory, send_file
 from flask_cors import CORS
 import os
 import dotenv
 import requests
 import CloudFlare
 import datetime
+import qrcode
+import re
+from ansi2html import Ansi2HTMLConverter
 
 app = Flask(__name__)
 CORS(app)
@@ -14,6 +17,13 @@ dotenv.load_dotenv()
 
 address = ''
 handshake_scripts = '<script src="https://nathan.woodburn/handshake.js" domain="nathan.woodburn" async></script><script src="https://nathan.woodburn/https.js" async></script>'
+
+restricted = ['ascii']
+
+sites = []
+if os.path.isfile('data/sites.json'):
+    with open('data/sites.json') as file:
+        sites = json.load(file)
 
 # Custom header
 def add_custom_header(response):
@@ -116,7 +126,7 @@ def index():
     except:
         repo_name = "nathanwoodburn.github.io"
         repo_description = "Personal website"
-        git = {'repo': {'html_url': 'https://example.com', 'name': 'nathanwoodburn.github.io', 'description': 'Personal website'}}
+        git = {'repo': {'html_url': 'https://nathan.woodburn.au', 'name': 'nathanwoodburn.github.io', 'description': 'Personal website'}}
     custom = ""
 
     # Check for downtime
@@ -140,12 +150,12 @@ def index():
     
 
     if request.cookies.get('HNS'):
-            return render_template('index.html', handshake_scripts=handshake_scripts, HNS=request.cookies.get('HNS'), repo=repo, repo_description=repo_description, custom=custom)
+            return render_template('index.html', handshake_scripts=handshake_scripts, HNS=request.cookies.get('HNS'), repo=repo, repo_description=repo_description, custom=custom,sites=sites)
     
     if address == '':
         address = getAddress()
     # Set cookie
-    resp = make_response(render_template('index.html', handshake_scripts=handshake_scripts, HNS=address, repo=repo, repo_description=repo_description, custom=custom), 200, {'Content-Type': 'text/html'})
+    resp = make_response(render_template('index.html', handshake_scripts=handshake_scripts, HNS=address, repo=repo, repo_description=repo_description, custom=custom,sites=sites), 200, {'Content-Type': 'text/html'})
     # Cookie should last 1 week
     resp.set_cookie('HNS', address, max_age=604800)
     return resp
@@ -268,7 +278,11 @@ def donate():
                 token = t
                 break
         if not isinstance(token, dict):
-            token = None
+            token = {
+                "name": "Unknown token",
+                "symbol": token,
+                "chain": crypto
+            }
 
     address = ''
     domain = ''
@@ -297,10 +311,44 @@ def donate():
             cryptoHTML += '<br>Or send to this domain on compatible wallets:<br>'
             cryptoHTML += f'<code data-bs-toggle="tooltip" data-bss-tooltip="" id="crypto-domain" class="address" style="color: rgb(242,90,5);display: block;" data-bs-original-title="Click to copy">{domain}</code>'
 
+    cryptoHTML += '<img src="/qrcode/' + address + '" alt="QR Code" style="width: 100%; max-width: 200px; margin: 20px auto;">'
+
+
     copyScript = '<script>document.getElementById("crypto-address").addEventListener("click", function() {navigator.clipboard.writeText(this.innerText);this.setAttribute("data-bs-original-title", "Copied!");});document.getElementById("crypto-domain").addEventListener("click", function() {navigator.clipboard.writeText(this.innerText);this.setAttribute("data-bs-original-title", "Copied!");});</script>'
     cryptoHTML += copyScript
 
     return render_template('donate.html', handshake_scripts=handshake_scripts, crypto=cryptoHTML, coins=coins,default_coins=default_coins)
+
+@app.route('/qrcode/<path:data>')
+def addressQR(data):
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(data)
+    qr.make(fit=True)
+    qr_image = qr.make_image(fill_color="#110033", back_color="white")
+
+
+    # Save the QR code image to a temporary file
+    qr_image_path = "/tmp/qr_code.png"
+    qr_image.save(qr_image_path)
+
+    # Return the QR code image as a response
+    return send_file(qr_image_path, mimetype="image/png")
+
+@app.route('/supersecretpath')
+def supersecretpath():
+    ascii_art = ''
+    if os.path.isfile('data/ascii.txt'):
+        with open('data/ascii.txt') as file:
+            ascii_art = file.read()
+        
+    converter = Ansi2HTMLConverter()
+    ascii_art_html = converter.convert(ascii_art)
+    return render_template('ascii.html', ascii_art=ascii_art_html)
 
 @app.route('/<path:path>')
 def catch_all(path):
@@ -308,6 +356,9 @@ def catch_all(path):
     # If localhost, don't load handshake
     if request.host == "localhost:5000" or request.host == "127.0.0.1:5000" or os.getenv('dev') == "true" or request.host == "test.nathan.woodburn.au":
         handshake_scripts = ""
+
+    if path.lower().replace('.html','') in restricted:
+        return render_template('404.html'), 404
     # If file exists, load it
     if os.path.isfile('templates/' + path):
         return render_template(path, handshake_scripts=handshake_scripts)
@@ -358,8 +409,6 @@ def hnsdoh_acme():
     record = cf.zones.dns_records.post(zone_id, data={'type': 'TXT', 'name': '_acme-challenge', 'content': txt})
     print(record)
     return jsonify({'status': 'success'})
-
-
 
 # 404 catch all
 @app.errorhandler(404)

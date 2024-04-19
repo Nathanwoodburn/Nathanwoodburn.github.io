@@ -1,12 +1,12 @@
 [
     {
         "symbol": "USDT",
-        "name": "USDT",
+        "name": "Tether",
         "chain": "ETH"
     },
     {
         "symbol": "USDT",
-        "name": "USDT",
+        "name": "Tether",
         "chain": "SOL"
     },
     {

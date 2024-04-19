@@ -4,3 +4,5 @@ python-dotenv
 gunicorn
 requests
 cloudflare
+qrcode
+ansi2html

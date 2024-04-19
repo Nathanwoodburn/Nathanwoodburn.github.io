@@ -19,5 +19,8 @@
     "SCRT": "Secret Network (SCRT)",
     "LTC": "Litecoin (LTC)",
     "DOGE": "Dogecoin (DOGE)",
-    "ALGO": "Algorand (ALGO)"
+    "ALGO": "Algorand (ALGO)",
+    "TON": "Toncoin (TON)",
+    "OP": "Optimism (OP)",
+    "IAA": "IRIS (IAA)"
 }

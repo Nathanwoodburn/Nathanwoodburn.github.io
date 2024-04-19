@@ -103,72 +103,26 @@ Check them out here!</blockquote><img class="img-fluid" src="/assets/img/pfront.
         <div class="site-container">
             <h1>My Websites</h1>
             <div class="swiper">
-                <div class="swiper-wrapper">
-                    <div class="swiper-slide site" data-url="https://nathan3dprinting.au"><img class="site-img" src="/assets/img/favicon_trans.webp">
-                        <div class="site-body">
-                            <div class="site-detail" style="width: 100%;">
-                                <h2 class="site-name" style="text-align: left;">Nathan 3D Printing</h2>
-                                <p class="text-start site-author">Offering 3D Printing and CAD modelling services to the Canberra region</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="swiper-slide site" data-url="https://domains.hns.au"><img class="site-img" src="/assets/img/HNSAU.webp">
-                        <div class="d-lg-flex justify-content-lg-center align-items-lg-start site-body">
-                            <div class="site-detail" style="width: 100%;">
-                                <h2 class="site-name" style="text-align: left;">HNSAU Registry</h2>
-                                <p class="text-start site-author">An easy to use DNS provider and domain reselling platform</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="swiper-slide site" data-url="https://hns.au"><img class="site-img" src="/assets/img/HNSAU_white.webp">
-                        <div class="d-lg-flex justify-content-lg-center align-items-lg-start site-body">
-                            <div class="site-detail" style="width: 100%;">
-                                <h2 class="site-name" style="text-align: left;">HNSAU</h2>
-                                <p class="text-start site-author">The group for Handshake enthusiasts in Australia</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="swiper-slide site" data-url="https://hnshosting.au"><img class="site-img" src="/assets/img/logo.png">
-                        <div class="d-lg-flex justify-content-lg-center align-items-lg-start site-body">
-                            <div class="site-detail" style="width: 100%;">
-                                <h2 class="site-name" style="text-align: left;">HNSHosting</h2>
-                                <p class="text-start site-author">Simple Wordpress hosting for Handshake domains with builtin SSL using DANE</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="swiper-slide site" data-url="https://firewallet.au"><img class="site-img" src="/assets/img/firewallet.png">
-                        <div class="d-lg-flex justify-content-lg-center align-items-lg-start site-body">
-                            <div class="site-detail" style="width: 100%;">
-                                <h2 class="site-name" style="text-align: left;">FireWallet</h2>
-                                <p class="text-start site-author">An opensource Handshake wallet that is Fire!</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="swiper-slide site" data-url="https://shakecities.com"><img class="site-img" src="/assets/img/HNSW.png">
-                        <div class="d-lg-flex justify-content-lg-center align-items-lg-start site-body">
-                            <div class="site-detail" style="width: 100%;">
-                                <h2 class="site-name" style="text-align: left;">ShakeCities</h2>
-                                <p class="text-start site-author">A single page website creator where each user's page on their free HNS domain</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="swiper-slide site" data-url="https://git.woodburn.au"><img class="site-img" src="/assets/img/logo.png">
-                        <div class="d-lg-flex justify-content-lg-center align-items-lg-start site-body">
-                            <div class="site-detail" style="width: 100%;">
-                                <h2 class="site-name" style="text-align: left;">Git Server</h2>
-                                <p class="text-start site-author">Selfhosted Git server to host my repos with custom hosted CI/CD&nbsp;</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="swiper-slide site" data-url="https://linkr"><img class="site-img" src="/assets/img/logo.png">
-                        <div class="d-lg-flex justify-content-lg-center align-items-lg-start site-body">
-                            <div class="site-detail" style="width: 100%;">
-                                <h2 class="site-name" style="text-align: left;">LINKR/</h2>
-                                <p class="text-start site-author">A free link shortener with a Handshake TLD and using DNS for authentication</p>
-                            </div>
-                        </div>
+                <div class="swiper-wrapper"><!-- <div class="swiper-slide site" data-url="https://nathan3dprinting.au"><img class="site-img" src="/assets/img/favicon_trans.webp" />
+    <div class="site-body">
+        <div class="site-detail" style="width: 100%;">
+            <h2 class="site-name" style="text-align: left;">Nathan 3D Printing</h2>
+            <p class="text-start site-author">Offering 3D Printing and CAD modelling services to the Canberra region</p>
+        </div>
+    </div>
+</div> -->
+
+{% for site in sites %}
+            <div class="swiper-slide site" data-url="{{ site.url }}">
+                <img class="site-img" src="{{ site.img }}" />
+                <div class="site-body">
+                    <div class="site-detail" style="width: 100%;">
+                        <h2 class="site-name" style="text-align: left;">{{ site.name }}</h2>
+                        <p class="text-start site-author">{{ site.description }}</p>
                     </div>
                 </div>
+            </div>
+            {% endfor %}</div>
                 <div class="swiper-scrollbar"></div>
             </div>
         </div>
@@ -286,6 +240,7 @@ Check them out here!</blockquote><img class="img-fluid" src="/assets/img/pfront.
     <script src="/assets/js/script.min.js"></script>
     <script src="/assets/js/hacker.min.js"></script>
     <script src="/assets/js/downtime.min.js"></script>
+    <script src="/assets/js/pfp.min.js"></script>
     <script src="/assets/js/sites.min.js"></script>
 </body>
 

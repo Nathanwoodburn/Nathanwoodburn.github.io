@@ -1,0 +1,50 @@
+[
+    {
+        "url": "https://nathan3dprinting.au",
+        "img": "/assets/img/favicon_trans.webp",
+        "name": "Nathan 3D Printing",
+        "description": "Offering 3D Printing and CAD modelling services to the Canberra region"
+    },
+    {
+        "url": "https://domains.hns.au",
+        "img": "/assets/img/HNSAU.webp",
+        "name": "HNSAU Registry",
+        "description": "An easy to use DNS provider and domain reselling platform"
+    },
+    {
+        "url": "https://hns.au",
+        "img": "/assets/img/HNSAU.webp",
+        "name": "HNSAU",
+        "description": "The group for Handshake enthusiasts in Australia"
+    },
+    {
+        "url": "https://hnshosting.au",
+        "img": "/assets/img/logo.png",
+        "name": "HNS Hosting",
+        "description": "Simple Wordpress hosting for Handshake domains with builtin SSL using DANE"
+    },
+    {
+        "url": "https://firewallet.au",
+        "img": "/assets/img/firewallet.png",
+        "name": "FireWallet",
+        "description": "An opensource Handshake wallet that is Fire!"
+    },
+    {
+        "url": "https://shakecities.com",
+        "img": "/assets/img/HNSW.png",
+        "name": "ShakeCities",
+        "description": "A single page website creator where each user's page on their free HNS domain"
+    },
+    {
+        "url": "https://git.woodburn.au",
+        "img": "/assets/img/logo.png",
+        "name": "Git Server",
+        "description": "Selfhosted Git server to host my repos with custom hosted CI/CD"
+    },
+    {
+        "url": "https://linkr",
+        "img": "/assets/img/logo.png",
+        "name": "LINKR/",
+        "description": "A free link shortener with a Handshake TLD and using DNS for authentication"
+    }
+]
