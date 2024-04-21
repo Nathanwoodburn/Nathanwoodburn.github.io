@@ -108,7 +108,18 @@ def wallet(path):
         return redirect('/.well-known/wallets/' + path.upper(), code=302)
 
     return render_template('404.html'), 404
-        
+
+@app.route('/.well-known/nostr.json')
+def nostr():
+    # Get name parameter
+    name = request.args.get('name')
+    if not name:
+        return jsonify({'error': 'No name provided'})
+    return jsonify({
+        'names': {
+            name: 'b57b6a06fdf0a4095eba69eee26e2bf6fa72bd1ce6cbe9a6f72a7021c7acaa82'
+        }
+    })
 
 
 # Main routes
