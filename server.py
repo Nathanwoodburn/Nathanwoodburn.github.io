@@ -439,13 +439,20 @@ def hnsdoh_acme():
 @app.route('/ID1')
 def ID1():
     # Proxy to ID1 url
-    req = requests.get('https://id1.woodburn.au')
+    req = requests.get('https://id1.woodburn.au/ID1')
+    return make_response(req.content, 200, {'Content-Type': req.headers['Content-Type']})
+
+@app.route('/ID1/')
+def ID1_slash():
+    # Proxy to ID1 url
+    req = requests.get('https://id1.woodburn.au/ID1/')
     return make_response(req.content, 200, {'Content-Type': req.headers['Content-Type']})
 
 @app.route('/ID1/<path:path>')
 def ID1_path(path):
     # Proxy to ID1 url
-    req = requests.get('https://id1.woodburn.au/' + path)
+    print('https://id1.woodburn.au/ID1/' + path)
+    req = requests.get('https://id1.woodburn.au/ID1/' + path)
     return make_response(req.content, 200, {'Content-Type': req.headers['Content-Type']})
 
 @app.route('/ID1.xml')
