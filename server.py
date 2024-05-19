@@ -125,6 +125,11 @@ def nostr():
 # Main routes
 @app.route('/')
 def index():
+    # Check if host if podcast.woodburn.au
+    if "podcast.woodburn.au" in request.host:
+        return render_template('podcast.html')
+
+
     global address
     global handshake_scripts
     try:
