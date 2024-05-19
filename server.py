@@ -436,6 +436,31 @@ def hnsdoh_acme():
     print(record)
     return jsonify({'status': 'success'})
 
+@app.route('/ID1')
+def ID1():
+    # Proxy to ID1 url
+    req = requests.get('https://id1.woodburn.au')
+    return make_response(req.content, 200, {'Content-Type': req.headers['Content-Type']})
+
+@app.route('/ID1/<path:path>')
+def ID1_path(path):
+    # Proxy to ID1 url
+    req = requests.get('https://id1.woodburn.au/' + path)
+    return make_response(req.content, 200, {'Content-Type': req.headers['Content-Type']})
+
+@app.route('/ID1.xml')
+def ID1_xml():
+    # Proxy to ID1 url
+    req = requests.get('https://id1.woodburn.au/ID1.xml')
+    return make_response(req.content, 200, {'Content-Type': req.headers['Content-Type']})
+
+@app.route('/podsync.opml')
+def podsync():
+    req = requests.get('https://id1.woodburn.au/podsync.opml')
+    return make_response(req.content, 200, {'Content-Type': req.headers['Content-Type']})
+
+
+
 # 404 catch all
 @app.errorhandler(404)
 def not_found(e):
