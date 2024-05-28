@@ -25,11 +25,11 @@ if os.path.isfile('data/sites.json'):
     with open('data/sites.json') as file:
         sites = json.load(file)
 
-# Custom header
-def add_custom_header(response):
-    response.headers['Onion-Location'] = 'http://wdbrncwefot4hd7bdrz5rzb74mefay7zvrjn2vmkpdm44l7fwnih5ryd.onion/'
-    return response
-app.after_request(add_custom_header)
+# Custom header for TOR
+# def add_custom_header(response):
+#     response.headers['Onion-Location'] = 'http://wdbrncwefot4hd7bdrz5rzb74mefay7zvrjn2vmkpdm44l7fwnih5ryd.onion/'
+#     return response
+# app.after_request(add_custom_header)
 
 
 #Assets routes
