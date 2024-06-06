@@ -212,6 +212,9 @@ def now_path(path):
         date = date.strftime('%A, %B %d, %Y')
     except:
         date = ""
+    
+    if path.lower().replace('.html','') == 'template':
+        return render_template('404.html'), 404
 
     # If file exists, load it
     if os.path.isfile('templates/now/' + path):
@@ -221,6 +224,8 @@ def now_path(path):
     
     return render_template('404.html'), 404
 
+@app.route('/old')
+@app.route('/old/')
 @app.route('/now/old')
 @app.route('/now/old/')
 def now_old():
