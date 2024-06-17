@@ -119,16 +119,19 @@ def index():
     if "podcast.woodburn.au" in request.host:
         return render_template('podcast.html')
     
-
+    loaded = False
     # Check if referrer is from handshake
     if request.referrer:
         print(request.referrer,flush=True)
+        # Check if referrer includes nathan.woodburn.au
+        if "nathan.woodburn.au" in request.referrer:
+            loaded = True
     else:
         print("No referrer",flush=True)
             
 
     # Check if cookie is set
-    if not request.cookies.get('loaded'):
+    if not request.cookies.get('loaded') and not loaded:
         # Set cookie
         resp = make_response(render_template('loading.html'), 200, {'Content-Type': 'text/html'})
         resp.set_cookie('loaded', 'true', max_age=604800)
@@ -177,6 +180,10 @@ def index():
     resp = make_response(render_template('index.html', handshake_scripts=handshake_scripts, HNS=address, repo=repo, repo_description=repo_description, custom=custom,sites=sites), 200, {'Content-Type': 'text/html'})
     # Cookie should last 1 week
     resp.set_cookie('HNS', address, max_age=604800)
+
+    if loaded:
+        resp.set_cookie('loaded', 'true', max_age=604800)
+
     return resp
 
 @app.route('/now')
