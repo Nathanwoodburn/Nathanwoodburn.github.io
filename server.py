@@ -120,6 +120,13 @@ def index():
         return render_template('podcast.html')
     
 
+    # Check if referrer is from handshake
+    if request.referrer:
+        print(request.referrer,flush=True)
+    else:
+        print("No referrer",flush=True)
+            
+
     # Check if cookie is set
     if not request.cookies.get('loaded'):
         # Set cookie
