@@ -25,12 +25,6 @@ if os.path.isfile('data/sites.json'):
     with open('data/sites.json') as file:
         sites = json.load(file)
 
-# Custom header for TOR
-# def add_custom_header(response):
-#     response.headers['Onion-Location'] = 'http://wdbrncwefot4hd7bdrz5rzb74mefay7zvrjn2vmkpdm44l7fwnih5ryd.onion/'
-#     return response
-# app.after_request(add_custom_header)
-
 
 #Assets routes
 @app.route('/assets/<path:path>')
@@ -58,15 +52,11 @@ def sitemap():
 
 @app.route('/favicon.png')
 def faviconPNG():
-    return send_from_directory('templates/assets/img', 'android-chrome-512x512.png')
-
-@app.route('/favicon.ico')
-def favicon():
-    return send_from_directory('templates/assets/img', 'favicon.ico')
+    return send_from_directory('templates/assets/img/favicon', 'favicon.png')
 
 @app.route('/favicon.svg')
 def faviconSVG():
-    return send_from_directory('templates/assets/img', 'favicon.svg')
+    return send_from_directory('templates/assets/img/favicon', 'favicon.svg')
 
 @app.route('/https.js')
 @app.route('/handshake.js')
@@ -128,7 +118,15 @@ def index():
     # Check if host if podcast.woodburn.au
     if "podcast.woodburn.au" in request.host:
         return render_template('podcast.html')
+    
 
+    # Check if cookie is set
+    if not request.cookies.get('loaded'):
+        # Set cookie
+        resp = make_response(render_template('loading.html'), 200, {'Content-Type': 'text/html'})
+        resp.set_cookie('loaded', 'true', max_age=604800)
+        return resp
+        
 
     global address
     global handshake_scripts
@@ -162,8 +160,6 @@ def index():
     # If localhost, don't load handshake
     if request.host == "localhost:5000" or request.host == "127.0.0.1:5000" or os.getenv('dev') == "true" or request.host == "test.nathan.woodburn.au":
         handshake_scripts = ""
-    
-    
 
     if request.cookies.get('HNS'):
             return render_template('index.html', handshake_scripts=handshake_scripts, HNS=request.cookies.get('HNS'), repo=repo, repo_description=repo_description, custom=custom,sites=sites)
