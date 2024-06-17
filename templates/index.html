@@ -3,13 +3,6 @@
 
 <head>
     <meta charset="utf-8">
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-NNXTCKW');</script>
-<!-- End Google Tag Manager -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Nathan.Woodburn/</title>
     <meta name="theme-color" content="#97009a">
@@ -33,14 +26,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             "url": "https://nathan.woodburn.au"
         }
     </script>
-    <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="/assets/img/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="180x180" href="/assets/img/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/android-chrome-192x192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="/assets/img/android-chrome-512x512.png">
+    <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="/assets/img/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="180x180" href="/assets/img/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/img/favicon/android-chrome-512x512.png">
     <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic&amp;display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Cabin:700&amp;display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Anonymous+Pro&amp;display=swap">
@@ -52,22 +45,19 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <link rel="stylesheet" href="/assets/css/styles.min.css">
     <link rel="stylesheet" href="/assets/css/index.min.css">
     <link rel="stylesheet" href="/assets/css/profile.min.css">
+    <link rel="stylesheet" href="/assets/css/swiper.min.css">
 <link rel="me" href="https://mastodon.woodburn.au/@nathanwoodburn" />
+<script async src="https://umami.woodburn.au/script.js" data-website-id="6a55028e-aad3-481c-9a37-3e096ff75589"></script>
 </head>
 
-<body id="page-top" data-bs-spy="scroll" data-bs-target="#mainNav" data-bs-offset="77">
-{{handshake_scripts | safe}}
-<!-- <script src="https://nathan.woodburn/handshake.js" domain="nathan.woodburn"></script>
-<script src="https://nathan.woodburn/https.js"></script> --><!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NNXTCKW"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
-    <nav class="navbar navbar-expand-md fixed-top navbar-light" id="mainNav" style="background: var(--bs-navbar-hover-color);position: absolute;">
+<body id="page-top" data-bs-spy="scroll" data-bs-target="#mainNav" data-bs-offset="77">{{handshake_scripts | safe}}
+    <nav class="navbar navbar-expand-md fixed-top navbar-light" id="mainNav" style="background: var(--bs-navbar-hover-color);">
         <div class="container-fluid"><a class="navbar-brand nathanwoodburn" href="/#">Nathan.Woodburn/</a><button data-bs-toggle="collapse" class="navbar-toggler navbar-toggler-right" data-bs-target="#navbarResponsive" type="button" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation" value="Menu"><i class="fa fa-bars"></i></button>
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item nav-link"><a class="nav-link" href="/">Home</a></li>
-                    <li class="nav-item nav-link"><a class="nav-link" href="projects">Projects</a></li>
+                    <li class="nav-item nav-link"><a class="nav-link" href="/projects">Projects</a></li>
+                    <li class="nav-item nav-link"><a class="nav-link" href="/now">Now</a></li>
                 </ul>
             </div>
         </div>
@@ -75,12 +65,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="text-end d-none d-xl-block d-xxl-block" id="downtime"><blockquote class="speech bubble"><em>G'day!</em><br>
 Some services are down.<br>
 Check them out here!</blockquote><img class="img-fluid" src="/assets/img/pfront.webp"></div>
-    <header class="masthead main" style="background: url(&quot;/assets/img/bg/background.webp&quot;) bottom / cover;position: relative;">
+    <header class="masthead main" style="background: url(&quot;/assets/img/bg/main.webp&quot;) center / cover;position: relative;height: 400px;">
         <div class="intro-body text parallax" style="color: rgb(0,0,0);">
-            <h1 class="d-none d-print-inline-block d-sm-inline-block d-md-inline-block d-lg-inline-block d-xl-inline-block d-xxl-inline-block inner-text" style="font-size: 70px;">G'day, Welcome to<br>my Personal Site</h1>
-            <h1 class="d-inline-block d-print-none d-sm-none d-md-none d-lg-none d-xl-none d-xxl-none inner-text" style="font-size: 70px;">G'day!</h1>
-            <h2 class="inner-text">Nathan Woodburn</h2>
-        </div><img class="fog" src="/assets/img/bg/fog_1.webp" alt="">
+            <h1 class="inner-text">Nathan.Woodburn/</h1>
+        </div>
     </header>
     <section class="text-center content-section" id="about" style="padding-bottom: 0px;background: black;">
         <div class="container">
@@ -88,7 +76,7 @@ Check them out here!</blockquote><img class="img-fluid" src="/assets/img/pfront.
                 <div class="col-lg-8 mx-auto">
                     <h2>About ME</h2>
                     <div class="profile-container" style="margin-bottom: 2em;"><img class="profile background" src="/assets/img/profile.jpg" style="border-radius: 50%;" alt="My Profile"><img class="profile foreground" src="/assets/img/pfront.webp" alt=""></div>
-                    <p style="margin-bottom: 5px;">Hi, I'm Nathan Woodburn and I live in Canberra, Australia.<br>I've been home schooled all the way to Yr 12.<br>I'm currently studying a&nbsp;Bachelor of Computer Science.<br>I started a 3D printing service in early 2021.<br>I'm one of the founders of <a href="https://hns.au" target="_blank">Handshake AU</a>&nbsp;working to increase Handshake adoption in Australia.<br>I work for <a href="https://www.namebase.io" target="_blank">Namebase</a>&nbsp;as tech and general support. Namebase is a US based company owned by <a href="https://namecheap.com" target="_blank">Namecheap</a>.</p>
+                    <p style="margin-bottom: 5px;">Hi, I'm Nathan Woodburn and I live in Canberra, Australia.<br>I've been home schooled all the way to Yr 12.<br>I'm currently studying a&nbsp;Bachelor of Computer Science.<br>I create tons of random projects so this site is often behind.<br>I'm one of the founders of <a href="https://hns.au" target="_blank">Handshake AU</a>&nbsp;working to increase Handshake adoption in Australia.<br>I work for <a href="https://www.namebase.io" target="_blank">Namebase</a>&nbsp;as tech and general support. Namebase is a US based company owned by <a href="https://namecheap.com" target="_blank">Namecheap</a>.</p>
                     <p title="{{repo_description}}" style="margin-bottom: 0px;display: inline-block;">I'm currently working on</p>
                     <p data-bs-toggle="tooltip" data-bss-tooltip="" title="{{repo_description}}" style="display: inline-block;">{{repo | safe}}</p>
                 </div>
@@ -99,7 +87,7 @@ Check them out here!</blockquote><img class="img-fluid" src="/assets/img/pfront.
                     <ul class="list-unstyled" style="font-size: 18px;">
                         <li class="printing">3D Printing</li>
                         <li>Autodesk Fusion 360 (CAD Modeling)</li>
-                        <li class="programc">C# Programming</li>
+                        <li class="programc">Programming with various languages</li>
                         <li>DNS, DNSSEC and Trustless SSL</li>
                         <li class="programlinux">Linux Servers and CLI</li>
                         <li class="programnginx">NGINX Web Servers</li>
@@ -110,43 +98,30 @@ Check them out here!</blockquote><img class="img-fluid" src="/assets/img/pfront.
         <p class="text-start d-inline-block skillcode"></p>
     </section><img class="no-drag" src="/assets/img/tilt.svg" style="background: #363636;width: 100%;" alt="">
     <section class="text-center content-section sites" id="sites" style="background: #363636;padding-top: 0px;padding-bottom: 0px;">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8 mx-auto">
-                    <h2>My WebSites</h2>
+        <div class="site-container">
+            <h1>My Websites</h1>
+            <div class="swiper">
+                <div class="swiper-wrapper"><!-- <div class="swiper-slide site" data-url="https://nathan3dprinting.au"><img class="site-img" src="/assets/img/external/nathan3dprinting.webp" />
+    <div class="site-body">
+        <div class="site-detail" style="width: 100%;">
+            <h2 class="site-name" style="text-align: left;">Nathan 3D Printing</h2>
+            <p class="text-start site-author">Offering 3D Printing and CAD modelling services to the Canberra region</p>
+        </div>
+    </div>
+</div> -->
+
+{% for site in sites %}
+            <div class="swiper-slide site" data-url="{{ site.url }}">
+                <img class="site-img" src="{{ site.img }}" />
+                <div class="site-body">
+                    <div class="site-detail" style="width: 100%;">
+                        <h2 class="site-name" style="text-align: left;">{{ site.name }}</h2>
+                        <p class="text-start site-author">{{ site.description }}</p>
+                    </div>
                 </div>
             </div>
-            <div class="row row-cols-1 d-print-none d-lg-none d-xl-none d-xxl-none">
-                <div class="col" style="padding-bottom: 50px;"><a href="https://nathan3dprinting.au" target="_blank"><img src="/assets/img/favicon_trans.webp" style="width: 200px;" alt="Nathan 3D Printing Logo"></a>
-                    <p>Nathan 3D Printing Service<br>Cheap 3D printing and CAD modeling</p><a class="btn btn-primary" role="button" href="https://nathan3dprinting.au" target="_blank">Visit Nathan 3D Printing Service</a>
-                </div>
-                <div class="col" style="padding-bottom: 50px;"><a href="https://hns.au" target="_blank"><img src="/assets/img/HNSAU_white.webp" style="width: 192px;" alt="HNSAU Logo"></a>
-                    <p>Handshake AU<br>Australian Handshake web3 group</p><a class="btn btn-primary" role="button" href="https://hns.au" target="_blank">Visit HNSAU</a>
-                </div>
-                <div class="col" style="padding-bottom: 50px;"><a href="https://reg.woodburn.au/" target="_blank"><img src="/assets/img/woodburn.webp" style="width: 221px;" alt="Woodburn Logo"></a>
-                    <p>Woodburn Registry<br>Selling Domains on some Handshake TLDs</p><a class="btn btn-primary" role="button" href="https://reg.woodburn.au/" target="_blank">Visit Woodburn Registry</a>
-                </div>
-            </div>
-            <div class="row d-none d-print-flex d-lg-flex d-xl-flex d-xxl-flex">
-                <div class="col"><a href="https://nathan3dprinting.au" target="_blank"><img src="/assets/img/favicon_trans.webp" style="width: 200px;" alt="Nathan 3D Printing Logo"></a></div>
-                <div class="col"><a href="https://hns.au" target="_blank"><img src="/assets/img/HNSAU_white.webp" style="width: 192px;" alt="HNSAU Logo"></a></div>
-                <div class="col"><a href="https://reg.woodburn.au/" target="_blank"><img src="/assets/img/favicon.png" style="width: 221px;" alt="Woodburn Logo"></a></div>
-            </div>
-            <div class="row d-none d-print-flex d-lg-flex d-xl-flex d-xxl-flex">
-                <div class="col">
-                    <p>Nathan 3D Printing Service<br>Cheap 3D printing and CAD modeling</p>
-                </div>
-                <div class="col">
-                    <p>Handshake AU<br>Australian Handshake web3 group</p>
-                </div>
-                <div class="col">
-                    <p>Woodburn Registry<br>Selling Domains on some Handshake TLDs</p>
-                </div>
-            </div>
-            <div class="row d-none d-print-flex d-lg-flex d-xl-flex d-xxl-flex">
-                <div class="col" style="padding-bottom: 50px;"><a class="btn btn-primary" role="button" href="https://nathan3dprinting.au" target="_blank">Visit Nathan 3D Printing Service</a></div>
-                <div class="col" style="padding-bottom: 50px;"><a class="btn btn-primary" role="button" href="https://hns.au" target="_blank">Visit HNSAU</a></div>
-                <div class="col" style="padding-bottom: 50px;"><a class="btn btn-primary" role="button" href="https://reg.woodburn.au/" target="_blank">Visit Woodburn Registry</a></div>
+            {% endfor %}</div>
+                <div class="swiper-scrollbar"></div>
             </div>
         </div>
     </section><img class="no-drag" src="/assets/img/tilt.svg" style="width: 100%;background: #363636;transform: rotate(180deg);" alt="">
@@ -156,23 +131,32 @@ Check them out here!</blockquote><img class="img-fluid" src="/assets/img/pfront.
                 <div class="col-lg-8 mx-auto">
                     <h2>Contact Me</h2>
                     <p>Here are my socials. I'm most active on Discord</p>
-                    <div class="table-responsive">
-                        <table class="table">
-                            <tbody>
-                                <tr>
-                                    <td style="border-width: 0px;border-style: none;background: transparent;"><a class="btn btn-primary btn-lg btn-default" role="button" style="width: 171px;" target="_blank" href="https://l.woodburn.au/discord"><i class="fab fa-discord fa-fw"></i><span class="network-name">&nbsp;Discord</span></a></td>
-                                    <td style="border-width: 0px;border-style: none;background: transparent;"><a class="btn btn-primary btn-lg btn-default" role="button" href="mailto:about@nathan.woodburn.au" style="width: 170px;"><i class="icon ion-email fa-fw" style="font-size: 19px;"></i><span class="network-name">&nbsp; Email</span></a></td>
-                                </tr>
-                                <tr>
-                                    <td style="border-width: 0px;border-style: none;background: transparent;"><a class="btn btn-primary btn-lg btn-default" role="button" href="https://www.facebook.com/nathanjwoodburn" style="width: 170px;" target="_blank"><i class="fa fa-facebook fa-fw"></i><span class="network-name">&nbsp;Facebook</span></a></td>
-                                    <td style="border-width: 0px;border-style: none;background: transparent;"><a class="btn btn-primary btn-lg btn-default" role="button" href="https://github.com/Nathanwoodburn" style="width: 171px;" target="_blank"><i class="fa fa-github fa-fw"></i><span class="network-name">&nbsp;github</span></a></td>
-                                </tr>
-                                <tr>
-                                    <td style="border-width: 0px;border-style: none;background: transparent;"><a class="btn btn-primary btn-lg btn-default" role="button" href="https://keybase.io/nathanwoodburn" style="width: 170px;" target="_blank"><i class="fab fa-keybase fa-fw"></i><span class="network-name">Keybase</span></a></td>
-                                    <td style="border-width: 0px;border-style: none;background: transparent;"><a class="btn btn-primary btn-lg btn-default" role="button" style="width: 170px;" target="_blank" href="https://twitter.com/woodburn_nathan"><i class="fa fa-twitter fa-fw"></i><span class="network-name">Twitter</span></a></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="social-div">
+                        <ul class="list-unstyled social-list">
+                            <li class="social-link"><a href="https://twitter.com/woodburn_nathan" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-twitter-x icon">
+                                        <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z"></path>
+                                    </svg></a></li>
+                            <li class="social-link"><a href="https://github.com/Nathanwoodburn" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-github icon">
+                                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8"></path>
+                                    </svg></a></li>
+                            <li class="social-link"><a href="mailto:about@nathan.woodburn.au" target="_blank"><i class="icon ion-email icon"></i></a></li>
+                            <li class="social-link discord"><a href="https://l.woodburn.au/discord" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-discord icon">
+                                        <path d="M13.545 2.907a13.227 13.227 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.19 12.19 0 0 0-3.658 0 8.258 8.258 0 0 0-.412-.833.051.051 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.041.041 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032c.001.014.01.028.021.037a13.276 13.276 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019c.308-.42.582-.863.818-1.329a.05.05 0 0 0-.01-.059.051.051 0 0 0-.018-.011 8.875 8.875 0 0 1-1.248-.595.05.05 0 0 1-.02-.066.051.051 0 0 1 .015-.019c.084-.063.168-.129.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.052.052 0 0 1 .053.007c.08.066.164.132.248.195a.051.051 0 0 1-.004.085 8.254 8.254 0 0 1-1.249.594.05.05 0 0 0-.03.03.052.052 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.235 13.235 0 0 0 4.001-2.02.049.049 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.034.034 0 0 0-.02-.019Zm-8.198 7.307c-.789 0-1.438-.724-1.438-1.612 0-.889.637-1.613 1.438-1.613.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612 0-.889.637-1.613 1.438-1.613.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"></path>
+                                    </svg></a></li>
+                        </ul>
+                    </div>
+                    <div class="social-div">
+                        <ul class="list-unstyled social-list">
+                            <li class="social-link mastodon"><a href="https://mastodon.woodburn.au/@nathanwoodburn" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-mastodon icon">
+                                        <path d="M11.19 12.195c2.016-.24 3.77-1.475 3.99-2.603.348-1.778.32-4.339.32-4.339 0-3.47-2.286-4.488-2.286-4.488C12.062.238 10.083.017 8.027 0h-.05C5.92.017 3.942.238 2.79.765c0 0-2.285 1.017-2.285 4.488l-.002.662c-.004.64-.007 1.35.011 2.091.083 3.394.626 6.74 3.78 7.57 1.454.383 2.703.463 3.709.408 1.823-.1 2.847-.647 2.847-.647l-.06-1.317s-1.303.41-2.767.36c-1.45-.05-2.98-.156-3.215-1.928a3.614 3.614 0 0 1-.033-.496s1.424.346 3.228.428c1.103.05 2.137-.064 3.188-.189zm1.613-2.47H11.13v-4.08c0-.859-.364-1.295-1.091-1.295-.804 0-1.207.517-1.207 1.541v2.233H7.168V5.89c0-1.024-.403-1.541-1.207-1.541-.727 0-1.091.436-1.091 1.296v4.079H3.197V5.522c0-.859.22-1.541.66-2.046.456-.505 1.052-.764 1.793-.764.856 0 1.504.328 1.933.983L8 4.39l.417-.695c.429-.655 1.077-.983 1.934-.983.74 0 1.336.259 1.791.764.442.505.661 1.187.661 2.046v4.203z"></path>
+                                    </svg></a></li>
+                            <li class="social-link youtube"><a href="https://www.youtube.com/@nathanjwoodburn" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-youtube icon">
+                                        <path d="M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.108-.082 2.06l-.008.105-.009.104c-.05.572-.124 1.14-.235 1.558a2.007 2.007 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.007 2.007 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31.4 31.4 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.778l.007-.103.003-.052.008-.104.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.007 2.007 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.003.171-.007A99.788 99.788 0 0 1 7.858 2h.193zM6.4 5.209v4.818l4.157-2.408z"></path>
+                                    </svg></a></li>
+                            <li class="social-link signal"><a href="/signalQR" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-signal icon">
+                                        <path d="m6.08.234.179.727a7.264 7.264 0 0 0-2.01.832l-.383-.643A7.9 7.9 0 0 1 6.079.234zm3.84 0L9.742.96a7.265 7.265 0 0 1 2.01.832l.388-.643A7.957 7.957 0 0 0 9.92.234zm-8.77 3.63a7.944 7.944 0 0 0-.916 2.215l.727.18a7.264 7.264 0 0 1 .832-2.01l-.643-.386zM.75 8a7.3 7.3 0 0 1 .081-1.086L.091 6.8a8 8 0 0 0 0 2.398l.74-.112A7.262 7.262 0 0 1 .75 8m11.384 6.848-.384-.64a7.23 7.23 0 0 1-2.007.831l.18.728a7.965 7.965 0 0 0 2.211-.919zM15.251 8c0 .364-.028.727-.082 1.086l.74.112a7.966 7.966 0 0 0 0-2.398l-.74.114c.054.36.082.722.082 1.086m.516 1.918-.728-.18a7.252 7.252 0 0 1-.832 2.012l.643.387a7.933 7.933 0 0 0 .917-2.219zm-6.68 5.25c-.72.11-1.453.11-2.173 0l-.112.742a7.99 7.99 0 0 0 2.396 0l-.112-.741zm4.75-2.868a7.229 7.229 0 0 1-1.537 1.534l.446.605a8.07 8.07 0 0 0 1.695-1.689l-.604-.45zM12.3 2.163c.587.432 1.105.95 1.537 1.537l.604-.45a8.06 8.06 0 0 0-1.69-1.691l-.45.604zM2.163 3.7A7.242 7.242 0 0 1 3.7 2.163l-.45-.604a8.06 8.06 0 0 0-1.691 1.69l.604.45zm12.688.163-.644.387c.377.623.658 1.3.832 2.007l.728-.18a7.931 7.931 0 0 0-.916-2.214M6.913.831a7.254 7.254 0 0 1 2.172 0l.112-.74a7.985 7.985 0 0 0-2.396 0l.112.74zM2.547 14.64 1 15l.36-1.549-.729-.17-.361 1.548a.75.75 0 0 0 .9.902l1.548-.357-.17-.734zM.786 12.612l.732.168.25-1.073A7.187 7.187 0 0 1 .96 9.74l-.727.18a8 8 0 0 0 .736 1.902l-.184.79zm3.5 1.623-1.073.25.17.731.79-.184c.6.327 1.239.574 1.902.737l.18-.728a7.197 7.197 0 0 1-1.962-.811l-.007.005zM8 1.5a6.502 6.502 0 0 0-6.498 6.502 6.516 6.516 0 0 0 .998 3.455l-.625 2.668L4.54 13.5a6.502 6.502 0 0 0 6.93-11A6.516 6.516 0 0 0 8 1.5"></path>
+                                    </svg></a></li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -189,7 +173,7 @@ Check them out here!</blockquote><img class="img-fluid" src="/assets/img/pfront.
                         <li class="list-inline-item">&nbsp;<a class="btn btn-primary btn-lg btn-default" role="button" href="https://github.com/sponsors/Nathanwoodburn" style="width: 170px;" target="_blank"><i class="fab fa-github fa-fw"></i><span class="network-name">&nbsp; Github</span></a></li>
                         <li class="list-inline-item">&nbsp;<a class="btn btn-primary btn-lg btn-default" role="button" href="https://donate.stripe.com/8wM6pv0VD08Xe408ww" style="width: 170px;" target="_blank"><i class="fab fa-stripe-s fa-fw"></i><span class="network-name">&nbsp;Stripe</span></a></li>
                     </ul>
-                    <p>HNS:<br><code data-bs-toggle="tooltip" data-bss-tooltip="" id="hns" class="hns" style="color: rgb(242,90,5);" title="Click to copy">{{HNS}}</code><br>BTC:<br><code data-bs-toggle="tooltip" data-bss-tooltip="" id="btc" class="btc" style="color: rgb(242,90,5);" title="Click to copy">bc1qhs94zzcw64qnwq4hvk056rwxwvgrkd7tq7d4xw</code><br>ETH:<br><code data-bs-toggle="tooltip" data-bss-tooltip="" id="eth" class="eth" style="color: rgb(242,90,5);" title="Click to copy">0x6cB4B39bEc23a921C9a20D061Bf17d4640B0d39e</code></p>
+                    <p>HNS:<br><code data-bs-toggle="tooltip" data-bss-tooltip="" id="hns-domain" class="hns" style="color: rgb(242,90,5);display: block;" title="Click to copy">nathan.woodburn</code><code data-bs-toggle="tooltip" data-bss-tooltip="" id="hns" class="hns" style="color: rgb(242,90,5);display: block;" title="Click to copy">{{HNS}}</code><br>BTC:<br><code data-bs-toggle="tooltip" data-bss-tooltip="" id="btc" class="btc" style="color: rgb(242,90,5);display: block;" title="Click to copy">bc1qhs94zzcw64qnwq4hvk056rwxwvgrkd7tq7d4xw</code><br>SOL:<br><code data-bs-toggle="tooltip" data-bss-tooltip="" id="sol-domain" class="sol" style="color: rgb(242,90,5);display: block;" title="Click to copy">woodburn.sol</code><code data-bs-toggle="tooltip" data-bss-tooltip="" id="sol" class="sol" style="color: rgb(242,90,5);display: block;" title="Click to copy">AJsPEEe6S7XSiVcdZKbeV8GRp1QuhFUsG8mLrqL4XgiU</code><br>ETH:<br><code data-bs-toggle="tooltip" data-bss-tooltip="" id="eth-domain" class="eth" style="color: rgb(242,90,5);display: block;" title="Click to copy">woodburn.au</code><code data-bs-toggle="tooltip" data-bss-tooltip="" id="eth" class="eth" style="color: rgb(242,90,5);display: block;" title="Click to copy">0x6cB4B39bEc23a921C9a20D061Bf17d4640B0d39e</code><a class="btn btn-primary btn-default" role="button" href="/donate" style="width: 170px;margin-top: 10px;">OTHER OPTIONS</a></p>
                 </div>
             </div>
         </div>
@@ -203,8 +187,8 @@ Check them out here!</blockquote><img class="img-fluid" src="/assets/img/pfront.
             </div>
             <div class="row">
                 <div class="col">
-                    <p class="d-none d-print-inline-block d-sm-inline-block d-md-inline-block d-lg-inline-block d-xl-inline-block d-xxl-inline-block">This site is also available on<br><a href="https://learn.namebase.io/" target="_blank">Handshake</a>&nbsp;at <a href="https://nathan.woodburn">https://nathan.woodburn/</a><br><a href="https://www.torproject.org/" target="_blank">Tor</a> at <a href="http://wdbrncwefot4hd7bdrz5rzb74mefay7zvrjn2vmkpdm44l7fwnih5ryd.onion/">http://wdbrncwefot4hd7bdrz5rzb74mefay7zvrjn2vmkpdm44l7fwnih5ryd.onion/</a></p>
-                    <p class="copyright">Copyright ©&nbsp;Nathan Woodburn 2023</p>
+                    <p class="d-none d-print-inline-block d-sm-inline-block d-md-inline-block d-lg-inline-block d-xl-inline-block d-xxl-inline-block">This site is also available on<br><a href="https://learn.namebase.io/" target="_blank">Handshake</a>&nbsp;at <a href="https://nathan.woodburn">https://nathan.woodburn/</a></p>
+                    <p class="copyright">Copyright ©&nbsp;Nathan.Woodburn/ 2024</p>
                 </div>
             </div>
         </div>
@@ -222,6 +206,10 @@ Check them out here!</blockquote><img class="img-fluid" src="/assets/img/pfront.
     const btc = document.getElementById('btc');
     const eth = document.getElementById('eth');
     const hns = document.getElementById('hns');
+    const sol = document.getElementById('sol');
+    const hnsdomain = document.getElementById('hns-domain');
+    const soldomain = document.getElementById('sol-domain');
+    const ethdomain = document.getElementById('eth-domain');
 
     btc.addEventListener('click', () => {
         copyToClipboard(btc);
@@ -232,11 +220,26 @@ Check them out here!</blockquote><img class="img-fluid" src="/assets/img/pfront.
     hns.addEventListener('click', () => {
         copyToClipboard(hns);
     });
+    sol.addEventListener('click', () => {
+        copyToClipboard(sol);
+    });
+
+    hnsdomain.addEventListener('click', () => {
+        copyToClipboard(hnsdomain);
+    });
+    soldomain.addEventListener('click', () => {
+        copyToClipboard(soldomain);
+    });
+    ethdomain.addEventListener('click', () => {
+        copyToClipboard(ethdomain);
+    });
 </script>{{custom | safe}}
     <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="/assets/js/script.min.js"></script>
     <script src="/assets/js/hacker.min.js"></script>
     <script src="/assets/js/downtime.min.js"></script>
+    <script src="/assets/js/pfp.min.js"></script>
+    <script src="/assets/js/sites.min.js"></script>
 </body>
 
 </html>

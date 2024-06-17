@@ -4,7 +4,7 @@ on:
   push:
 
 jobs:
-  Build Image:
+  BuildImage:
     runs-on: [ubuntu-latest, amd]
     steps:
       - name: Checkout

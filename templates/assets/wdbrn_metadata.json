@@ -1,0 +1,16 @@
+{
+  "name": "Woodburn",
+  "symbol": "WDBRN",
+  "image": "https://nathan.woodburn.au/favicon.png",
+  "description": "Woodburn Token",
+  "extensions": {
+    "website": "https://nathan.woodburn.au"
+  },
+  "tags": [
+    "Woodburn"
+  ],
+  "creator": {
+    "name": "Nathan.Woodburn/",
+    "site": "https://nathan.woodburn.au"
+  }
+}

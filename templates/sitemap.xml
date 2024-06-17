@@ -1,24 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
     <url>
-        <loc>https://nathan.woodburn.au/about.html</loc>
+        <loc>https://nathan.woodburn.au/now/24_02_18</loc>
     </url>
     <url>
-        <loc>https://nathan.woodburn.au/ascii.html</loc>
+        <loc>https://nathan.woodburn.au/now/24_02_25</loc>
     </url>
     <url>
-        <loc>https://nathan.woodburn.au/gitpgp.html</loc>
+        <loc>https://nathan.woodburn.au/now/24_04_19</loc>
+    </url>
+    <url>
+        <loc>https://nathan.woodburn.au/now/24_05_20</loc>
+    </url>
+    <url>
+        <loc>https://nathan.woodburn.au/now/24_05_28</loc>
+    </url>
+    <url>
+        <loc>https://nathan.woodburn.au/now/24_06_06</loc>
+    </url>
+    <url>
+        <loc>https://nathan.woodburn.au/now/24_06_17</loc>
+    </url>
+    <url>
+        <loc>https://nathan.woodburn.au/now/old</loc>
+    </url>
+    <url>
+        <loc>https://nathan.woodburn.au/now/template</loc>
+    </url>
+    <url>
+        <loc>https://nathan.woodburn.au/404</loc>
+    </url>
+    <url>
+        <loc>https://nathan.woodburn.au/about</loc>
+    </url>
+    <url>
+        <loc>https://nathan.woodburn.au/donate</loc>
+    </url>
+    <url>
+        <loc>https://nathan.woodburn.au/gitpgp</loc>
     </url>
     <url>
         <loc>https://nathan.woodburn.au/</loc>
     </url>
     <url>
-        <loc>https://nathan.woodburn.au/link.html</loc>
+        <loc>https://nathan.woodburn.au/link</loc>
     </url>
     <url>
-        <loc>https://nathan.woodburn.au/pgp.html</loc>
+        <loc>https://nathan.woodburn.au/loading</loc>
     </url>
     <url>
-        <loc>https://nathan.woodburn.au/projects.html</loc>
+        <loc>https://nathan.woodburn.au/pgp</loc>
+    </url>
+    <url>
+        <loc>https://nathan.woodburn.au/projects</loc>
+    </url>
+    <url>
+        <loc>https://nathan.woodburn.au/signalQR</loc>
     </url>
 </urlset>
