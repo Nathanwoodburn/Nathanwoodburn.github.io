@@ -25,6 +25,11 @@ if os.path.isfile('data/sites.json'):
     with open('data/sites.json') as file:
         sites = json.load(file)
 
+def getAddress():
+    global address
+    if address == '':
+        address = 'hs1qv3uu4amv87g7p7h49xez2pmzwjf92am0wzpnh4'
+    return address
 
 #Assets routes
 @app.route('/assets/<path:path>')
@@ -120,14 +125,10 @@ def index():
         return render_template('podcast.html')
     
     loaded = False
-    # Check if referrer is from handshake
     if request.referrer:
-        print(request.referrer,flush=True)
         # Check if referrer includes nathan.woodburn.au
         if "nathan.woodburn.au" in request.referrer:
             loaded = True
-    else:
-        print("No referrer",flush=True)
             
 
     # Check if cookie is set
@@ -172,7 +173,9 @@ def index():
         handshake_scripts = ""
 
     if request.cookies.get('HNS'):
-            return render_template('index.html', handshake_scripts=handshake_scripts, HNS=request.cookies.get('HNS'), repo=repo, repo_description=repo_description, custom=custom,sites=sites)
+            resp = make_response(render_template('index.html', handshake_scripts=handshake_scripts, HNS=request.cookies.get('HNS'), repo=repo, repo_description=repo_description, custom=custom,sites=sites), 200, {'Content-Type': 'text/html'})
+            resp.set_cookie('loaded', 'true', max_age=604800)
+            return resp
     
     if address == '':
         address = getAddress()
@@ -413,12 +416,18 @@ def catch_all(path):
 
     return render_template('404.html'), 404
 
-def getAddress():
-    global address
-    if address == '':
-        address = 'hs1qv3uu4amv87g7p7h49xez2pmzwjf92am0wzpnh4'
-    return address
-
+@app.route('/manifest.json')
+def manifest():
+    host = request.host
+    if host == 'nathan.woodburn.au':
+        return send_from_directory('templates', 'manifest.json')
+    
+    # Read as json
+    with open('templates/manifest.json') as file:
+        manifest = json.load(file)
+    scheme = request.scheme
+    manifest['start_url'] = f'{scheme}://{host}/'
+    return jsonify(manifest)
 
 @app.route('/hnsdoh-acme', methods=['POST'])
 def hnsdoh_acme():
@@ -466,7 +475,6 @@ def ID1_slash():
 @app.route('/ID1/<path:path>')
 def ID1_path(path):
     # Proxy to ID1 url
-    print('https://id1.woodburn.au/ID1/' + path)
     req = requests.get('https://id1.woodburn.au/ID1/' + path)
     return make_response(req.content, 200, {'Content-Type': req.headers['Content-Type']})
 
