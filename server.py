@@ -24,6 +24,12 @@ sites = []
 if os.path.isfile('data/sites.json'):
     with open('data/sites.json') as file:
         sites = json.load(file)
+        # Remove any sites that are not enabled
+        sites = [site for site in sites if 'enabled' not in site or site['enabled'] == True]
+
+projects = []
+projectsUpdated = 0
+
 
 def getAddress():
     global address
@@ -37,7 +43,19 @@ def send_report(path):
     if path.endswith('.json'):
         return send_from_directory('templates/assets', path, mimetype='application/json')
 
-    return send_from_directory('templates/assets', path)
+    if os.path.isfile('templates/assets/' + path):
+        return send_from_directory('templates/assets', path)
+    
+    # Try looking in one of the directories
+    filename:str = path.split('/')[-1]
+    if filename.endswith('.png') or filename.endswith('.jpg') \
+        or filename.endswith('.jpeg') or filename.endswith('.svg'):
+        if os.path.isfile('templates/assets/img/' + filename):
+            return send_from_directory('templates/assets/img', filename)
+        if os.path.isfile('templates/assets/img/favicon/' + filename):
+            return send_from_directory('templates/assets/img/favicon', filename)
+
+    return render_template('404.html'), 404
 
 
 # Special routes
@@ -117,7 +135,21 @@ def nostr():
     })
 
 
-# Main routes
+@app.route('/manifest.json')
+def manifest():
+    host = request.host
+    if host == 'nathan.woodburn.au':
+        return send_from_directory('templates', 'manifest.json')
+    
+    # Read as json
+    with open('templates/manifest.json') as file:
+        manifest = json.load(file)
+    scheme = request.scheme
+    manifest['start_url'] = f'{scheme}://{host}/'
+    return jsonify(manifest)
+
+
+# region Main routes
 @app.route('/')
 def index():
     # Check if host if podcast.woodburn.au
@@ -141,8 +173,11 @@ def index():
 
     global address
     global handshake_scripts
+    global projects
+
     try:
-        git=requests.get('https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1&token=' + os.getenv('git_token'))
+        git=requests.get('https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1',
+                         headers={'Authorization': os.getenv('git_token')})
         git = git.json()
         git = git[0]
         repo_name=git['repo']['name']
@@ -152,7 +187,38 @@ def index():
         repo_name = "nathanwoodburn.github.io"
         repo_description = "Personal website"
         git = {'repo': {'html_url': 'https://nathan.woodburn.au', 'name': 'nathanwoodburn.github.io', 'description': 'Personal website'}}
+        print("Error getting git data")
     custom = ""
+
+    # Get only repo names for the newest updates
+    if projects == [] or projectsUpdated < datetime.datetime.now() - datetime.timedelta(hours=2):
+        projectsreq = requests.get('https://git.woodburn.au/api/v1/users/nathanwoodburn/repos')
+        
+        projects = projectsreq.json()
+
+        # Check for next page
+        pageNum = 1
+        while 'rel="next"' in projectsreq.headers['link']:
+            projectsreq = requests.get('https://git.woodburn.au/api/v1/users/nathanwoodburn/repos?page=' + str(pageNum))
+            projects += projectsreq.json()
+            pageNum += 1
+        
+        
+        for project in projects:
+            if project['avatar_url'] == 'https://git.woodburn.au/':
+                project['avatar_url'] = '/favicon.png'
+            project['name'] = project['name'].replace('_', ' ').replace('-', ' ')
+        # Sort by last updated
+        projectsList = sorted(projects, key=lambda x: x['updated_at'], reverse=True)
+        projects = []
+        projectNames = []
+        projectNum = 0
+        while len(projects) < 3:
+            if projectsList[projectNum]['name'] not in projectNames:
+                projects.append(projectsList[projectNum])
+                projectNames.append(projectsList[projectNum]['name'])
+            projectNum += 1
+        projectsUpdated = datetime.datetime.now()
 
     # Check for downtime
     uptime = requests.get('https://uptime.woodburn.au/api/status-page/main/badge')
@@ -173,14 +239,20 @@ def index():
         handshake_scripts = ""
 
     if request.cookies.get('HNS'):
-            resp = make_response(render_template('index.html', handshake_scripts=handshake_scripts, HNS=request.cookies.get('HNS'), repo=repo, repo_description=repo_description, custom=custom,sites=sites), 200, {'Content-Type': 'text/html'})
+            resp = make_response(render_template('index.html', handshake_scripts=handshake_scripts,
+                                                 HNS=request.cookies.get('HNS'), repo=repo,
+                                                 repo_description=repo_description,
+                                                 custom=custom,sites=sites, projects=projects), 200, {'Content-Type': 'text/html'})
             resp.set_cookie('loaded', 'true', max_age=604800)
             return resp
     
     if address == '':
         address = getAddress()
     # Set cookie
-    resp = make_response(render_template('index.html', handshake_scripts=handshake_scripts, HNS=address, repo=repo, repo_description=repo_description, custom=custom,sites=sites), 200, {'Content-Type': 'text/html'})
+    resp = make_response(render_template('index.html', handshake_scripts=handshake_scripts,
+                                         HNS=address, repo=repo,
+                                         repo_description=repo_description,
+                                         custom=custom,sites=sites,projects=projects), 200, {'Content-Type': 'text/html'})
     # Cookie should last 1 week
     resp.set_cookie('HNS', address, max_age=604800)
 
@@ -189,6 +261,8 @@ def index():
 
     return resp
 
+
+# region Now Pages
 @app.route('/now')
 @app.route('/now/')
 def now():
@@ -261,6 +335,7 @@ def now_old():
 
     html += '</ul>'
     return render_template('now/old.html', handshake_scripts=handshake_scripts,now_pages=html)
+# endregion
 
 
 @app.route('/donate')
@@ -405,30 +480,19 @@ def catch_all(path):
         return render_template('404.html'), 404
     # If file exists, load it
     if os.path.isfile('templates/' + path):
-        return render_template(path, handshake_scripts=handshake_scripts)
+        return render_template(path, handshake_scripts=handshake_scripts,sites=sites)
     
     # Try with .html
     if os.path.isfile('templates/' + path + '.html'):
-        return render_template(path + '.html', handshake_scripts=handshake_scripts)
+        return render_template(path + '.html', handshake_scripts=handshake_scripts,sites=sites)
 
     if os.path.isfile('templates/' + path.strip('/') + '.html'):
-        return render_template(path.strip('/') + '.html', handshake_scripts=handshake_scripts)
+        return render_template(path.strip('/') + '.html', handshake_scripts=handshake_scripts,sites=sites)
 
     return render_template('404.html'), 404
+# endregion
 
-@app.route('/manifest.json')
-def manifest():
-    host = request.host
-    if host == 'nathan.woodburn.au':
-        return send_from_directory('templates', 'manifest.json')
-    
-    # Read as json
-    with open('templates/manifest.json') as file:
-        manifest = json.load(file)
-    scheme = request.scheme
-    manifest['start_url'] = f'{scheme}://{host}/'
-    return jsonify(manifest)
-
+#region ACME
 @app.route('/hnsdoh-acme', methods=['POST'])
 def hnsdoh_acme():
     # Get the TXT record from the request
@@ -459,7 +523,9 @@ def hnsdoh_acme():
     record = cf.zones.dns_records.post(zone_id, data={'type': 'TXT', 'name': '_acme-challenge', 'content': txt})
     print(record)
     return jsonify({'status': 'success'})
+#endregion
 
+#region Podcast
 @app.route('/ID1')
 def ID1():
     # Proxy to ID1 url
@@ -488,13 +554,15 @@ def ID1_xml():
 def podsync():
     req = requests.get('https://id1.woodburn.au/podsync.opml')
     return make_response(req.content, 200, {'Content-Type': req.headers['Content-Type']})
+#endregion
 
 
-
+#region Error Catching
 # 404 catch all
 @app.errorhandler(404)
 def not_found(e):
     return render_template('404.html'), 404
+#endregion
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000, host='0.0.0.0')

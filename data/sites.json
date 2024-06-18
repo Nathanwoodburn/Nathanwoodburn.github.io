@@ -3,7 +3,8 @@
         "url": "https://nathan3dprinting.au",
         "img": "/assets/img/external/nathan3dprinting.webp",
         "name": "Nathan 3D Printing",
-        "description": "Offering 3D Printing and CAD modelling services to the Canberra region"
+        "description": "Offering 3D Printing and CAD modelling services to the Canberra region",
+        "enabled": false
     },
     {
         "url": "https://domains.hns.au",
@@ -46,5 +47,17 @@
         "img": "/favicon.png",
         "name": "LINKR/",
         "description": "A free link shortener with a Handshake TLD and using DNS for authentication"
+    },
+    {
+        "url": "https://faucet.woodburn.au",
+        "img": "/favicon.png",
+        "name": "HNS Domain Faucet",
+        "description": "A service providing free Handshake TLDs to allow for quick testing for new users"
+    },
+    {
+        "url":"https://hnsdoh.com",
+        "img": "/assets/img/external/HNS.png",
+        "name": "HNS DoH",
+        "description": "A DNS over HTTPS resolver for Handshake domains"
     }
 ]
