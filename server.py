@@ -189,8 +189,7 @@ def index():
         repo_description = "Personal website"
         git = {'repo': {'html_url': 'https://nathan.woodburn.au', 'name': 'nathanwoodburn.github.io', 'description': 'Personal website'}}
         print("Error getting git data")
-    custom = ""
-
+    
     # Get only repo names for the newest updates
     if projects == [] or projectsUpdated < datetime.datetime.now() - datetime.timedelta(hours=2):
         projectsreq = requests.get('https://git.woodburn.au/api/v1/users/nathanwoodburn/repos')
@@ -221,6 +220,7 @@ def index():
             projectNum += 1
         projectsUpdated = datetime.datetime.now()
 
+    custom = ""
     # Check for downtime
     uptime = requests.get('https://uptime.woodburn.au/api/status-page/main/badge')
     uptime = uptime.content.count(b'Up') > 1
@@ -239,26 +239,13 @@ def index():
     if request.host == "localhost:5000" or request.host == "127.0.0.1:5000" or os.getenv('dev') == "true" or request.host == "test.nathan.woodburn.au":
         handshake_scripts = ""
 
-    if request.cookies.get('HNS'):
-            resp = make_response(render_template('index.html', handshake_scripts=handshake_scripts,
-                                                 HNS=request.cookies.get('HNS'), repo=repo,
-                                                 repo_description=repo_description,
-                                                 custom=custom,sites=sites, projects=projects), 200, {'Content-Type': 'text/html'})
-            resp.set_cookie('loaded', 'true', max_age=604800)
-            return resp
-    
-    if address == '':
-        address = getAddress()
+    address = getAddress()
     # Set cookie
     resp = make_response(render_template('index.html', handshake_scripts=handshake_scripts,
                                          HNS=address, repo=repo,
                                          repo_description=repo_description,
                                          custom=custom,sites=sites,projects=projects), 200, {'Content-Type': 'text/html'})
-    # Cookie should last 1 week
-    resp.set_cookie('HNS', address, max_age=604800)
-
-    if loaded:
-        resp.set_cookie('loaded', 'true', max_age=604800)
+    resp.set_cookie('loaded', 'true', max_age=604800)
 
     return resp
 
