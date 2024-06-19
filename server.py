@@ -174,6 +174,7 @@ def index():
     global address
     global handshake_scripts
     global projects
+    global projectsUpdated
 
     try:
         git=requests.get('https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1',
