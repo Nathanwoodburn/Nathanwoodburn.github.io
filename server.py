@@ -144,8 +144,10 @@ def manifest():
     # Read as json
     with open('templates/manifest.json') as file:
         manifest = json.load(file)
-    scheme = request.scheme
-    manifest['start_url'] = f'{scheme}://{host}/'
+    if host != 'localhost:5000' and host != '127.0.0.1:5000':
+        manifest['start_url'] = f'https://{host}/'
+    else:
+        manifest['start_url'] = 'http://127.0.0.1:5000/'
     return jsonify(manifest)
 
 
