@@ -23,5 +23,6 @@
     "TON": "Toncoin (TON)",
     "OP": "Optimism (OP)",
     "IAA": "IRIS (IAA)",
-    "NEAR": "NEAR Protocol (NEAR)"
+    "NEAR": "NEAR Protocol (NEAR)",
+    "KAS": "Kasper (KAS)"
 }
