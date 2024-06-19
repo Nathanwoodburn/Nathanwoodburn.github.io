@@ -101,15 +101,12 @@ Check them out here!</blockquote><img class="img-fluid" src="/assets/img/pfront.
             <h1>Some recent projects</h1>
             <div class="swiper">
                 <div class="swiper-wrapper">{% for project in projects %}
-            <div class="swiper-slide site" data-url="{{ project_url }}">
+            <div class="swiper-slide site" data-url="{{ project.html_url }}">
                 <img class="site-img" src="{{ project.avatar_url }}" />
                 <div class="site-body">
                     <div class="site-detail" style="width: 100%;">
                         <h2 class="site-name" style="text-align: left;">{{ project.name }}</h2>
                         <p class="text-start site-author">{{ project.description }}</p>
-                        {% if project.actions %}
-                        <img src="{{project.actions}}" alt="Build Status">
-                        {% endif %}
                     </div>
                 </div>
             </div>
