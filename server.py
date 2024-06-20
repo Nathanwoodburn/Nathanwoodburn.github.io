@@ -46,6 +46,22 @@ def send_report(path):
     if os.path.isfile('templates/assets/' + path):
         return send_from_directory('templates/assets', path)
     
+    # Custom matching for images
+    pathMap = {
+        "img/hns/w": "img/external/HNS/white",
+        "img/hns/b": "img/external/HNS/black",
+        "img/hns": "img/external/HNS/black",
+    }
+
+    for key in pathMap:
+        print(path, key)
+        if path.startswith(key):
+            tmpPath = path.replace(key, pathMap[key])
+            print(tmpPath)
+            if os.path.isfile('templates/assets/' + tmpPath):
+                return send_from_directory('templates/assets', tmpPath)
+            
+
     # Try looking in one of the directories
     filename:str = path.split('/')[-1]
     if filename.endswith('.png') or filename.endswith('.jpg') \
