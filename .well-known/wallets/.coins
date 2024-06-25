@@ -24,5 +24,6 @@
     "OP": "Optimism (OP)",
     "IAA": "IRIS (IAA)",
     "NEAR": "NEAR Protocol (NEAR)",
-    "KAS": "Kasper (KAS)"
+    "KAS": "Kasper (KAS)",
+    "XLM": "Stellar (XLM)"
 }
