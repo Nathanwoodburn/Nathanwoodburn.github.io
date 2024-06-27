@@ -367,7 +367,7 @@ def donate():
         coinNames = json.loads(coinNames)
 
     coins = ''
-    default_coins = ['btc', 'eth', 'hns','sol','bnb','xrp','ada']
+    default_coins = ['btc', 'eth', 'hns','sol','xrp','ada','dot']
 
 
     for file in coinList:
