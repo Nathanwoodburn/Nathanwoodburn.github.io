@@ -4,7 +4,7 @@ from flask_cors import CORS
 import os
 import dotenv
 import requests
-import CloudFlare
+from cloudflare import Cloudflare
 import datetime
 import qrcode
 import re
@@ -504,7 +504,7 @@ def hnsdoh_acme():
     if auth != os.getenv('CF_AUTH'):
         return jsonify({'status': 'error', 'error': 'Invalid auth'})
 
-    cf = CloudFlare.CloudFlare(token=os.getenv('CF_TOKEN'))
+    cf = Cloudflare(api_token=os.getenv('CF_TOKEN'))
     zone = cf.zones.get(params={'name': 'hnsdoh.com'})
     zone_id = zone[0]['id']
     existing_records = cf.zones.dns_records.get(zone_id, params={'type': 'TXT', 'name': '_acme-challenge.hnsdoh.com'})
