@@ -6,3 +6,4 @@ requests
 cloudflare
 qrcode
 ansi2html
+cachetools

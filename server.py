@@ -9,13 +9,13 @@ import datetime
 import qrcode
 import re
 from ansi2html import Ansi2HTMLConverter
+from functools import cache
 
 app = Flask(__name__)
 CORS(app)
 
 dotenv.load_dotenv()
 
-address = ''
 handshake_scripts = '<script src="https://nathan.woodburn/handshake.js" domain="nathan.woodburn" async></script><script src="https://nathan.woodburn/https.js" async></script>'
 
 restricted = ['ascii']
@@ -30,11 +30,12 @@ if os.path.isfile('data/sites.json'):
 projects = []
 projectsUpdated = 0
 
-
-def getAddress():
-    global address
-    if address == '':
-        address = 'hs1qv3uu4amv87g7p7h49xez2pmzwjf92am0wzpnh4'
+@cache
+def getAddress(coin:str) -> str:
+    address = ''
+    if os.path.isfile('.well-known/wallets/' + coin.upper()):
+        with open('.well-known/wallets/' + coin.upper()) as file:
+            address = file.read()
     return address
 
 #Assets routes
@@ -110,20 +111,6 @@ def removeTrailingSlash():
 
 @app.route('/.well-known/wallets/<path:path>')
 def wallet(path):
-    # If HNS, redirect to HNS wallet
-    if path == "HNS":
-        # Get from 100.66.107.77:8080 then return result
-        # Check for cookie
-        if request.cookies.get('HNS'):
-            return make_response(request.cookies.get('HNS'), 200, {'Content-Type': 'text/plain'})
-        
-        address = getAddress()
-        # Set cookie
-        resp = make_response(address, 200, {'Content-Type': 'text/plain'})
-        # Cookie should last 1 week
-        resp.set_cookie('HNS', address, max_age=604800)
-        return resp
-    
     if path[0] == ".":
         return send_from_directory('.well-known/wallets', path, mimetype='application/json')
     elif os.path.isfile('.well-known/wallets/' + path):
@@ -181,15 +168,16 @@ def index():
             loaded = True
             
 
-    # Check if cookie is set
-    if not request.cookies.get('loaded') and not loaded:
-        # Set cookie
-        resp = make_response(render_template('loading.html'), 200, {'Content-Type': 'text/html'})
-        resp.set_cookie('loaded', 'true', max_age=604800)
-        return resp
+    # Check if crawler
+    if request.user_agent.browser != 'Googlebot' and request.user_agent.browser != 'Bingbot':
+        # Check if cookie is set
+        if not request.cookies.get('loaded') and not loaded:
+            # Set cookie
+            resp = make_response(render_template('loading.html'), 200, {'Content-Type': 'text/html'})
+            resp.set_cookie('loaded', 'true', max_age=604800)
+            return resp
         
 
-    global address
     global handshake_scripts
     global projects
     global projectsUpdated
@@ -257,10 +245,14 @@ def index():
     if request.host == "localhost:5000" or request.host == "127.0.0.1:5000" or os.getenv('dev') == "true" or request.host == "test.nathan.woodburn.au":
         handshake_scripts = ""
 
-    address = getAddress()
+    HNSaddress = getAddress("HNS")
+    SOLaddress = getAddress("SOL")
+    BTCaddress = getAddress("BTC")
+    ETHaddress = getAddress("ETH")
     # Set cookie
     resp = make_response(render_template('index.html', handshake_scripts=handshake_scripts,
-                                         HNS=address, repo=repo,
+                                         HNS=HNSaddress, SOL=SOLaddress, BTC=BTCaddress,
+                                         ETH=ETHaddress, repo=repo,
                                          repo_description=repo_description,
                                          custom=custom,sites=sites,projects=projects), 200, {'Content-Type': 'text/html'})
     resp.set_cookie('loaded', 'true', max_age=604800)
