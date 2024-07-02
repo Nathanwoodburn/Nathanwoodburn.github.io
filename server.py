@@ -137,6 +137,18 @@ def nostr():
         }
     })
 
+@app.route('/.well-known/xrp-ledger.toml')
+def xrpLedger():
+    # Create a response with the xrp-ledger.toml file
+    with open('.well-known/xrp-ledger.toml') as file:
+        toml = file.read()
+    
+    response = make_response(toml, 200, {'Content-Type': 'application/toml'})
+    # Set cors headers
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
 
 @app.route('/manifest.json')
 def manifest():
