@@ -8,8 +8,19 @@ from cloudflare import Cloudflare
 import datetime
 import qrcode
 import re
+import binascii
+import base64
 from ansi2html import Ansi2HTMLConverter
 from functools import cache
+from solders.keypair import Keypair
+from solders.pubkey import Pubkey
+from solana.rpc.api import Client
+from solders.system_program import TransferParams, transfer
+from solana.transaction import Transaction
+from solders.hash import Hash
+from solders.message import MessageV0
+from solders.transaction import VersionedTransaction
+from solders.null_signer import NullSigner
 
 app = Flask(__name__)
 CORS(app)
@@ -165,6 +176,104 @@ def manifest():
         manifest['start_url'] = 'http://127.0.0.1:5000/'
     return jsonify(manifest)
 
+# region Sol Links
+@app.route('/actions.json')
+def actionsJson():
+    return jsonify({
+        "rules": [
+            {
+                "pathPattern":"/donate**",
+                "apiPath":"/api/donate**"
+            }
+        ]})
+
+@app.route('/api/donate')
+def donateAPI():
+    data = {
+        "icon": "https://nathan.woodburn.au/assets/img/profile.png",
+        "label": "1 SOL",
+        "title": "Donate to Nathan.Woodburn/",
+        "description": "Student, developer, and crypto enthusiast",
+        "links": {
+            "actions": [
+                {
+                    "label": "0.01 SOL",
+                    "href": "/api/donate/0.01"
+                },
+                {
+                    "label": "0.1 SOL",
+                    "href": "/api/donate/0.1"
+                },
+                {
+                    "label": "1 SOL",
+                    "href": "/api/donate/1"
+                },
+                {
+                    "href": "/api/donate/{amount}",
+                    "label": "Donate",
+                    "parameters": [
+                        {
+                            "name": "amount",
+                            "label": "Enter a custom SOL amount"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+    return jsonify(data)
+
+@app.route('/api/donate/<amount>')
+def donateAmount(amount):
+    data = {
+        "icon": "https://nathan.woodburn.au/assets/img/profile.png",
+        "label": f"{amount} SOL",
+        "title": "Donate to Nathan.Woodburn/",
+        "description": "Student, developer, and crypto enthusiast"
+    }
+    return jsonify(data)
+
+@app.route('/api/donate/<amount>', methods=['POST'])
+def donateAmountPost(amount):
+    if not request.json:
+        return jsonify({'message': 'Error: No JSON data provided'})
+
+    if 'account' not in request.json:
+        return jsonify({'message': 'Error: No account provided'})
+
+    sender = request.json['account']
+
+    # Make sure amount is a number
+    try:
+        amount = float(amount)
+    except:
+        return jsonify({'message': 'Error: Invalid amount'})
+    
+    # Create transaction
+    sender = Pubkey.from_string(sender)
+    receiver = Pubkey.from_string('AJsPEEe6S7XSiVcdZKbeV8GRp1QuhFUsG8mLrqL4XgiU')
+    transfer_ix = transfer(TransferParams(from_pubkey=sender, to_pubkey=receiver, lamports=int(amount * 1000000000)))
+    solana_client = Client("https://api.mainnet-beta.solana.com")
+    blockhashData = solana_client.get_recent_blockhash()
+    blockhash = blockhashData['result']['value']['blockhash']
+
+    msg = MessageV0.try_compile(
+        payer=sender,
+        instructions=[transfer_ix],
+        address_lookup_table_accounts=[],
+        recent_blockhash=Hash.from_string(blockhash),
+    )
+    tx = VersionedTransaction(message=msg, keypairs=[NullSigner(sender)])
+    tx = bytes(tx).hex()
+    raw_bytes = binascii.unhexlify(tx)
+    base64_string = base64.b64encode(raw_bytes).decode('utf-8')
+
+    return jsonify({'message': 'Success', 'transaction': base64_string})
+    
+
+    
+
+# endregion
 
 # region Main routes
 @app.route('/')

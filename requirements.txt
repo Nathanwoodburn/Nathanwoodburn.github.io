@@ -7,3 +7,5 @@ cloudflare
 qrcode
 ansi2html
 cachetools
+solana
+solders
