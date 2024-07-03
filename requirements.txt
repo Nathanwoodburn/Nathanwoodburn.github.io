@@ -3,9 +3,9 @@ Flask-Cors
 python-dotenv
 gunicorn
 requests
-cloudflare
+cloudflare == 3.0.1
 qrcode
 ansi2html
 cachetools
-solana
-solders
+solana == 0.34.2
+solders == 0.21.0

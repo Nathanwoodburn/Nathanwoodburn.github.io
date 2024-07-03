@@ -270,9 +270,6 @@ def donateAmountPost(amount):
 
     return jsonify({'message': 'Success', 'transaction': base64_string})
     
-
-    
-
 # endregion
 
 # region Main routes
