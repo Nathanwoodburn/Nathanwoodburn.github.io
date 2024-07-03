@@ -254,14 +254,14 @@ def donateAmountPost(amount):
     receiver = Pubkey.from_string('AJsPEEe6S7XSiVcdZKbeV8GRp1QuhFUsG8mLrqL4XgiU')
     transfer_ix = transfer(TransferParams(from_pubkey=sender, to_pubkey=receiver, lamports=int(amount * 1000000000)))
     solana_client = Client("https://api.mainnet-beta.solana.com")
-    blockhashData = solana_client.get_recent_blockhash()
-    blockhash = blockhashData['result']['value']['blockhash']
+    blockhashData = solana_client.get_latest_blockhash()
+    blockhash = blockhashData.value.blockhash
 
     msg = MessageV0.try_compile(
         payer=sender,
         instructions=[transfer_ix],
         address_lookup_table_accounts=[],
-        recent_blockhash=Hash.from_string(blockhash),
+        recent_blockhash=blockhash,
     )
     tx = VersionedTransaction(message=msg, keypairs=[NullSigner(sender)])
     tx = bytes(tx).hex()
