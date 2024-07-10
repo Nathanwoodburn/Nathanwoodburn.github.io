@@ -187,11 +187,11 @@ def actionsJson():
             }
         ]})
 
-@app.route('/api/donate')
+@app.route('/api/donate', methods=['GET','OPTIONS'])
 def donateAPI():
     data = {
         "icon": "https://nathan.woodburn.au/assets/img/profile.png",
-        "label": "1 SOL",
+        "label": "Donate to Nathan.Woodburn/",
         "title": "Donate to Nathan.Woodburn/",
         "description": "Student, developer, and crypto enthusiast",
         "links": {
@@ -227,9 +227,9 @@ def donateAPI():
 def donateAmount(amount):
     data = {
         "icon": "https://nathan.woodburn.au/assets/img/profile.png",
-        "label": f"{amount} SOL",
+        "label": f"Donate {amount} SOL to Nathan.Woodburn/",
         "title": "Donate to Nathan.Woodburn/",
-        "description": "Student, developer, and crypto enthusiast"
+        "description": "Donate {amount} SOL to Nathan.Woodburn/",
     }
     return jsonify(data)
 
@@ -269,7 +269,7 @@ def donateAmountPost(amount):
     base64_string = base64.b64encode(raw_bytes).decode('utf-8')
 
     return jsonify({'message': 'Success', 'transaction': base64_string})
-    
+
 # endregion
 
 # region Main routes
