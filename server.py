@@ -23,7 +23,7 @@ from solders.transaction import VersionedTransaction
 from solders.null_signer import NullSigner
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}}, allow_headers=['Content-Type', 'Authorization', 'Content-Encoding', 'Accept-Encoding'], methods=['GET', 'POST', 'PUT', 'OPTIONS'])
 
 dotenv.load_dotenv()
 
@@ -222,46 +222,6 @@ def donateAPI():
         }
     }
     return jsonify(data)
-
-@app.route('/api/donate', methods=['OPTIONS'])
-def donateOptions():
-    data = {
-        "icon": "https://nathan.woodburn.au/assets/img/profile.png",
-        "label": "Donate to Nathan.Woodburn/",
-        "title": "Donate to Nathan.Woodburn/",
-        "description": "Student, developer, and crypto enthusiast",
-        "links": {
-            "actions": [
-                {
-                    "label": "0.01 SOL",
-                    "href": "/api/donate/0.01"
-                },
-                {
-                    "label": "0.1 SOL",
-                    "href": "/api/donate/0.1"
-                },
-                {
-                    "label": "1 SOL",
-                    "href": "/api/donate/1"
-                },
-                {
-                    "href": "/api/donate/{amount}",
-                    "label": "Donate",
-                    "parameters": [
-                        {
-                            "name": "amount",
-                            "label": "Enter a custom SOL amount"
-                        }
-                    ]
-                }
-            ]
-        }
-    }
-    response = make_response(jsonify(data), 200, {'Content-Type': 'application/json'})
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, OPTIONS'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Content-Encoding, Accept-Encoding'
-    return response
 
 @app.route('/api/donate/<amount>')
 def donateAmount(amount):
