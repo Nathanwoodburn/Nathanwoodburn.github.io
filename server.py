@@ -523,6 +523,11 @@ def donate():
     address = ''
     domain = ''
     cryptoHTML = ''
+
+    proof = ''
+    if os.path.isfile(f'.well-known/wallets/.{crypto}.proof'):
+        proof = f'<a href="/.well-known/wallets/.{crypto}.proof" target="_blank"><img src="/assets/img/proof.png" alt="Proof of ownership" style="width: 100%; max-width: 30px; margin-left: 10px;"></a>'
+
     if os.path.isfile(f'.well-known/wallets/{crypto}'):
         with open(f'.well-known/wallets/{crypto}') as file:
             address = file.read()
@@ -530,12 +535,17 @@ def donate():
                 cryptoHTML += f'<br>Donate with {coinNames[crypto] if crypto in coinNames else crypto}:'
             else:
                 cryptoHTML += f'<br>Donate with {token["name"]} {"("+token["symbol"]+") " if token["symbol"] != token["name"] else ""}on {crypto}:'
-            cryptoHTML += f'<code data-bs-toggle="tooltip" data-bss-tooltip="" id="crypto-address" class="address" style="color: rgb(242,90,5);display: block;" data-bs-original-title="Click to copy">{address}</code>'
+            cryptoHTML += f'<br><code data-bs-toggle="tooltip" data-bss-tooltip="" id="crypto-address" class="address" style="color: rgb(242,90,5);display: inline-block;" data-bs-original-title="Click to copy">{address}</code>'
+
+            if proof:
+                cryptoHTML += proof
     elif token:
         if 'address' in token:
             address = token['address']
             cryptoHTML += f'<br>Donate with {token["name"]} {"("+token["symbol"]+")" if token["symbol"] != token["name"] else ""}{" on "+crypto if crypto != "NULL" else ""}:'
-            cryptoHTML += f'<code data-bs-toggle="tooltip" data-bss-tooltip="" id="crypto-address" class="address" style="color: rgb(242,90,5);display: block;" data-bs-original-title="Click to copy">{address}</code>'
+            cryptoHTML += f'<br><code data-bs-toggle="tooltip" data-bss-tooltip="" id="crypto-address" class="address" style="color: rgb(242,90,5);display: inline-block;" data-bs-original-title="Click to copy">{address}</code>'
+            if proof:
+                cryptoHTML += proof
         else:
             cryptoHTML += f'<br>Invalid coin: {crypto}<br>'
     else:
@@ -554,11 +564,13 @@ def donate():
             cryptoHTML += '<br>Or send to this domain on compatible wallets:<br>'
             cryptoHTML += f'<code data-bs-toggle="tooltip" data-bss-tooltip="" id="crypto-domain" class="address" style="color: rgb(242,90,5);display: block;" data-bs-original-title="Click to copy">{domain}</code>'
     if address:
-        cryptoHTML += '<img src="/qrcode/' + address + '" alt="QR Code" style="width: 100%; max-width: 200px; margin: 20px auto;">'
+        cryptoHTML += '<br><img src="/qrcode/' + address + '" alt="QR Code" style="width: 100%; max-width: 200px; margin: 20px auto;">'
 
 
     copyScript = '<script>document.getElementById("crypto-address").addEventListener("click", function() {navigator.clipboard.writeText(this.innerText);this.setAttribute("data-bs-original-title", "Copied!");});document.getElementById("crypto-domain").addEventListener("click", function() {navigator.clipboard.writeText(this.innerText);this.setAttribute("data-bs-original-title", "Copied!");});</script>'
     cryptoHTML += copyScript
+
+    
 
     return render_template('donate.html', handshake_scripts=handshake_scripts, crypto=cryptoHTML, coins=coins,default_coins=default_coins)
 
