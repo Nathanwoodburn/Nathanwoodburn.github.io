@@ -111,6 +111,12 @@ def send_report(path):
 
 
 # region Special routes
+@app.route("/meet")
+@app.route("/meeting")
+@app.route("/appointment")
+def meet():
+    return redirect("https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr", code=302)
+
 @app.route("/links")
 def links():
     return render_template("link.html")
