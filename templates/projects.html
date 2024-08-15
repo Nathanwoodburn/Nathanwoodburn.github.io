@@ -61,7 +61,7 @@
     </header>
     <section class="text-center content-section" id="sites" style="padding-bottom: 100px;">
         <div class="container">
-            <div class="row gx-5 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-3 row-cols-xxl-4">{% for site in sites %}
+            <div class="row gx-5 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-3 row-cols-xxl-4" style="max-width: 100vw;">{% for site in sites %}
 <div class="col" style="padding-top: 20px;">
     <h2>{{site.name}}</h2>
     <p>{{site.description}}</p><a class="btn btn-primary" role="button" href="{{site.url}}" target="_blank">More Info</a>
