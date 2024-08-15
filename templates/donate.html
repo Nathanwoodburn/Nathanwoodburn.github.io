@@ -151,6 +151,10 @@
             textArea.select();
             document.execCommand('copy');
             document.body.removeChild(textArea);
+            const tooltips = document.querySelectorAll('.tooltip-inner');
+            tooltips.forEach(tooltip => {
+                tooltip.innerText = 'Copied!';
+            });
         }
 
     const btc = document.getElementById('btc');

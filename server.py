@@ -710,7 +710,7 @@ def donate():
             + '" alt="QR Code" style="width: 100%; max-width: 200px; margin: 20px auto;">'
         )
 
-    copyScript = '<script>document.getElementById("crypto-address").addEventListener("click", function() {navigator.clipboard.writeText(this.innerText);this.setAttribute("data-bs-original-title", "Copied!");});document.getElementById("crypto-domain").addEventListener("click", function() {navigator.clipboard.writeText(this.innerText);this.setAttribute("data-bs-original-title", "Copied!");});</script>'
+    copyScript = '<script>document.getElementById("crypto-address").addEventListener("click", function() {navigator.clipboard.writeText(this.innerText);this.setAttribute("data-bs-original-title", "Copied!");const tooltips = document.querySelectorAll(".tooltip-inner");tooltips.forEach(tooltip => {tooltip.innerText = "Copied!";});});document.getElementById("crypto-domain").addEventListener("click", function() {navigator.clipboard.writeText(this.innerText);this.setAttribute("data-bs-original-title", "Copied!");const tooltips = document.querySelectorAll(".tooltip-inner");tooltips.forEach(tooltip => {tooltip.innerText = "Copied!";});});</script>'
     cryptoHTML += copyScript
 
     return render_template(
