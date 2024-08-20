@@ -25,5 +25,6 @@
     "IAA": "IRIS (IAA)",
     "NEAR": "NEAR Protocol (NEAR)",
     "KAS": "Kasper (KAS)",
-    "XLM": "Stellar (XLM)"
+    "XLM": "Stellar (XLM)",
+    "NOBLE": "Noble (NOBLE)"
 }

@@ -20,6 +20,11 @@
         "chain": "SOL"
     },
     {
+        "symbol": "USDC",
+        "name": "USDC",
+        "chain": "NOBLE"
+    },
+    {
         "symbol": "WDBRN",
         "name": "Woodburn",
         "chain": "SOL"
