@@ -115,7 +115,10 @@ def send_report(path):
 @app.route("/meeting")
 @app.route("/appointment")
 def meet():
-    return redirect("https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr", code=302)
+    return redirect(
+        "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr", code=302
+    )
+
 
 @app.route("/links")
 def links():
@@ -810,23 +813,21 @@ def hnsdoh_acme():
         return jsonify({"status": "error", "error": "Invalid auth"})
 
     cf = Cloudflare(api_token=os.getenv("CF_TOKEN"))
-    zone = cf.zones.get(params={"name": "hnsdoh.com"})
-    zone_id = zone[0]["id"]
-    existing_records = cf.zones.dns_records.get(
-        zone_id, params={"type": "TXT", "name": "_acme-challenge.hnsdoh.com"}
+    zone = cf.zones.list(name="hnsdoh.com").to_dict()
+    zone_id = zone["result"][0]["id"]
+    existing_records = cf.dns.records.list(
+        zone_id=zone_id, type="TXT", name="_acme-challenge.hnsdoh.com"
+    ).to_dict()
+    record_id = existing_records["result"][0]["id"]
+    cf.dns.records.delete(dns_record_id=record_id, zone_id=zone_id)
+    cf.dns.records.create(
+        zone_id=zone_id,
+        type="TXT",
+        name="_acme-challenge",
+        content=txt,
     )
-
-    # Delete existing TXT records
-    for record in existing_records:
-        print(record)
-        record_id = record["id"]
-        cf.zones.dns_records.delete(zone_id, record_id)
-
-    record = cf.zones.dns_records.post(
-        zone_id, data={"type": "TXT", "name": "_acme-challenge", "content": txt}
-    )
-    print(record)
     return jsonify({"status": "success"})
+    
 
 
 # endregion
