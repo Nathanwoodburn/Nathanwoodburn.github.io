@@ -604,7 +604,7 @@ def now_old():
 
 # endregion
 
-
+#region Donate
 @app.route("/donate")
 def donate():
     global handshake_scripts
@@ -698,9 +698,9 @@ def donate():
             if proof:
                 cryptoHTML += proof
         else:
-            cryptoHTML += f"<br>Invalid coin: {crypto}<br>"
+            cryptoHTML += f'<br>Invalid offchain token: {token["symbol"]}<br>'
     else:
-        cryptoHTML += f"<br>Invalid coin: {crypto}<br>"
+        cryptoHTML += f"<br>Invalid chain: {crypto}<br>"
 
     if os.path.isfile(f".well-known/wallets/.domains"):
         # Get json of all domains
@@ -750,6 +750,7 @@ def addressQR(data):
     # Return the QR code image as a response
     return send_file(qr_image_path, mimetype="image/png")
 
+#endregion
 
 @app.route("/supersecretpath")
 def supersecretpath():
