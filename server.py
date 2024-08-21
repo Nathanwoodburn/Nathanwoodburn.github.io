@@ -67,6 +67,11 @@ def getAddress(coin: str) -> str:
             address = file.read()
     return address
 
+def find(name, path):
+    for root, dirs, files in os.walk(path):
+        if name in files:
+            return os.path.join(root, name)
+
 
 # Assets routes
 @app.route("/assets/<path:path>")
@@ -765,7 +770,7 @@ def supersecretpath():
 
 
 @app.route("/<path:path>")
-def catch_all(path):
+def catch_all(path: str):
     global handshake_scripts
     # If localhost, don't load handshake
     if (
@@ -792,6 +797,15 @@ def catch_all(path):
         return render_template(
             path.strip("/") + ".html", handshake_scripts=handshake_scripts, sites=sites
         )
+
+    # Try to find a file matching
+    if path.count("/") < 1:
+        # Try to find a file matching
+        filename = find(path, "templates")
+        if filename:
+            return send_file(filename)
+    
+
 
     return render_template("404.html"), 404
 
