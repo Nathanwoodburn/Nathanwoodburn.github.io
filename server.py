@@ -496,6 +496,7 @@ def index():
             sites=sites,
             projects=projects,
             time=time,
+            message=ncConfig["message"],
         ),
         200,
         {"Content-Type": "text/html"},
