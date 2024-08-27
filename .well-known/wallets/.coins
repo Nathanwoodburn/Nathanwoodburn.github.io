@@ -26,5 +26,7 @@
     "NEAR": "NEAR Protocol (NEAR)",
     "KAS": "Kasper (KAS)",
     "XLM": "Stellar (XLM)",
-    "NOBLE": "Noble (NOBLE)"
+    "APT": "Aptos (APT)",
+    "TRX": "Tron (TRX)",
+    "BCH": "Bitcoin Cash (BCH)"
 }
