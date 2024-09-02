@@ -67,6 +67,7 @@ def getAddress(coin: str) -> str:
             address = file.read()
     return address
 
+
 def find(name, path):
     for root, dirs, files in os.walk(path):
         if name in files:
@@ -341,14 +342,18 @@ def index():
 
     # Check if crawler
     if (
-        request.user_agent.browser != "Googlebot"
-        and request.user_agent.browser != "Bingbot"
+        "Googlebot" not in request.user_agent.browser
+        and "Bingbot" not in request.user_agent.browser
     ):
         # Check if cookie is set
         if not request.cookies.get("loaded") and not loaded:
             # Set cookie
             resp = make_response(
-                render_template("loading.html"), 200, {"Content-Type": "text/html"}
+                render_template("loading.html").replace(
+                    "https://nathan.woodburn.au/loading", "https://nathan.woodburn.au/"
+                ),
+                200,
+                {"Content-Type": "text/html"},
             )
             resp.set_cookie("loaded", "true", max_age=604800)
             return resp
@@ -610,7 +615,8 @@ def now_old():
 
 # endregion
 
-#region Donate
+
+# region Donate
 @app.route("/donate")
 def donate():
     global handshake_scripts
@@ -756,7 +762,9 @@ def addressQR(data):
     # Return the QR code image as a response
     return send_file(qr_image_path, mimetype="image/png")
 
-#endregion
+
+# endregion
+
 
 @app.route("/supersecretpath")
 def supersecretpath():
@@ -805,8 +813,6 @@ def catch_all(path: str):
         filename = find(path, "templates")
         if filename:
             return send_file(filename)
-    
-
 
     return render_template("404.html"), 404
 
@@ -843,7 +849,6 @@ def hnsdoh_acme():
         content=txt,
     )
     return jsonify({"status": "success"})
-    
 
 
 # endregion
