@@ -342,8 +342,8 @@ def index():
 
     # Check if crawler
     if (
-        "Googlebot" not in request.user_agent.browser
-        and "Bingbot" not in request.user_agent.browser
+        "Googlebot" not in request.headers.get("User-Agent")
+        and "Bingbot" not in request.headers.get("User-Agent")
     ):
         # Check if cookie is set
         if not request.cookies.get("loaded") and not loaded:
