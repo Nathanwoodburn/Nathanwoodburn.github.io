@@ -188,12 +188,19 @@ def wallet(path):
 def nostr():
     # Get name parameter
     name = request.args.get("name")
-    if not name:
-        return jsonify({"error": "No name provided"})
+    if name:
+        return jsonify(
+            {
+                "names": {
+                    name: "b57b6a06fdf0a4095eba69eee26e2bf6fa72bd1ce6cbe9a6f72a7021c7acaa82"
+                }
+            }
+        )
     return jsonify(
         {
             "names": {
-                name: "b57b6a06fdf0a4095eba69eee26e2bf6fa72bd1ce6cbe9a6f72a7021c7acaa82"
+                "nathan": "b57b6a06fdf0a4095eba69eee26e2bf6fa72bd1ce6cbe9a6f72a7021c7acaa82",
+                "_": "b57b6a06fdf0a4095eba69eee26e2bf6fa72bd1ce6cbe9a6f72a7021c7acaa82",
             }
         }
     )
@@ -341,10 +348,9 @@ def index():
             loaded = True
 
     # Check if crawler
-    if (
-        "Googlebot" not in request.headers.get("User-Agent")
-        and "Bingbot" not in request.headers.get("User-Agent")
-    ):
+    if "Googlebot" not in request.headers.get(
+        "User-Agent"
+    ) and "Bingbot" not in request.headers.get("User-Agent"):
         # Check if cookie is set
         if not request.cookies.get("loaded") and not loaded:
             # Set cookie
