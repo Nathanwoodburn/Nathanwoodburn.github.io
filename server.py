@@ -411,7 +411,10 @@ def index():
             pageNum += 1
 
         for project in projects:
-            if project["avatar_url"] == "https://git.woodburn.au/":
+            if (
+                project["avatar_url"] == "https://git.woodburn.au/"
+                or project["avatar_url"] == ""
+            ):
                 project["avatar_url"] = "/favicon.png"
             project["name"] = project["name"].replace("_", " ").replace("-", " ")
         # Sort by last updated
