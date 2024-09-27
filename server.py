@@ -39,6 +39,9 @@ dotenv.load_dotenv()
 handshake_scripts = '<script src="https://nathan.woodburn/handshake.js" domain="nathan.woodburn" async></script><script src="https://nathan.woodburn/https.js" async></script>'
 
 restricted = ["ascii"]
+redirects = {
+    "contact":"/#contact"
+}
 
 sites = []
 if os.path.isfile("data/sites.json"):
@@ -801,6 +804,10 @@ def catch_all(path: str):
 
     if path.lower().replace(".html", "") in restricted:
         return render_template("404.html"), 404
+    print(path)
+    if path in redirects:
+        return redirect(redirects[path], code=302)
+
     # If file exists, load it
     if os.path.isfile("templates/" + path):
         return render_template(path, handshake_scripts=handshake_scripts, sites=sites)
