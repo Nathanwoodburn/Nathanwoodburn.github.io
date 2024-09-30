@@ -42,6 +42,10 @@ restricted = ["ascii"]
 redirects = {
     "contact":"/#contact"
 }
+downloads = {
+    "pgp": "data/nathanwoodburn.asc"
+}
+
 
 sites = []
 if os.path.isfile("data/sites.json"):
@@ -789,6 +793,14 @@ def supersecretpath():
     ascii_art_html = converter.convert(ascii_art)
     return render_template("ascii.html", ascii_art=ascii_art_html)
 
+@app.route("/download/<path:path>")
+def download(path):
+    # Check if file exists
+    if path in downloads:
+        path = downloads[path]
+    if os.path.isfile(path):
+        return send_file(path)
+    return render_template("404.html"), 404
 
 @app.route("/<path:path>")
 def catch_all(path: str):
