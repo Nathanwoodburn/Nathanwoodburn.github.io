@@ -158,6 +158,10 @@ def faviconPNG():
 def faviconSVG():
     return send_from_directory("templates/assets/img/favicon", "favicon.svg")
 
+@app.route("/favicon.ico")
+def faviconICO():
+    return send_from_directory("templates/assets/img/favicon", "favicon.ico")
+
 
 @app.route("/https.js")
 @app.route("/handshake.js")
