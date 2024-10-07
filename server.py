@@ -634,8 +634,9 @@ def now_old():
 
 @app.route("/now.rss")
 def now_rss():
-    host = request.scheme + "://" + request.host
-    print(host)
+    host = "https://" + request.host
+    if ":" in request.host:
+        host = "http://" + request.host
     # Generate RSS feed
     now_pages = os.listdir("templates/now")
     now_pages = [
@@ -647,7 +648,7 @@ def now_rss():
         link = page.strip(".html")
         date = datetime.datetime.strptime(link, "%y_%m_%d")
         date = date.strftime("%A, %B %d, %Y")
-        rss += f'<item><title>{date}</title><link>{host}/now/{link}</link><description>{date}</description><guid>{host}/now/{link}</guid></item>'
+        rss += f'<item><title>What\'s Happening {date}</title><link>{host}/now/{link}</link><description>Latest updates for {date}</description><guid>{host}/now/{link}</guid></item>'
     rss += "</channel></rss>"
     return make_response(rss, 200, {"Content-Type": "application/rss+xml"})
 
