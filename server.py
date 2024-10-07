@@ -652,6 +652,18 @@ def now_rss():
     rss += "</channel></rss>"
     return make_response(rss, 200, {"Content-Type": "application/rss+xml"})
 
+@app.route("/now.json")
+def now_json():
+    now_pages = os.listdir("templates/now")
+    now_pages = [
+        page for page in now_pages if page != "template.html" and page != "old.html"
+    ]
+    now_pages.sort(reverse=True)
+    host = "https://" + request.host
+    if ":" in request.host:
+        host = "http://" + request.host
+    now_pages = [{"url":host+"/now/"+page.strip(".html"), "date":datetime.datetime.strptime(page.strip(".html"), "%y_%m_%d").strftime("%A, %B %d, %Y"), "title":"What's Happening "+datetime.datetime.strptime(page.strip(".html"), "%y_%m_%d").strftime("%A, %B %d, %Y")} for page in now_pages]
+    return jsonify(now_pages)
 
 # endregion
 
