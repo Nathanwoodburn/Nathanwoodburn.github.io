@@ -632,6 +632,25 @@ def now_old():
         "now/old.html", handshake_scripts=handshake_scripts, now_pages=html
     )
 
+@app.route("/now.rss")
+def now_rss():
+    host = request.scheme + "://" + request.host
+    print(host)
+    # Generate RSS feed
+    now_pages = os.listdir("templates/now")
+    now_pages = [
+        page for page in now_pages if page != "template.html" and page != "old.html"
+    ]
+    now_pages.sort(reverse=True)
+    rss = f'<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Nathan.Woodburn/</title><link>{host}</link><description>See what I\'ve been up to</description><language>en-us</language><lastBuildDate>{datetime.datetime.now(tz=datetime.timezone.utc).strftime("%a, %d %b %Y %H:%M:%S %z")}</lastBuildDate><atom:link href="{host}/now.rss" rel="self" type="application/rss+xml" />'
+    for page in now_pages:
+        link = page.strip(".html")
+        date = datetime.datetime.strptime(link, "%y_%m_%d")
+        date = date.strftime("%A, %B %d, %Y")
+        rss += f'<item><title>{date}</title><link>{host}/now/{link}</link><description>{date}</description><guid>{host}/now/{link}</guid></item>'
+    rss += "</channel></rss>"
+    return make_response(rss, 200, {"Content-Type": "application/rss+xml"})
+
 
 # endregion
 
