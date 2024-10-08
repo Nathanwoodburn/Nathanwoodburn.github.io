@@ -359,21 +359,22 @@ def index():
             loaded = True
 
     # Check if crawler
-    if "Googlebot" not in request.headers.get(
-        "User-Agent"
-    ) and "Bingbot" not in request.headers.get("User-Agent"):
-        # Check if cookie is set
-        if not request.cookies.get("loaded") and not loaded:
-            # Set cookie
-            resp = make_response(
-                render_template("loading.html").replace(
-                    "https://nathan.woodburn.au/loading", "https://nathan.woodburn.au/"
-                ),
-                200,
-                {"Content-Type": "text/html"},
-            )
-            resp.set_cookie("loaded", "true", max_age=604800)
-            return resp
+    if request.headers:
+        if "Googlebot" not in request.headers.get(
+            "User-Agent"
+        ) and "Bingbot" not in request.headers.get("User-Agent"):
+            # Check if cookie is set
+            if not request.cookies.get("loaded") and not loaded:
+                # Set cookie
+                resp = make_response(
+                    render_template("loading.html").replace(
+                        "https://nathan.woodburn.au/loading", "https://nathan.woodburn.au/"
+                    ),
+                    200,
+                    {"Content-Type": "text/html"},
+                )
+                resp.set_cookie("loaded", "true", max_age=604800)
+                return resp
 
     global handshake_scripts
     global projects
