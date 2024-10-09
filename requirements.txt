@@ -5,6 +5,7 @@ gunicorn
 requests
 cloudflare == 3.0.1
 qrcode
+Pillow
 ansi2html
 cachetools
 solana == 0.34.2

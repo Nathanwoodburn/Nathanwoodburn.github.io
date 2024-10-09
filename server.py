@@ -30,6 +30,7 @@ from solders.hash import Hash
 from solders.message import MessageV0
 from solders.transaction import VersionedTransaction
 from solders.null_signer import NullSigner
+from PIL import Image
 
 app = Flask(__name__)
 CORS(app)
@@ -779,7 +780,7 @@ def donate():
             cryptoHTML += f'<code data-bs-toggle="tooltip" data-bss-tooltip="" id="crypto-domain" class="address" style="color: rgb(242,90,5);display: block;" data-bs-original-title="Click to copy">{domain}</code>'
     if address:
         cryptoHTML += (
-            '<br><img src="/qrcode/'
+            '<br><img src="/address/'
             + address
             + '" alt="QR Code" style="width: 100%; max-width: 200px; margin: 20px auto;">'
         )
@@ -796,15 +797,15 @@ def donate():
     )
 
 
-@app.route("/qrcode/<path:data>")
-def addressQR(data):
+@app.route("/address/<path:address>")
+def addressQR(address:str):
     qr = qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
         box_size=10,
         border=4,
     )
-    qr.add_data(data)
+    qr.add_data(address)
     qr.make(fit=True)
     qr_image = qr.make_image(fill_color="#110033", back_color="white")
 
@@ -814,6 +815,30 @@ def addressQR(data):
 
     # Return the QR code image as a response
     return send_file(qr_image_path, mimetype="image/png")
+
+
+@app.route("/qrcode/<path:data>")
+@app.route("/qr/<path:data>")
+def qr(data:str):
+    qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_H,box_size=10,border=2)
+    qr.add_data(data)
+    qr.make()
+
+    qr_image:Image.Image = qr.make_image(fill_color="black", back_color="white").convert('RGB')
+
+    # Add logo
+    logo = Image.open("templates/assets/img/favicon/logo.png")
+    basewidth = qr_image.size[0]//3
+    wpercent = (basewidth / float(logo.size[0]))
+    hsize = int((float(logo.size[1]) * float(wpercent)))
+    logo = logo.resize((basewidth, hsize),Image.Resampling.LANCZOS)
+    pos = ((qr_image.size[0] - logo.size[0]) // 2,
+       (qr_image.size[1] - logo.size[1]) // 2)
+    qr_image.paste(logo, pos, mask=logo)
+
+
+    qr_image.save("/tmp/qr_code.png")
+    return send_file("/tmp/qr_code.png", mimetype="image/png")
 
 
 # endregion
