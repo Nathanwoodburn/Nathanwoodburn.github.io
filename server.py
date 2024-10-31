@@ -31,6 +31,8 @@ from solders.message import MessageV0
 from solders.transaction import VersionedTransaction
 from solders.null_signer import NullSigner
 from PIL import Image
+from mail import sendEmail
+import now
 
 app = Flask(__name__)
 CORS(app)
@@ -295,7 +297,7 @@ def donateAmount(amount):
         "icon": "https://nathan.woodburn.au/assets/img/profile.png",
         "label": f"Donate {amount} SOL to Nathan.Woodburn/",
         "title": "Donate to Nathan.Woodburn/",
-        "description": "Donate {amount} SOL to Nathan.Woodburn/",
+        "description": f"Donate {amount} SOL to Nathan.Woodburn/",
     }
     return jsonify(data)
 
@@ -343,12 +345,90 @@ def donateAmountPost(amount):
 
 
 # endregion
+
+#region Other API routes
+@app.route("/api/time")
+def time():
+    timezone_offset = datetime.timedelta(hours=ncConfig["time-zone"])
+    timezone = datetime.timezone(offset=timezone_offset)
+    time = datetime.datetime.now(tz=timezone)
+    return jsonify({
+        "timestring": time.strftime("%A, %B %d, %Y %I:%M %p"),
+        "timestamp": time.timestamp(),
+        "timezone": ncConfig["time-zone"],
+        "timeISO": time.isoformat()
+        })
+
+
+@app.route("/api/timezone")
+def timezone():
+    return jsonify({"timezone": ncConfig["time-zone"]})
+
+@app.route("/api/timezone", methods=["POST"])
+def timezonePost():
+    # Refresh config
+    global ncConfig
+    conf = requests.get("https://cloud.woodburn.au/s/4ToXgFe3TnnFcN7/download/website-conf.json")
+    if conf.status_code != 200:
+        return jsonify({"message": "Error: Could not get timezone"})
+    if not conf.json():
+        return jsonify({"message": "Error: Could not get timezone"})
+    conf = conf.json()
+    if "time-zone" not in conf:
+        return jsonify({"message": "Error: Could not get timezone"})
+    
+    ncConfig = conf
+    return jsonify({"message": "Successfully pulled latest timezone", "timezone": ncConfig["time-zone"]})
+
+@app.route("/api/message")
+def nc():
+    return jsonify({"message": ncConfig["message"]})
+
+@app.route("/api/ip")
+def ip():
+    return jsonify({"ip": request.remote_addr})
+
+
+@app.route("/api/email", methods=["POST"])
+def email():
+    # Verify json
+    if not request.is_json:
+        return jsonify({
+            "status": 400,
+            "error": "Bad request JSON Data missing"
+        })
+    
+    # Check if api key sent
+    data = request.json
+    if "key" not in data:
+        return jsonify({
+            "status": 401,
+            "error": "Unauthorized 'key' missing"
+        })
+    
+    if data["key"] != os.getenv("EMAIL_KEY"):
+        return jsonify({
+            "status": 401,
+            "error": "Unauthorized 'key' invalid"
+        })
+    
+    
+
+    return sendEmail(data)
+
+    
+
+#endregion
 # endregion
 
 
 # region Main routes
 @app.route("/")
-def index():
+def index():    
+    global handshake_scripts
+    global projects
+    global projectsUpdated
+
     # Check if host if podcast.woodburn.au
     if "podcast.woodburn.au" in request.host:
         return render_template("podcast.html")
@@ -361,6 +441,16 @@ def index():
 
     # Check if crawler
     if request.headers:
+        # Check if curl
+        if "curl" in request.headers.get("User-Agent"):
+            return jsonify(
+                {
+                    "message": "Welcome to Nathan.Woodburn/! This is a personal website. For more information, visit https://nathan.woodburn.au",
+                    "ip": request.remote_addr,
+                    "dev": handshake_scripts == "",
+                }
+            )
+
         if "Googlebot" not in request.headers.get(
             "User-Agent"
         ) and "Bingbot" not in request.headers.get("User-Agent"):
@@ -376,11 +466,7 @@ def index():
                 )
                 resp.set_cookie("loaded", "true", max_age=604800)
                 return resp
-
-    global handshake_scripts
-    global projects
-    global projectsUpdated
-
+    
     try:
         git = requests.get(
             "https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1",
@@ -477,26 +563,15 @@ def index():
     <script>
     function startClock(timezoneOffset) {
     function updateClock() {
-        // Get current UTC time
         const now = new Date();
-
-        // Calculate the local time based on the timezone offset
         const localTime = new Date(now.getTime() + timezoneOffset * 3600 * 1000);
-
-        // Generate timezone name dynamically
         const tzName = timezoneOffset >= 0 ? `UTC+${timezoneOffset}` : `UTC`;
-
-        // Format the local time as HH:MM:SS
         const hours = String(localTime.getUTCHours()).padStart(2, '0');
         const minutes = String(localTime.getUTCMinutes()).padStart(2, '0');
         const seconds = String(localTime.getUTCSeconds()).padStart(2, '0');
-
-        // Display the formatted time with the timezone name
         const timeString = `${hours}:${minutes}:${seconds} ${tzName}`;
         document.getElementById('time').textContent = timeString;
     }
-
-    // Update the clock immediately and then every second
     updateClock();
     setInterval(updateClock, 1000);
 }
@@ -536,7 +611,7 @@ def index():
 # region Now Pages
 @app.route("/now")
 @app.route("/now/")
-def now():
+def now_page():
     global handshake_scripts
 
     # If localhost, don't load handshake
@@ -548,18 +623,7 @@ def now():
     ):
         handshake_scripts = ""
 
-    # Get latest now page
-    files = os.listdir("templates/now")
-    # Remove template
-    files = [file for file in files if file != "template.html" and file != "old.html"]
-    files.sort(reverse=True)
-    date = files[0].strip(".html")
-    # Convert to date
-    date = datetime.datetime.strptime(date, "%y_%m_%d")
-    date = date.strftime("%A, %B %d, %Y")
-    return render_template(
-        "now/" + files[0], handshake_scripts=handshake_scripts, DATE=date
-    )
+    return now.render_latest_now(handshake_scripts)
 
 
 @app.route("/now/<path:path>")
@@ -573,31 +637,9 @@ def now_path(path):
         or request.host == "test.nathan.woodburn.au"
     ):
         handshake_scripts = ""
+    
 
-    date = path
-    date = date.strip(".html")
-
-    try:
-        # Convert to date
-        date = datetime.datetime.strptime(date, "%y_%m_%d")
-        date = date.strftime("%A, %B %d, %Y")
-    except:
-        date = ""
-
-    if path.lower().replace(".html", "") == "template":
-        return render_template("404.html"), 404
-
-    # If file exists, load it
-    if os.path.isfile("templates/now/" + path):
-        return render_template(
-            "now/" + path, handshake_scripts=handshake_scripts, DATE=date
-        )
-    if os.path.isfile("templates/now/" + path + ".html"):
-        return render_template(
-            "now/" + path + ".html", handshake_scripts=handshake_scripts, DATE=date
-        )
-
-    return render_template("404.html"), 404
+    return now.render_now_page(path,handshake_scripts)
 
 
 @app.route("/old")
@@ -614,20 +656,16 @@ def now_old():
         or request.host == "test.nathan.woodburn.au"
     ):
         handshake_scripts = ""
-
-    now_pages = os.listdir("templates/now")
-    now_pages = [
-        page for page in now_pages if page != "template.html" and page != "old.html"
-    ]
-    now_pages.sort(reverse=True)
+    
+    now_dates = now.list_now_dates()[1:]
     html = '<ul class="list-group">'
-    latest = " (Latest)"
-    for page in now_pages:
-        link = page.strip(".html")
-        date = datetime.datetime.strptime(link, "%y_%m_%d")
+    html += f'<a style="text-decoration:none;" href="/now"><li class="list-group-item" style="background-color:#000000;color:#ffffff;">{now.get_latest_now_date(True)}</li></a>'
+    
+    for date in now_dates:
+        link = date
+        date = datetime.datetime.strptime(date, "%y_%m_%d")
         date = date.strftime("%A, %B %d, %Y")
-        html += f'<a style="text-decoration:none;" href="/now/{link}"><li class="list-group-item" style="background-color:#000000;color:#ffffff;">{date}{latest}</li></a>'
-        latest = ""
+        html += f'<a style="text-decoration:none;" href="/now/{link}"><li class="list-group-item" style="background-color:#000000;color:#ffffff;">{date}</li></a>'
 
     html += "</ul>"
     return render_template(
@@ -640,11 +678,7 @@ def now_rss():
     if ":" in request.host:
         host = "http://" + request.host
     # Generate RSS feed
-    now_pages = os.listdir("templates/now")
-    now_pages = [
-        page for page in now_pages if page != "template.html" and page != "old.html"
-    ]
-    now_pages.sort(reverse=True)
+    now_pages = now.list_now_page_files()
     rss = f'<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Nathan.Woodburn/</title><link>{host}</link><description>See what I\'ve been up to</description><language>en-us</language><lastBuildDate>{datetime.datetime.now(tz=datetime.timezone.utc).strftime("%a, %d %b %Y %H:%M:%S %z")}</lastBuildDate><atom:link href="{host}/now.rss" rel="self" type="application/rss+xml" />'
     for page in now_pages:
         link = page.strip(".html")
@@ -656,11 +690,7 @@ def now_rss():
 
 @app.route("/now.json")
 def now_json():
-    now_pages = os.listdir("templates/now")
-    now_pages = [
-        page for page in now_pages if page != "template.html" and page != "old.html"
-    ]
-    now_pages.sort(reverse=True)
+    now_pages = now.list_now_page_files()
     host = "https://" + request.host
     if ":" in request.host:
         host = "http://" + request.host
@@ -878,7 +908,7 @@ def catch_all(path: str):
 
     if path.lower().replace(".html", "") in restricted:
         return render_template("404.html"), 404
-    print(path)
+
     if path in redirects:
         return redirect(redirects[path], code=302)
 
@@ -904,6 +934,16 @@ def catch_all(path: str):
         if filename:
             return send_file(filename)
 
+    if request.headers:
+        # Check if curl
+        if "curl" in request.headers.get("User-Agent"):
+            return jsonify(
+                {
+                    "status": 404,
+                    "message": "Page not found",
+                    "ip": request.remote_addr,
+                }
+            ), 404
     return render_template("404.html"), 404
 
 
@@ -996,6 +1036,17 @@ def podsync():
 # 404 catch all
 @app.errorhandler(404)
 def not_found(e):
+    if request.headers:
+        # Check if curl
+        if "curl" in request.headers.get("User-Agent"):
+            return jsonify(
+                {
+                    "status": 404,
+                    "message": "Page not found",
+                    "ip": request.remote_addr,
+                }
+            ), 404
+
     return render_template("404.html"), 404
 
 
