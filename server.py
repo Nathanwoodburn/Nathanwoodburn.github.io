@@ -411,11 +411,8 @@ def email():
             "status": 401,
             "error": "Unauthorized 'key' invalid"
         })
-    
-    
 
     return sendEmail(data)
-
     
 
 #endregion
@@ -673,6 +670,8 @@ def now_old():
     )
 
 @app.route("/now.rss")
+@app.route("/now.xml")
+@app.route("/rss.xml")
 def now_rss():
     host = "https://" + request.host
     if ":" in request.host:

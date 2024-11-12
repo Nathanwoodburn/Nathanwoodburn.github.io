@@ -7,6 +7,20 @@ from flask import jsonify
 import os
 
 
+# This is used to send emails via API
+# The process should be something like this
+# curl --request POST \
+#   --url https://nathan.c.woodburn.au/api/email \
+#   --header 'Content-Type: application/json' \
+#   --data '{
+#         "key":"api-key",
+#         "to": "recipient@nathan.woodburn.au",
+#         "from": "sender@nathan.woodburn.au",
+#         "sender":"Nathan.Woodburn/",
+#         "subject":"Test email from api",
+#         "body":"G'\''day\nThis is a test email from my website api\n\nRegards,\nNathan.Woodburn/"
+# }'
+
 def validateSender(email):
     domains = os.getenv("EMAIL_DOMAINS").split(",")
     for domain in domains:
