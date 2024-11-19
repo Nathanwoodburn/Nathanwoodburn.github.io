@@ -279,13 +279,19 @@ def donateAPI():
             ]
         },
     }
-    response = make_response(jsonify(data), 200, {"Content-Type": "application/json"})
+    headers = {
+        "Content-Type": "application/json",
+        "X-Action-Version": "2.4.2",
+        "X-Blockchain-Ids": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+    }
+    response = make_response(jsonify(data), 200, headers)
+    
 
     if request.method == "OPTIONS":
         response.headers["Access-Control-Allow-Origin"] = "*"
         response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, OPTIONS"
         response.headers["Access-Control-Allow-Headers"] = (
-            "Content-Type,Authorization,Content-Encoding,Accept-Encoding"
+            "Content-Type,Authorization,Content-Encoding,Accept-Encoding,X-Action-Version,X-Blockchain-Ids"
         )
 
     return response
@@ -312,11 +318,21 @@ def donateAmountPost(amount):
 
     sender = request.json["account"]
 
+    headers = {
+        "Content-Type": "application/json",
+        "X-Action-Version": "2.4.2",
+        "X-Blockchain-Ids": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+    }
+
     # Make sure amount is a number
     try:
         amount = float(amount)
     except:
-        return jsonify({"message": "Error: Invalid amount"})
+        return jsonify({"message": "Error: Invalid amount"}), 400, headers
+    
+    if amount < 0.0001:
+        return jsonify({"message": "Error: Amount too small"}), 400, headers
+        
 
     # Create transaction
     sender = Pubkey.from_string(sender)
@@ -341,7 +357,7 @@ def donateAmountPost(amount):
     raw_bytes = binascii.unhexlify(tx)
     base64_string = base64.b64encode(raw_bytes).decode("utf-8")
 
-    return jsonify({"message": "Success", "transaction": base64_string})
+    return jsonify({"message": "Success", "transaction": base64_string}), 200, headers
 
 
 # endregion
