@@ -25,6 +25,16 @@
         "chain": "NOBLE"
     },
     {
+        "symbol": "PYUSD",
+        "name": "PayPal USD",
+        "chain": "ETH"
+    },
+    {
+        "symbol": "PYUSD",
+        "name": "PayPal USD",
+        "chain": "SOL"
+    },
+    {
         "symbol": "WDBRN",
         "name": "Woodburn",
         "chain": "SOL"
