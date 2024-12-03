@@ -10,3 +10,4 @@ ansi2html
 cachetools
 solana == 0.34.2
 solders == 0.21.0
+weasyprint
