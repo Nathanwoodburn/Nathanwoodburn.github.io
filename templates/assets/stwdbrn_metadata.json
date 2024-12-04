@@ -1,0 +1,16 @@
+{
+  "name": "Woodburn Portfolio",
+  "symbol": "stWDBRN",
+  "image": "https://nathan.woodburn.au/stWDBRN.png",
+  "description": "Woodburn Portfolio Token",
+  "extensions": {
+    "website": "https://nathan.woodburn.au"
+  },
+  "tags": [
+    "Woodburn"
+  ],
+  "creator": {
+    "name": "Nathan.Woodburn/",
+    "site": "https://nathan.woodburn.au"
+  }
+}
