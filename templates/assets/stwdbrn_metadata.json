@@ -1,8 +1,8 @@
 {
-  "name": "Woodburn Portfolio",
+  "name": "Woodburn Vault",
   "symbol": "stWDBRN",
   "image": "https://nathan.woodburn.au/stWDBRN.png",
-  "description": "Woodburn Portfolio Token",
+  "description": "Woodburn Vault Token",
   "extensions": {
     "website": "https://nathan.woodburn.au"
   },
