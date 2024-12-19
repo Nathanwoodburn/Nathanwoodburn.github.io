@@ -413,7 +413,7 @@ def email():
             "status": 400,
             "error": "Bad request JSON Data missing"
         })
-    
+
     # Check if api key sent
     data = request.json
     if "key" not in data:
@@ -421,7 +421,7 @@ def email():
             "status": 401,
             "error": "Unauthorized 'key' missing"
         })
-    
+
     if data["key"] != os.getenv("EMAIL_KEY"):
         return jsonify({
             "status": 401,
@@ -429,7 +429,6 @@ def email():
         })
 
     return sendEmail(data)
-    
 
 #endregion
 # endregion
@@ -437,7 +436,7 @@ def email():
 
 # region Main routes
 @app.route("/")
-def index():    
+def index():
     global handshake_scripts
     global projects
     global projectsUpdated
@@ -453,7 +452,7 @@ def index():
             loaded = True
 
     # Check if crawler
-    if request.headers:
+    if request.headers and request.headers.get("User-Agent"):
         # Check if curl
         if "curl" in request.headers.get("User-Agent"):
             return jsonify(
@@ -479,7 +478,7 @@ def index():
                 )
                 resp.set_cookie("loaded", "true", max_age=604800)
                 return resp
-    
+
     try:
         git = requests.get(
             "https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1",
@@ -650,7 +649,7 @@ def now_path(path):
         or request.host == "test.nathan.woodburn.au"
     ):
         handshake_scripts = ""
-    
+
 
     return now.render_now_page(path,handshake_scripts)
 
@@ -669,11 +668,11 @@ def now_old():
         or request.host == "test.nathan.woodburn.au"
     ):
         handshake_scripts = ""
-    
+
     now_dates = now.list_now_dates()[1:]
     html = '<ul class="list-group">'
     html += f'<a style="text-decoration:none;" href="/now"><li class="list-group-item" style="background-color:#000000;color:#ffffff;">{now.get_latest_now_date(True)}</li></a>'
-    
+
     for date in now_dates:
         link = date
         date = datetime.datetime.strptime(date, "%y_%m_%d")

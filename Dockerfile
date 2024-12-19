@@ -14,4 +14,4 @@ COPY . /app
 ENTRYPOINT ["python3"]
 CMD ["main.py"]
 
-FROM builder as dev-envs
+FROM builder AS dev-envs
