@@ -181,7 +181,7 @@ def removeTrailingSlash():
 
 @app.route("/.well-known/wallets/<path:path>")
 def wallet(path):
-    if path[0] == ".":
+    if path[0] == "." and 'proof' not in path:
         return send_from_directory(
             ".well-known/wallets", path, mimetype="application/json"
         )
