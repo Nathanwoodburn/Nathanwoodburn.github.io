@@ -967,15 +967,20 @@ def catch_all(path: str):
 # region ACME
 @app.route("/hnsdoh-acme", methods=["POST"])
 def hnsdoh_acme():
+    print(f"ACME request from {request.remote_addr}")
+
     # Get the TXT record from the request
     if not request.json:
+        print("No JSON data provided for ACME")
         return jsonify({"status": "error", "error": "No JSON data provided"})
     if "txt" not in request.json or "auth" not in request.json:
+        print("Missing required data for ACME")
         return jsonify({"status": "error", "error": "Missing required data"})
 
     txt = request.json["txt"]
     auth = request.json["auth"]
     if auth != os.getenv("CF_AUTH"):
+        print("Invalid auth for ACME")
         return jsonify({"status": "error", "error": "Invalid auth"})
 
     cf = Cloudflare(api_token=os.getenv("CF_TOKEN"))
@@ -992,6 +997,7 @@ def hnsdoh_acme():
         name="_acme-challenge",
         content=txt,
     )
+    print(f"ACME request successful: {txt}")
     return jsonify({"status": "success"})
 
 
