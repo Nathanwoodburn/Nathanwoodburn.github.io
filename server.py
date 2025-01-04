@@ -650,7 +650,6 @@ def now_path(path):
     ):
         handshake_scripts = ""
 
-
     return now.render_now_page(path,handshake_scripts)
 
 
