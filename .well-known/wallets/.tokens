@@ -79,5 +79,10 @@
         "name": "Bitcoin Lightning",
         "chain": "null",
         "address": "thinbadger6@primal.net"
+    },
+    {
+        "symbol": "stWDBRN",
+        "name": "Woodburn Vault",
+        "chain": "SOL"
     }
 ]
