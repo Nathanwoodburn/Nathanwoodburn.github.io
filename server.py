@@ -430,6 +430,39 @@ def email():
 
     return sendEmail(data)
 
+@app.route("/api/v1/project")
+def getCurrentProject():
+    try:
+        git = requests.get(
+            "https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1",
+            headers={"Authorization": os.getenv("git_token")},
+        )
+        git = git.json()
+        git = git[0]
+        repo_name = git["repo"]["name"]
+        repo_name = repo_name.lower()
+        repo_description = git["repo"]["description"]
+    except:
+        repo_name = "nathanwoodburn.github.io"
+        repo_description = "Personal website"
+        git = {
+            "repo": {
+                "html_url": "https://nathan.woodburn.au",
+                "name": "nathanwoodburn.github.io",
+                "description": "Personal website",
+            }
+        }
+        print("Error getting git data")
+    
+    return jsonify({
+        "repo_name": repo_name,
+        "repo_description": repo_description,
+        "git": git,
+    })
+
+    
+    
+
 #endregion
 # endregion
 
