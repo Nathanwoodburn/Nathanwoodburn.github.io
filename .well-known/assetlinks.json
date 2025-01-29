@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "au.woodburn.nathan",
+        "sha256_cert_fingerprints": ["3F:C7:09:DE:FA:79:69:25:80:CB:23:A0:CE:5E:50:BB:BC:00:70:30:55:E8:15:70:FA:F9:4E:97:1E:39:59:7B"]
+      }
+    }]

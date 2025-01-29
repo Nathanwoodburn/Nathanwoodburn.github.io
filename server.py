@@ -944,6 +944,11 @@ def download(path):
         return send_file(path)
     return render_template("404.html"), 404
 
+@app.route("/.well-known/<path:path>")
+def wellknown(path):
+    return send_from_directory(".well-known", path)
+
+
 @app.route("/<path:path>")
 def catch_all(path: str):
     global handshake_scripts
