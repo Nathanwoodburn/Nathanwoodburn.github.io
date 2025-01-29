@@ -237,17 +237,19 @@ def manifest():
     host = request.host
 
     # Read as json
-    with open("manifest.json") as file:
+    with open("pwa/manifest.json") as file:
         manifest = json.load(file)
     url = f"https://{host}"
     if host == "localhost:5000" or host == "127.0.0.1:5000":
         url = "http://127.0.0.1:5000"
     
     manifest["start_url"] = url
-    manifest["scope"] = url
-    
-    
+    manifest["scope"] = url    
     return jsonify(manifest)
+
+@app.route("/sw.js")
+def pw():
+    return send_from_directory("pwa", "sw.js")
 
 
 # region Sol Links
