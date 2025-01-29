@@ -1,0 +1,26 @@
+{
+    "short_name": "Nathan.Woodburn/",
+    "name": "Nathan.Woodburn/",
+    "icons": [
+      {
+        "src": "https://nathan.woodburn.au/assets/img/favicon/android-chrome-192x192.png",
+        "type": "image/png",
+        "sizes": "192x192"
+      },
+      {
+        "src": "https://nathan.woodburn.au/assets/img/favicon/android-chrome-512x512.png",
+        "type": "image/png",
+        "sizes": "512x512"
+      }
+    ],
+    "start_url": "https://nathan.woodburn.au",
+    "background_color": "#000000",
+    "theme_color": "#000000",
+    "display": "fullscreen",
+    "orientation": "portrait",
+    "id": "nathanwoodburn",
+    "description": "Nathan.Woodburn/",
+    "scope": "https://nathan.woodburn.au",
+    "dir": "ltr",
+    "lang": "en"
+  }

@@ -235,16 +235,18 @@ def xrpLedger():
 @app.route("/manifest.json")
 def manifest():
     host = request.host
-    if host == "nathan.woodburn.au":
-        return send_from_directory("templates", "manifest.json")
 
     # Read as json
-    with open("templates/manifest.json") as file:
+    with open("manifest.json") as file:
         manifest = json.load(file)
-    if host != "localhost:5000" and host != "127.0.0.1:5000":
-        manifest["start_url"] = f"https://{host}/"
-    else:
-        manifest["start_url"] = "http://127.0.0.1:5000/"
+    url = f"https://{host}"
+    if host == "localhost:5000" or host == "127.0.0.1:5000":
+        url = "http://127.0.0.1:5000"
+    
+    manifest["start_url"] = url
+    manifest["scope"] = url
+    
+    
     return jsonify(manifest)
 
 
