@@ -4,7 +4,11 @@ const CACHE = "pwabuilder-offline-page";
 
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-sw.js');
 
-const offlineFallbackPage = "404";
+const PRECACHE_ASSETS = [
+  '/',
+  '/404'
+]
+
 
 self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "SKIP_WAITING") {
@@ -15,7 +19,7 @@ self.addEventListener("message", (event) => {
 self.addEventListener('install', async (event) => {
   event.waitUntil(
     caches.open(CACHE)
-      .then((cache) => cache.add(offlineFallbackPage))
+      .then((cache) => cache.addAll(PRECACHE_ASSETS))
   );
 });
 
@@ -45,7 +49,7 @@ self.addEventListener('fetch', (event) => {
       } catch (error) {
 
         const cache = await caches.open(CACHE);
-        const cachedResp = await cache.match(offlineFallbackPage);
+        const cachedResp = await cache.match('/404');
         return cachedResp;
       }
     })());
