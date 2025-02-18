@@ -1049,7 +1049,7 @@ def hnsdoh_acme():
 @app.route("/ID1")
 def ID1():
     # Proxy to ID1 url
-    req = requests.get("https://id1.woodburn.au/ID1")
+    req = requests.get("https://podcasts.c.woodburn.au/ID1")
     return make_response(
         req.content, 200, {"Content-Type": req.headers["Content-Type"]}
     )
@@ -1058,7 +1058,7 @@ def ID1():
 @app.route("/ID1/")
 def ID1_slash():
     # Proxy to ID1 url
-    req = requests.get("https://id1.woodburn.au/ID1/")
+    req = requests.get("https://podcasts.c.woodburn.au/ID1/")
     return make_response(
         req.content, 200, {"Content-Type": req.headers["Content-Type"]}
     )
@@ -1067,7 +1067,7 @@ def ID1_slash():
 @app.route("/ID1/<path:path>")
 def ID1_path(path):
     # Proxy to ID1 url
-    req = requests.get("https://id1.woodburn.au/ID1/" + path)
+    req = requests.get("https://podcasts.c.woodburn.au/ID1/" + path)
     return make_response(
         req.content, 200, {"Content-Type": req.headers["Content-Type"]}
     )
@@ -1076,7 +1076,7 @@ def ID1_path(path):
 @app.route("/ID1.xml")
 def ID1_xml():
     # Proxy to ID1 url
-    req = requests.get("https://id1.woodburn.au/ID1.xml")
+    req = requests.get("https://podcasts.c.woodburn.au/ID1.xml")
     return make_response(
         req.content, 200, {"Content-Type": req.headers["Content-Type"]}
     )
@@ -1084,7 +1084,7 @@ def ID1_xml():
 
 @app.route("/podsync.opml")
 def podsync():
-    req = requests.get("https://id1.woodburn.au/podsync.opml")
+    req = requests.get("https://podcasts.c.woodburn.au/podsync.opml")
     return make_response(
         req.content, 200, {"Content-Type": req.headers["Content-Type"]}
     )
