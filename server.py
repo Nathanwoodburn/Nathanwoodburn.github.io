@@ -125,6 +125,14 @@ def send_report(path):
 
     return render_template("404.html"), 404
 
+def getClientIP(request):
+    x_forwarded_for = request.headers.get("X-Forwarded-For")
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(",")[0]
+    else:
+        ip = request.remote_addr
+    return ip
+
 
 # region Special routes
 @app.route("/meet")
@@ -406,7 +414,7 @@ def nc():
 
 @app.route("/api/ip")
 def ip():
-    return jsonify({"ip": request.remote_addr})
+    return jsonify({"ip": getClientIP(request)})
 
 
 @app.route("/api/email", methods=["POST"])
@@ -495,7 +503,7 @@ def index():
             return jsonify(
                 {
                     "message": "Welcome to Nathan.Woodburn/! This is a personal website. For more information, visit https://nathan.woodburn.au",
-                    "ip": request.remote_addr,
+                    "ip": getClientIP(request),
                     "dev": handshake_scripts == "",
                 }
             )
@@ -996,7 +1004,7 @@ def catch_all(path: str):
                 {
                     "status": 404,
                     "message": "Page not found",
-                    "ip": request.remote_addr,
+                    "ip": getClientIP(request),
                 }
             ), 404
     return render_template("404.html"), 404
@@ -1008,7 +1016,7 @@ def catch_all(path: str):
 # region ACME
 @app.route("/hnsdoh-acme", methods=["POST"])
 def hnsdoh_acme():
-    print(f"ACME request from {request.remote_addr}")
+    print(f"ACME request from {getClientIP(request)}")
 
     # Get the TXT record from the request
     if not request.json:
@@ -1104,7 +1112,7 @@ def not_found(e):
                 {
                     "status": 404,
                     "message": "Page not found",
-                    "ip": request.remote_addr,
+                    "ip": getClientIP(request),
                 }
             ), 404
 
