@@ -25,7 +25,7 @@ from solders.keypair import Keypair
 from solders.pubkey import Pubkey
 from solana.rpc.api import Client
 from solders.system_program import TransferParams, transfer
-from solana.transaction import Transaction
+from solders.transaction import Transaction
 from solders.hash import Hash
 from solders.message import MessageV0
 from solders.transaction import VersionedTransaction
@@ -33,6 +33,7 @@ from solders.null_signer import NullSigner
 from PIL import Image
 from mail import sendEmail
 import now
+import blog
 
 app = Flask(__name__)
 CORS(app)
@@ -757,6 +758,69 @@ def now_json():
 
 # endregion
 
+# region blog Pages
+@app.route("/blog")
+@app.route("/blog/")
+def blog_page():
+    global handshake_scripts
+
+    # If localhost, don't load handshake
+    if (
+        request.host == "localhost:5000"
+        or request.host == "127.0.0.1:5000"
+        or os.getenv("dev") == "true"
+        or request.host == "test.nathan.woodburn.au"
+    ):
+        handshake_scripts = ""
+
+    return blog.render_blog_home(handshake_scripts)
+
+
+@app.route("/blog/<path:path>")
+def blog_path(path):
+    global handshake_scripts
+    # If localhost, don't load handshake
+    if (
+        request.host == "localhost:5000"
+        or request.host == "127.0.0.1:5000"
+        or os.getenv("dev") == "true"
+        or request.host == "test.nathan.woodburn.au"
+    ):
+        handshake_scripts = ""
+
+    return blog.render_blog_page(path,handshake_scripts)
+
+#TODO add rss json and xml for blog
+# @app.route("/blog.rss")
+# @app.route("/blog.xml")
+# @app.route("/rss.xml")
+# def blog_rss():
+#     host = "https://" + request.host
+#     if ":" in request.host:
+#         host = "http://" + request.host
+#     # Generate RSS feed
+#     blog_pages = blog.list_blog_page_files()
+#     rss = f'<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Nathan.Woodburn/</title><link>{host}</link><description>See what I\'ve been up to</description><language>en-us</language><lastBuildDate>{datetime.datetime.blog(tz=datetime.timezone.utc).strftime("%a, %d %b %Y %H:%M:%S %z")}</lastBuildDate><atom:link href="{host}/blog.rss" rel="self" type="application/rss+xml" />'
+#     for page in blog_pages:
+#         link = page.strip(".html")
+#         date = datetime.datetime.strptime(link, "%y_%m_%d")
+#         date = date.strftime("%A, %B %d, %Y")
+#         rss += f'<item><title>What\'s Happening {date}</title><link>{host}/blog/{link}</link><description>Latest updates for {date}</description><guid>{host}/blog/{link}</guid></item>'
+#     rss += "</channel></rss>"
+#     return make_response(rss, 200, {"Content-Type": "application/rss+xml"})
+
+# @app.route("/blog.json")
+# def blog_json():
+#     blog_pages = blog.list_blog_page_files()
+#     host = "https://" + request.host
+#     if ":" in request.host:
+#         host = "http://" + request.host
+#     blog_pages = [{"url":host+"/blog/"+page.strip(".html"), "date":datetime.datetime.strptime(page.strip(".html"), "%y_%m_%d").strftime("%A, %B %d, %Y"), "title":"What's Happening "+datetime.datetime.strptime(page.strip(".html"), "%y_%m_%d").strftime("%A, %B %d, %Y")} for page in blog_pages]
+#     return jsonify(blog_pages)
+
+# endregion
+
+
 
 # region Donate
 @app.route("/donate")
@@ -1122,4 +1186,4 @@ def not_found(e):
 # endregion
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000, host="0.0.0.0")
+    app.run(debug=True, port=5000, host="127.0.0.1")
