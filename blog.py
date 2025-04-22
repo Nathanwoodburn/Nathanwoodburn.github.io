@@ -24,7 +24,7 @@ def render_blog_page(date,handshake_scripts=None):
     # Get the title from the file name
     title = date.removesuffix(".md").replace("_", " ").title()
     # Convert the md to html
-    content = markdown.markdown(content, extensions=['codehilite', 'fenced_code'])
+    content = markdown.markdown(content, extensions=['sane_lists', 'codehilite', 'fenced_code'])
     # Add target="_blank" to all links
     content = content.replace('<a href="', '<a target="_blank" href="')
 
@@ -45,7 +45,8 @@ def render_blog_home(handshake_scripts=None):
     # Create a html list of pages
     blog_pages = [
         f"""<li class="list-group-item">
-            <a href='/blog/{page}'>{page.replace("_"," ")}</a>
+        
+            <p style="margin-bottom: 0px;"><a href='/blog/{page}'>{page.replace("_"," ")}</a></p>
         </li>"""
         for page in blog_pages
     ]
