@@ -43,7 +43,6 @@ def render_now_page(date,handshake_scripts=None):
 
 def render_latest_now(handshake_scripts=None):
     now_page = list_now_dates()[0]
-    print(now_page)
     return render_now_page(now_page,handshake_scripts=handshake_scripts)
 
 #endregion
