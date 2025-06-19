@@ -46,7 +46,8 @@
         "url": "https://linkr",
         "img": "/favicon.png",
         "name": "LINKR/",
-        "description": "A free link shortener with a Handshake TLD and using DNS for authentication"
+        "description": "A free link shortener with a Handshake TLD and using DNS for authentication",
+        "enabled": false
     },
     {
         "url": "https://faucet.woodburn.au",
@@ -59,5 +60,11 @@
         "img": "/assets/img/external/HNS.png",
         "name": "HNS DoH",
         "description": "A DNS over HTTPS resolver for Handshake domains"
+    },
+    {
+        "url": "https://ipfs.hnsproxy.au",
+        "img": "https://ipfs.hnsproxy.au/fireportal.png",
+        "name": "FirePortal",
+        "description": "A Handshake domain IPFS gateway that allows you to access IPFS content using Handshake domains"
     }
 ]
