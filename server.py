@@ -390,6 +390,28 @@ def donateAmountPost(amount):
 # endregion
 
 #region Other API routes
+@app.route("/api/version")
+def version():
+    return jsonify({"version": getVersion()})
+
+@app.route("/api/help")
+def help():
+    return jsonify({
+        "message": "Welcome to Nathan.Woodburn/ API! This is a personal website. For more information, visit https://nathan.woodburn.au",
+        "endpoints": {
+            "/api/time": "Get the current time",
+            "/api/timezone": "Get the current timezone",
+            "/api/message": "Get the message from the config",
+            "/api/ip": "Get your IP address",
+            "/api/v1/project": "Get the current project from git",
+            "/api/version": "Get the current version of the website"
+        },
+        "version": getVersion()
+    })
+
+
+
+
 @app.route("/api/time")
 def time():
     timezone_offset = datetime.timedelta(hours=ncConfig["time-zone"])
