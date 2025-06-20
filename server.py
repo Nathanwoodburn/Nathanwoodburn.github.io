@@ -146,6 +146,10 @@ def getVersion():
         else:
             return head_ref
 
+    # Check if env SOURCE_COMMIT is set
+    if "SOURCE_COMMIT" in os.environ:
+        return os.environ["SOURCE_COMMIT"]
+
     return "failed to get version"
 
 
