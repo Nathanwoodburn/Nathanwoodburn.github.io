@@ -132,6 +132,22 @@ def getClientIP(request):
         ip = request.remote_addr
     return ip
 
+def getVersion():
+    # if .git exists, get the latest commit hash
+    if os.path.isdir(".git"):
+        git_dir = ".git"
+        head_ref = ""
+        with open(os.path.join(git_dir, "HEAD")) as file:
+            head_ref = file.read().strip()
+        if head_ref.startswith("ref: "):
+            head_ref = head_ref[5:]
+            with open(os.path.join(git_dir, head_ref)) as file:
+                return file.read().strip()
+        else:
+            return head_ref
+
+    return "failed to get version"
+
 
 # region Special routes
 @app.route("/meet")
@@ -504,6 +520,7 @@ def index():
                     "message": "Welcome to Nathan.Woodburn/! This is a personal website. For more information, visit https://nathan.woodburn.au",
                     "ip": getClientIP(request),
                     "dev": handshake_scripts == "",
+                    "version": getVersion()
                 }
             )
 
