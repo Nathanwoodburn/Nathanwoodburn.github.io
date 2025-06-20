@@ -104,10 +104,8 @@ def send_report(path):
     }
 
     for key in pathMap:
-        print(path, key)
         if path.startswith(key):
             tmpPath = path.replace(key, pathMap[key])
-            print(tmpPath)
             if os.path.isfile("templates/assets/" + tmpPath):
                 return send_from_directory("templates/assets", tmpPath)
 
