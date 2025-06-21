@@ -1114,6 +1114,13 @@ def catch_all(path: str):
             ), 404
     return render_template("404.html"), 404
 
+@app.route("/resume.pdf")
+def resume_pdf():
+    # Check if file exists
+    if os.path.isfile("data/resume.pdf"):
+        return send_file("data/resume.pdf")
+    return render_template("404.html"), 404
+
 
 # endregion
 
