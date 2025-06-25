@@ -589,9 +589,9 @@ def index():
         print("Error getting git data")
 
     # Get only repo names for the newest updates
-    if projects == [] or projectsUpdated < datetime.datetime.now() - datetime.timedelta(
+    if projects == [] or projectsUpdated < (datetime.datetime.now() - datetime.timedelta(
         hours=2
-    ):
+    )).timestamp():
         projectsreq = requests.get(
             "https://git.woodburn.au/api/v1/users/nathanwoodburn/repos"
         )
@@ -625,7 +625,7 @@ def index():
                 projects.append(projectsList[projectNum])
                 projectNames.append(projectsList[projectNum]["name"])
             projectNum += 1
-        projectsUpdated = datetime.datetime.now()
+        projectsUpdated = datetime.datetime.now().timestamp()
 
     custom = ""
     # Check for downtime

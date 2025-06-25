@@ -14,3 +14,4 @@ solders
 weasyprint
 markdown
 pygments
+beautifulsoup4
