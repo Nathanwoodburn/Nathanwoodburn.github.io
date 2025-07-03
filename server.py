@@ -536,6 +536,13 @@ def index():
         # Check if referrer includes nathan.woodburn.au
         if "nathan.woodburn.au" in request.referrer:
             loaded = True
+    if request.cookies.get("loaded"):
+        loaded = True
+    
+    # Always load if load=true is in the query string
+    if request.args.get("load").lower() == "true":
+        loaded = False
+
 
     # Check if crawler
     if request.headers and request.headers.get("User-Agent"):
@@ -554,7 +561,7 @@ def index():
             "User-Agent"
         ) and "Bingbot" not in request.headers.get("User-Agent"):
             # Check if cookie is set
-            if not request.cookies.get("loaded") and not loaded:
+            if not loaded:
                 # Set cookie
                 resp = make_response(
                     render_template("loading.html").replace(
