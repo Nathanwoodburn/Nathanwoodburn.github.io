@@ -536,6 +536,13 @@ def index():
         # Check if referrer includes nathan.woodburn.au
         if "nathan.woodburn.au" in request.referrer:
             loaded = True
+    if request.cookies.get("loaded"):
+        loaded = True
+    
+    # Always load if load is in the query string
+    if request.args.get("load"):
+        loaded = False
+
 
     # Check if crawler
     if request.headers and request.headers.get("User-Agent"):
@@ -554,7 +561,7 @@ def index():
             "User-Agent"
         ) and "Bingbot" not in request.headers.get("User-Agent"):
             # Check if cookie is set
-            if not request.cookies.get("loaded") and not loaded:
+            if not loaded:
                 # Set cookie
                 resp = make_response(
                     render_template("loading.html").replace(
@@ -830,34 +837,6 @@ def blog_path(path):
         handshake_scripts = ""
 
     return blog.render_blog_page(path,handshake_scripts)
-
-#TODO add rss json and xml for blog
-# @app.route("/blog.rss")
-# @app.route("/blog.xml")
-# @app.route("/rss.xml")
-# def blog_rss():
-#     host = "https://" + request.host
-#     if ":" in request.host:
-#         host = "http://" + request.host
-#     # Generate RSS feed
-#     blog_pages = blog.list_blog_page_files()
-#     rss = f'<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Nathan.Woodburn/</title><link>{host}</link><description>See what I\'ve been up to</description><language>en-us</language><lastBuildDate>{datetime.datetime.blog(tz=datetime.timezone.utc).strftime("%a, %d %b %Y %H:%M:%S %z")}</lastBuildDate><atom:link href="{host}/blog.rss" rel="self" type="application/rss+xml" />'
-#     for page in blog_pages:
-#         link = page.strip(".html")
-#         date = datetime.datetime.strptime(link, "%y_%m_%d")
-#         date = date.strftime("%A, %B %d, %Y")
-#         rss += f'<item><title>What\'s Happening {date}</title><link>{host}/blog/{link}</link><description>Latest updates for {date}</description><guid>{host}/blog/{link}</guid></item>'
-#     rss += "</channel></rss>"
-#     return make_response(rss, 200, {"Content-Type": "application/rss+xml"})
-
-# @app.route("/blog.json")
-# def blog_json():
-#     blog_pages = blog.list_blog_page_files()
-#     host = "https://" + request.host
-#     if ":" in request.host:
-#         host = "http://" + request.host
-#     blog_pages = [{"url":host+"/blog/"+page.strip(".html"), "date":datetime.datetime.strptime(page.strip(".html"), "%y_%m_%d").strftime("%A, %B %d, %Y"), "title":"What's Happening "+datetime.datetime.strptime(page.strip(".html"), "%y_%m_%d").strftime("%A, %B %d, %Y")} for page in blog_pages]
-#     return jsonify(blog_pages)
 
 # endregion
 
