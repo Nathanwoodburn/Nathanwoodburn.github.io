@@ -539,8 +539,8 @@ def index():
     if request.cookies.get("loaded"):
         loaded = True
     
-    # Always load if load=true is in the query string
-    if request.args.get("load").lower() == "true":
+    # Always load if load is in the query string
+    if request.args.get("load"):
         loaded = False
 
 
