@@ -64,10 +64,13 @@ projects = []
 projectsUpdated = 0
 
 
-ncConfig = requests.get(
+ncReq = requests.get(
     "https://cloud.woodburn.au/s/4ToXgFe3TnnFcN7/download/website-conf.json"
 )
-ncConfig = ncConfig.json()
+ncConfig = ncReq.json()
+
+if 'time-zone' not in ncConfig:
+    ncConfig['time-zone'] = 10
 
 
 @cache
