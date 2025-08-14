@@ -1043,6 +1043,45 @@ def download(path):
 def wellknown(path):
     return send_from_directory(".well-known", path)
 
+@app.route("/hosting/send-enquiry", methods=["POST"])
+def hosting_send_enquiry():
+    if not request.json:
+        return jsonify({"status": "error", "message": "No JSON data provided"}), 400
+
+    # Keys
+    # email, cpus, memory, disk, backups, message
+    required_keys = ["email", "cpus", "memory", "disk", "backups", "message"]
+    for key in required_keys:
+        if key not in request.json:
+            return jsonify({"status": "error", "message": f"Missing key: {key}"}), 400
+    email = request.json["email"]
+    cpus = request.json["cpus"]
+    memory = request.json["memory"]
+    disk = request.json["disk"]
+    backups = request.json["backups"]
+    message = request.json["message"]
+    # Send to Discord webhook
+    webhook_url = os.getenv("HOSTING_WEBHOOK")
+    if not webhook_url:
+        return jsonify({"status": "error", "message": "Hosting webhook not set"}), 500
+    data = {
+        "content": "",
+        "embeds": [
+            {
+                "title": "Hosting Enquiry",
+                "description": f"Email: {email}\nCPUs: {cpus}\nMemory: {memory}GB\nDisk: {disk}GB\nBackups: {backups}\nMessage: {message}",
+                "color": 16711680,  # Red color
+            }
+        ],
+    }
+    headers = {
+        "Content-Type": "application/json",
+    }
+    response = requests.post(webhook_url, json=data, headers=headers)
+    if response.status_code != 204 and response.status_code != 200:
+        return jsonify({"status": "error", "message": "Failed to send enquiry"}), 500
+    return jsonify({"status": "success", "message": "Enquiry sent successfully"}), 200
+
 
 @app.route("/<path:path>")
 def catch_all(path: str):
