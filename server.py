@@ -1113,6 +1113,34 @@ def hosting_send_enquiry():
     backups = request.json["backups"]
     message = request.json["message"]
     
+    # Try to convert to correct types
+    try:
+        cpus = int(cpus)
+        memory = float(memory)
+        disk = int(disk)
+        backups = backups in [True, "true", "True", 1, "1", "yes", "Yes"]
+        message = str(message)
+        email = str(email)
+    except:
+        return jsonify({"status": "error", "message": "Invalid data types"}), 400
+
+
+    # Basic validation
+    if not isinstance(cpus, int) or cpus < 1 or cpus > 64:
+        return jsonify({"status": "error", "message": "Invalid CPUs"}), 400
+    if not isinstance(memory, float) or memory < 0.5 or memory > 512:
+        return jsonify({"status": "error", "message": "Invalid memory"}), 400
+    if not isinstance(disk, int) or disk < 10 or disk > 500:
+        return jsonify({"status": "error", "message": "Invalid disk"}), 400
+    if not isinstance(backups, bool):
+        return jsonify({"status": "error", "message": "Invalid backups"}), 400
+    if not isinstance(message, str) or len(message) > 1000:
+        return jsonify({"status": "error", "message": "Invalid message"}), 400
+    if not isinstance(email, str) or len(email) > 100 or "@" not in email:
+        return jsonify({"status": "error", "message": "Invalid email"}), 400
+
+
+
     # Send to Discord webhook
     webhook_url = os.getenv("HOSTING_WEBHOOK")
     if not webhook_url:
