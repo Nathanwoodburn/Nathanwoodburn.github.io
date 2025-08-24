@@ -40,6 +40,13 @@ CORS(app)
 
 dotenv.load_dotenv()
 
+# Rate limiting for hosting enquiries
+email_request_count = {}  # Track requests by email
+ip_request_count = {}     # Track requests by IP
+EMAIL_RATE_LIMIT = 3      # Max 3 requests per email per hour
+IP_RATE_LIMIT = 5         # Max 5 requests per IP per hour
+RATE_LIMIT_WINDOW = 3600  # 1 hour in seconds
+
 handshake_scripts = '<script src="https://nathan.woodburn/handshake.js" domain="nathan.woodburn" async></script><script src="https://nathan.woodburn/https.js" async></script>'
 
 restricted = ["ascii"]
@@ -1045,6 +1052,10 @@ def wellknown(path):
 
 @app.route("/hosting/send-enquiry", methods=["POST"])
 def hosting_send_enquiry():
+    global email_request_count
+    global ip_request_count   
+
+
     if not request.json:
         return jsonify({"status": "error", "message": "No JSON data provided"}), 400
 
@@ -1054,12 +1065,54 @@ def hosting_send_enquiry():
     for key in required_keys:
         if key not in request.json:
             return jsonify({"status": "error", "message": f"Missing key: {key}"}), 400
+    
     email = request.json["email"]
+    ip = getClientIP(request)
+    print(f"Hosting enquiry from {email} ({ip})")
+    
+    # Check rate limits
+    current_time = datetime.datetime.now().timestamp()
+    
+    # Check email rate limit
+    if email in email_request_count:
+        if (current_time - email_request_count[email]["last_reset"]) > RATE_LIMIT_WINDOW:
+            # Reset counter if the time window has passed
+            email_request_count[email] = {"count": 1, "last_reset": current_time}
+        else:
+            # Increment counter
+            email_request_count[email]["count"] += 1
+            if email_request_count[email]["count"] > EMAIL_RATE_LIMIT:
+                return jsonify({
+                    "status": "error", 
+                    "message": f"Rate limit exceeded. Please try again later."
+                }), 429
+    else:
+        # First request for this email
+        email_request_count[email] = {"count": 1, "last_reset": current_time}
+    
+    # Check IP rate limit
+    if ip in ip_request_count:
+        if (current_time - ip_request_count[ip]["last_reset"]) > RATE_LIMIT_WINDOW:
+            # Reset counter if the time window has passed
+            ip_request_count[ip] = {"count": 1, "last_reset": current_time}
+        else:
+            # Increment counter
+            ip_request_count[ip]["count"] += 1
+            if ip_request_count[ip]["count"] > IP_RATE_LIMIT:
+                return jsonify({
+                    "status": "error", 
+                    "message": "Rate limit exceeded. Please try again later."
+                }), 429
+    else:
+        # First request for this IP
+        ip_request_count[ip] = {"count": 1, "last_reset": current_time}
+    
     cpus = request.json["cpus"]
     memory = request.json["memory"]
     disk = request.json["disk"]
     backups = request.json["backups"]
     message = request.json["message"]
+    
     # Send to Discord webhook
     webhook_url = os.getenv("HOSTING_WEBHOOK")
     if not webhook_url:
