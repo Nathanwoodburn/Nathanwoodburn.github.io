@@ -22,7 +22,11 @@ import os
 # }'
 
 def validateSender(email):
-    domains = os.getenv("EMAIL_DOMAINS").split(",")
+    domains = os.getenv("EMAIL_DOMAINS")
+    if not domains:
+        return False
+    
+    domains = domains.split(",")
     for domain in domains:
         if re.match(r".+@" + domain, email):
             return True
@@ -84,8 +88,17 @@ def sendEmail(data):
     
     # Sending the email
     try:
-        with smtplib.SMTP_SSL(os.getenv("EMAIL_SMTP"), 465) as server:
-            server.login(os.getenv("EMAIL_USER"), os.getenv("EMAIL_PASS"))
+        host = os.getenv("EMAIL_SMTP")
+        user = os.getenv("EMAIL_USER")
+        password = os.getenv("EMAIL_PASS")
+        if host is None or user is None or password is None:
+            return jsonify({
+                "status": 500,
+                "error": "Email server not configured"
+            })
+
+        with smtplib.SMTP_SSL(host, 465) as server:
+            server.login(user, password)
             server.sendmail(fromEmail, to, msg.as_string())
         print("Email sent successfully.")
         return jsonify({

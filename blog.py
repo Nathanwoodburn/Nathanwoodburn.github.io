@@ -48,7 +48,7 @@ def fix_numbered_lists(html):
     # Find the <p> tag containing numbered steps
     paragraphs = soup.find_all('p')
     for p in paragraphs:
-        content = p.decode_contents()
+        content = p.decode_contents() # type: ignore
 
         # Check for likely numbered step structure
         if re.search(r'1\.\s', content):
