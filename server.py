@@ -410,27 +410,33 @@ def donateAmountPost(amount):
 
 # region Other API routes
 @app.route("/api/version")
+@app.route("/api/v1/version")
 def version():
     return jsonify({"version": getVersion()})
 
-
+@app.route("/api")
+@app.route("/api/")
+@app.route("/api/v1")
+@app.route("/api/v1/")
 @app.route("/api/help")
 def help():
     return jsonify({
         "message": "Welcome to Nathan.Woodburn/ API! This is a personal website. For more information, visit https://nathan.woodburn.au",
         "endpoints": {
-            "/api/time": "Get the current time",
-            "/api/timezone": "Get the current timezone",
-            "/api/message": "Get the message from the config",
-            "/api/ip": "Get your IP address",
+            "/api/v1/time": "Get the current time",
+            "/api/v1/timezone": "Get the current timezone",
+            "/api/v1/message": "Get the message from the config",
+            "/api/v1/ip": "Get your IP address",
             "/api/v1/project": "Get the current project from git",
-            "/api/version": "Get the current version of the website"
+            "/api/v1/version": "Get the current version of the website",
+            "/api/v1/help": "Get this help message"
         },
         "version": getVersion()
     })
 
 
 @app.route("/api/time")
+@app.route("/api/v1/time")
 def time():
     timezone_offset = datetime.timedelta(hours=ncConfig["time-zone"])
     timezone = datetime.timezone(offset=timezone_offset)
@@ -444,11 +450,13 @@ def time():
 
 
 @app.route("/api/timezone")
+@app.route("/api/v1/timezone")
 def timezone():
     return jsonify({"timezone": ncConfig["time-zone"]})
 
 
 @app.route("/api/timezone", methods=["POST"])
+@app.route("/api/v1/timezone", methods=["POST"])
 def timezonePost():
     # Refresh config
     global ncConfig
@@ -467,16 +475,19 @@ def timezonePost():
 
 
 @app.route("/api/message")
+@app.route("/api/v1/message")
 def nc():
     return jsonify({"message": ncConfig["message"]})
 
 
 @app.route("/api/ip")
+@app.route("/api/v1/ip")
 def ip():
     return jsonify({"ip": getClientIP(request)})
 
 
 @app.route("/api/email", methods=["POST"])
+@app.route("/api/v1/email", methods=["POST"])
 def email():
     # Verify json
     if not request.is_json:
@@ -1334,7 +1345,6 @@ def podsync():
 
 
 # endregion
-
 
 # region Error Catching
 # 404 catch all
