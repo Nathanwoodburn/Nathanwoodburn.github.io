@@ -22,19 +22,17 @@ import binascii
 import base64
 from ansi2html import Ansi2HTMLConverter
 from functools import cache
-from solders.keypair import Keypair
-from solders.pubkey import Pubkey
-from solana.rpc.api import Client
-from solders.system_program import TransferParams, transfer
-from solders.transaction import Transaction
-from solders.hash import Hash
-from solders.message import MessageV0
-from solders.transaction import VersionedTransaction
-from solders.null_signer import NullSigner
 from PIL import Image
 from mail import sendEmail
-import now
-import blog
+from now import (
+    list_now_dates,
+    get_latest_now_date,
+    list_now_page_files,
+    render_latest_now,
+    render_now_page,
+)
+from blog import render_blog_home, render_blog_page
+from sol import create_transaction
 
 app = Flask(__name__)
 CORS(app)
@@ -81,6 +79,8 @@ if 'time-zone' not in ncConfig:
     ncConfig['time-zone'] = 10
 
 # region Helper Functions
+
+
 @cache
 def getAddress(coin: str) -> str:
     address = ""
@@ -94,6 +94,7 @@ def getFilePath(name, path):
     for root, dirs, files in os.walk(path):
         if name in files:
             return os.path.join(root, name)
+
 
 def getClientIP(request):
     x_forwarded_for = request.headers.get("X-Forwarded-For")
@@ -166,6 +167,7 @@ def asset_get(path):
 
     return render_template("404.html"), 404
 
+
 @app.route("/sitemap")
 @app.route("/sitemap.xml")
 def sitemap_get():
@@ -176,11 +178,13 @@ def sitemap_get():
     sitemap = sitemap.replace(".html", "")
     return make_response(sitemap, 200, {"Content-Type": "application/xml"})
 
+
 @app.route("/favicon.<ext>")
 def favicon_get(ext):
     if ext not in ("png", "svg", "ico"):
         return render_template("404.html"), 404
     return send_from_directory("templates/assets/img/favicon", f"favicon.{ext}")
+
 
 @app.route("/<name>.js")
 def javascript_get(name):
@@ -192,9 +196,12 @@ def javascript_get(name):
 # endregion
 
 # region Well-known routes
+
+
 @app.route("/.well-known/<path:path>")
 def wk_index_get(path):
     return send_from_directory(".well-known", path)
+
 
 @app.route("/.well-known/wallets/<path:path>")
 def wk_wallet_get(path):
@@ -213,6 +220,7 @@ def wk_wallet_get(path):
         return redirect("/.well-known/wallets/" + path.upper(), code=302)
 
     return render_template("404.html"), 404
+
 
 @app.route("/.well-known/nostr.json")
 def wk_nostr_get():
@@ -235,6 +243,7 @@ def wk_nostr_get():
         }
     )
 
+
 @app.route("/.well-known/xrp-ledger.toml")
 def wk_xrp_get():
     # Create a response with the xrp-ledger.toml file
@@ -248,6 +257,8 @@ def wk_xrp_get():
 
 # endregion
 # region PWA routes
+
+
 @app.route("/manifest.json")
 def manifest_get():
     host = request.host
@@ -263,18 +274,28 @@ def manifest_get():
     manifest["scope"] = url
     return jsonify(manifest)
 
+
 @app.route("/sw.js")
 def serviceWorker_get():
     return send_from_directory("pwa", "sw.js")
 
 # endregion
 
+
 # region Solana Links
+SOLANA_HEADERS = {
+    "Content-Type": "application/json",
+    "X-Action-Version": "2.4.2",
+    "X-Blockchain-Ids": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+}
+
+
 @app.route("/actions.json")
 def sol_actions_get():
     return jsonify(
         {"rules": [{"pathPattern": "/donate**", "apiPath": "/api/donate**"}]}
     )
+
 
 @app.route("/api/donate", methods=["GET", "OPTIONS"])
 def sol_donate_get():
@@ -298,12 +319,8 @@ def sol_donate_get():
             ]
         },
     }
-    headers = {
-        "Content-Type": "application/json",
-        "X-Action-Version": "2.4.2",
-        "X-Blockchain-Ids": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
-    }
-    response = make_response(jsonify(data), 200, headers)
+
+    response = make_response(jsonify(data), 200, SOLANA_HEADERS)
 
     if request.method == "OPTIONS":
         response.headers["Access-Control-Allow-Origin"] = "*"
@@ -314,6 +331,7 @@ def sol_donate_get():
 
     return response
 
+
 @app.route("/api/donate/<amount>")
 def sol_donate_amount_get(amount):
     data = {
@@ -322,67 +340,41 @@ def sol_donate_amount_get(amount):
         "title": "Donate to Nathan.Woodburn/",
         "description": f"Donate {amount} SOL to Nathan.Woodburn/",
     }
-    return jsonify(data)
+    return jsonify(data), 200, SOLANA_HEADERS
+
 
 @app.route("/api/donate/<amount>", methods=["POST"])
 def sol_donate_post(amount):
     if not request.json:
-        return jsonify({"message": "Error: No JSON data provided"})
+        return jsonify({"message": "Error: No JSON data provided"}), 400, SOLANA_HEADERS
 
     if "account" not in request.json:
-        return jsonify({"message": "Error: No account provided"})
+        return jsonify({"message": "Error: No account provided"}), 400, SOLANA_HEADERS
 
     sender = request.json["account"]
-
-    headers = {
-        "Content-Type": "application/json",
-        "X-Action-Version": "2.4.2",
-        "X-Blockchain-Ids": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
-    }
 
     # Make sure amount is a number
     try:
         amount = float(amount)
     except:
-        return jsonify({"message": "Error: Invalid amount"}), 400, headers
+        return jsonify({"message": "Error: Invalid amount"}), 400, SOLANA_HEADERS
 
     if amount < 0.0001:
-        return jsonify({"message": "Error: Amount too small"}), 400, headers
+        return jsonify({"message": "Error: Amount too small"}), 400, SOLANA_HEADERS
 
-    # Create transaction
-    sender = Pubkey.from_string(sender)
-    receiver = Pubkey.from_string(
-        "AJsPEEe6S7XSiVcdZKbeV8GRp1QuhFUsG8mLrqL4XgiU")
-    transfer_ix = transfer(
-        TransferParams(
-            from_pubkey=sender, to_pubkey=receiver, lamports=int(
-                amount * 1000000000)
-        )
-    )
-    solana_client = Client("https://api.mainnet-beta.solana.com")
-    blockhashData = solana_client.get_latest_blockhash()
-    blockhash = blockhashData.value.blockhash
-
-    msg = MessageV0.try_compile(
-        payer=sender,
-        instructions=[transfer_ix],
-        address_lookup_table_accounts=[],
-        recent_blockhash=blockhash,
-    )
-    tx = VersionedTransaction(message=msg, keypairs=[NullSigner(sender)])
-    tx = bytes(tx).hex()
-    raw_bytes = binascii.unhexlify(tx)
-    base64_string = base64.b64encode(raw_bytes).decode("utf-8")
-
-    return jsonify({"message": "Success", "transaction": base64_string}), 200, headers
+    transaction = create_transaction(sender, amount)
+    return jsonify({"message": "Success", "transaction": transaction}), 200, SOLANA_HEADERS
 
 # endregion
 
 # region API routes
+
+
 @app.route("/api/version")
 @app.route("/api/v1/version")
 def api_version_get():
     return jsonify({"version": getGitCommit()})
+
 
 @app.route("/api")
 @app.route("/api/")
@@ -522,6 +514,8 @@ def api_project_get():
 # endregion
 
 # region Misc routes
+
+
 @app.route("/meet")
 @app.route("/meeting")
 @app.route("/appointment")
@@ -530,9 +524,11 @@ def meetingLink_get():
         "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr", code=302
     )
 
+
 @app.route("/links")
 def links_get():
     return render_template("link.html")
+
 
 @app.route("/generator/")
 def generator_get():
@@ -541,6 +537,8 @@ def generator_get():
 # endregion
 
 # region Main routes
+
+
 @app.route("/")
 def index_get():
     global handshake_scripts
@@ -751,7 +749,7 @@ def now_index_get():
     ):
         handshake_scripts = ""
 
-    return now.render_latest_now(handshake_scripts)
+    return render_latest_now(handshake_scripts)
 
 
 @app.route("/now/<path:path>")
@@ -766,7 +764,7 @@ def now_path_get(path):
     ):
         handshake_scripts = ""
 
-    return now.render_now_page(path, handshake_scripts)
+    return render_now_page(path, handshake_scripts)
 
 
 @app.route("/old")
@@ -784,9 +782,9 @@ def now_old_get():
     ):
         handshake_scripts = ""
 
-    now_dates = now.list_now_dates()[1:]
+    now_dates = list_now_dates()[1:]
     html = '<ul class="list-group">'
-    html += f'<a style="text-decoration:none;" href="/now"><li class="list-group-item" style="background-color:#000000;color:#ffffff;">{now.get_latest_now_date(True)}</li></a>'
+    html += f'<a style="text-decoration:none;" href="/now"><li class="list-group-item" style="background-color:#000000;color:#ffffff;">{get_latest_now_date(True)}</li></a>'
 
     for date in now_dates:
         link = date
@@ -808,7 +806,7 @@ def now_rss_get():
     if ":" in request.host:
         host = "http://" + request.host
     # Generate RSS feed
-    now_pages = now.list_now_page_files()
+    now_pages = list_now_page_files()
     rss = f'<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Nathan.Woodburn/</title><link>{host}</link><description>See what I\'ve been up to</description><language>en-us</language><lastBuildDate>{datetime.datetime.now(tz=datetime.timezone.utc).strftime("%a, %d %b %Y %H:%M:%S %z")}</lastBuildDate><atom:link href="{host}/now.rss" rel="self" type="application/rss+xml" />'
     for page in now_pages:
         link = page.strip(".html")
@@ -821,7 +819,7 @@ def now_rss_get():
 
 @app.route("/now.json")
 def now_json_get():
-    now_pages = now.list_now_page_files()
+    now_pages = list_now_page_files()
     host = "https://" + request.host
     if ":" in request.host:
         host = "http://" + request.host
@@ -832,6 +830,7 @@ def now_json_get():
 # endregion
 
 # region Blog Pages
+
 
 @app.route("/blog")
 @app.route("/blog/")
@@ -847,7 +846,7 @@ def blog_index_get():
     ):
         handshake_scripts = ""
 
-    return blog.render_blog_home(handshake_scripts)
+    return render_blog_home(handshake_scripts)
 
 
 @app.route("/blog/<path:path>")
@@ -862,11 +861,13 @@ def blog_path_get(path):
     ):
         handshake_scripts = ""
 
-    return blog.render_blog_page(path, handshake_scripts)
+    return render_blog_page(path, handshake_scripts)
 
 # endregion
 
 # region Donate
+
+
 @app.route("/donate")
 def donate_get():
     global handshake_scripts
@@ -1007,10 +1008,11 @@ def qraddress_get(address):
 
     # Save the QR code image to a temporary file
     qr_image_path = "/tmp/qr_code.png"
-    qr_image.save(qr_image_path) # type: ignore
+    qr_image.save(qr_image_path)  # type: ignore
 
     # Return the QR code image as a response
     return send_file(qr_image_path, mimetype="image/png")
+
 
 @app.route("/qrcode/<path:data>")
 @app.route("/qr/<path:data>")
@@ -1021,7 +1023,7 @@ def qrcode_get(data):
     qr.make()
 
     qr_image: Image.Image = qr.make_image(
-        fill_color="black", back_color="white").convert('RGB') # type: ignore
+        fill_color="black", back_color="white").convert('RGB')  # type: ignore
 
     # Add logo
     logo = Image.open("templates/assets/img/favicon/logo.png")
@@ -1038,6 +1040,7 @@ def qrcode_get(data):
 
 # endregion
 
+
 @app.route("/supersecretpath")
 def supersecretpath_get():
     ascii_art = ""
@@ -1048,6 +1051,7 @@ def supersecretpath_get():
     converter = Ansi2HTMLConverter()
     ascii_art_html = converter.convert(ascii_art)
     return render_template("ascii.html", ascii_art=ascii_art_html)
+
 
 @app.route("/download/<path:path>")
 def download_get(path):
@@ -1169,6 +1173,7 @@ def hosting_post():
         return jsonify({"status": "error", "message": "Failed to send enquiry"}), 500
     return jsonify({"status": "success", "message": "Enquiry sent successfully"}), 200
 
+
 @app.route("/resume.pdf")
 def resume_pdf_get():
     # Check if file exists
@@ -1179,6 +1184,8 @@ def resume_pdf_get():
 # endregion
 
 # region ACME route
+
+
 @app.route("/hnsdoh-acme", methods=["POST"])
 def acme_post():
     print(f"ACME request from {getClientIP(request)}")
@@ -1199,11 +1206,11 @@ def acme_post():
 
     cf = Cloudflare(api_token=os.getenv("CF_TOKEN"))
     zone = cf.zones.list(name="hnsdoh.com").to_dict()
-    zone_id = zone["result"][0]["id"] # type: ignore
+    zone_id = zone["result"][0]["id"]  # type: ignore
     existing_records = cf.dns.records.list(
-        zone_id=zone_id, type="TXT", name="_acme-challenge.hnsdoh.com" # type: ignore
+        zone_id=zone_id, type="TXT", name="_acme-challenge.hnsdoh.com"  # type: ignore
     ).to_dict()
-    record_id = existing_records["result"][0]["id"] # type: ignore
+    record_id = existing_records["result"][0]["id"]  # type: ignore
     cf.dns.records.delete(dns_record_id=record_id, zone_id=zone_id)
     cf.dns.records.create(
         zone_id=zone_id,
@@ -1217,6 +1224,8 @@ def acme_post():
 # endregion
 
 # region Podcast routes
+
+
 @app.route("/ID1")
 def podcast_index_get():
     # Proxy to ID1 url
@@ -1224,6 +1233,7 @@ def podcast_index_get():
     return make_response(
         req.content, 200, {"Content-Type": req.headers["Content-Type"]}
     )
+
 
 @app.route("/ID1/")
 def podcast_contents_get():
@@ -1233,6 +1243,7 @@ def podcast_contents_get():
         req.content, 200, {"Content-Type": req.headers["Content-Type"]}
     )
 
+
 @app.route("/ID1/<path:path>")
 def podcast_path_get(path):
     # Proxy to ID1 url
@@ -1241,6 +1252,7 @@ def podcast_path_get(path):
         req.content, 200, {"Content-Type": req.headers["Content-Type"]}
     )
 
+
 @app.route("/ID1.xml")
 def podcast_xml_get():
     # Proxy to ID1 url
@@ -1248,6 +1260,7 @@ def podcast_xml_get():
     return make_response(
         req.content, 200, {"Content-Type": req.headers["Content-Type"]}
     )
+
 
 @app.route("/podsync.opml")
 def podcast_podsync_get():
@@ -1261,6 +1274,8 @@ def podcast_podsync_get():
 # region Error Catching
 
 # Catch all for GET requests
+
+
 @app.route("/<path:path>")
 def catch_all_get(path: str):
     global handshake_scripts
@@ -1314,6 +1329,8 @@ def catch_all_get(path: str):
     return render_template("404.html"), 404
 
 # 404 catch all
+
+
 @app.errorhandler(404)
 def not_found(e):
     if request.headers:

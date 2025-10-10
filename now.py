@@ -2,7 +2,6 @@ import os
 from flask import render_template
 from datetime import datetime
 
-
 def list_now_page_files():
     now_pages = os.listdir("templates/now")
     now_pages = [
@@ -24,7 +23,6 @@ def get_latest_now_date(formatted=False):
         return date
     return list_now_dates()[0]
 
-#region Rendering
 def render_now_page(date,handshake_scripts=None):
     # If the date is not available, render the latest page
     if date is None:
@@ -40,9 +38,6 @@ def render_now_page(date,handshake_scripts=None):
     date_formatted = date_formatted.strftime("%A, %B %d, %Y")
     return render_template(f"now/{date}.html",DATE=date_formatted,handshake_scripts=handshake_scripts)
 
-
 def render_latest_now(handshake_scripts=None):
     now_page = list_now_dates()[0]
     return render_now_page(now_page,handshake_scripts=handshake_scripts)
-
-#endregion
