@@ -17,9 +17,6 @@ from cloudflare import Cloudflare
 import datetime
 import qrcode
 from qrcode.constants import ERROR_CORRECT_L, ERROR_CORRECT_H
-import re
-import binascii
-import base64
 from ansi2html import Ansi2HTMLConverter
 from functools import cache
 from PIL import Image
@@ -63,7 +60,7 @@ if os.path.isfile("data/sites.json"):
         sites = json.load(file)
         # Remove any sites that are not enabled
         sites = [
-            site for site in sites if "enabled" not in site or site["enabled"] == True
+            site for site in sites if "enabled" not in site or site["enabled"]
         ]
 
 projects = []
@@ -356,7 +353,7 @@ def sol_donate_post(amount):
     # Make sure amount is a number
     try:
         amount = float(amount)
-    except:
+    except ValueError:
         return jsonify({"message": "Error: Invalid amount"}), 400, SOLANA_HEADERS
 
     if amount < 0.0001:
@@ -374,7 +371,6 @@ def sol_donate_post(amount):
 @app.route("/api/v1/version")
 def api_version_get():
     return jsonify({"version": getGitCommit()})
-
 
 @app.route("/api")
 @app.route("/api/")
@@ -493,7 +489,7 @@ def api_project_get():
         repo_name = git["repo"]["name"]
         repo_name = repo_name.lower()
         repo_description = git["repo"]["description"]
-    except:
+    except Exception as e:
         repo_name = "nathanwoodburn.github.io"
         repo_description = "Personal website"
         git = {
@@ -503,7 +499,7 @@ def api_project_get():
                 "description": "Personal website",
             }
         }
-        print("Error getting git data")
+        print(f"Error getting git data: {e}")
 
     return jsonify({
         "repo_name": repo_name,
@@ -600,7 +596,7 @@ def index_get():
         repo_name = git["repo"]["name"]
         repo_name = repo_name.lower()
         repo_description = git["repo"]["description"]
-    except:
+    except Exception as e:
         repo_name = "nathanwoodburn.github.io"
         repo_description = "Personal website"
         git = {
@@ -610,7 +606,7 @@ def index_get():
                 "description": "Personal website",
             }
         }
-        print("Error getting git data")
+        print(f"Error getting git data: {e}")
 
     # Get only repo names for the newest updates
     if projects == [] or projectsUpdated < (datetime.datetime.now() - datetime.timedelta(
@@ -965,9 +961,9 @@ def donate_get():
     else:
         cryptoHTML += f"<br>Invalid chain: {crypto}<br>"
 
-    if os.path.isfile(f".well-known/wallets/.domains"):
+    if os.path.isfile(".well-known/wallets/.domains"):
         # Get json of all domains
-        with open(f".well-known/wallets/.domains") as file:
+        with open(".well-known/wallets/.domains") as file:
             domains = file.read()
             domains = json.loads(domains)
 
@@ -1097,7 +1093,7 @@ def hosting_post():
             if email_request_count[email]["count"] > EMAIL_RATE_LIMIT:
                 return jsonify({
                     "status": "error",
-                    "message": f"Rate limit exceeded. Please try again later."
+                    "message": "Rate limit exceeded. Please try again later."
                 }), 429
     else:
         # First request for this email
@@ -1134,7 +1130,7 @@ def hosting_post():
         backups = backups in [True, "true", "True", 1, "1", "yes", "Yes"]
         message = str(message)
         email = str(email)
-    except:
+    except ValueError:
         return jsonify({"status": "error", "message": "Invalid data types"}), 400
 
     # Basic validation

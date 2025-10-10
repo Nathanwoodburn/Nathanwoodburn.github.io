@@ -1,12 +1,6 @@
-import time
-from flask import Flask
 from server import app
-import server
 from gunicorn.app.base import BaseApplication
 import os
-import dotenv
-import sys
-import json
 
 
 class GunicornApp(BaseApplication):

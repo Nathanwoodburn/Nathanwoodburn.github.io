@@ -1,9 +1,6 @@
 import os
 from flask import render_template
-from datetime import datetime
 import markdown
-from markdown.extensions.codehilite import CodeHiliteExtension
-from markdown.extensions.fenced_code import FencedCodeExtension
 from bs4 import BeautifulSoup
 import re
 

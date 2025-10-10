@@ -30,7 +30,7 @@ def render_now_page(date,handshake_scripts=None):
     # Remove .html
     date = date.removesuffix(".html")
 
-    if not date in list_now_dates():
+    if date not in list_now_dates():
         return render_template("404.html"), 404
 
 
