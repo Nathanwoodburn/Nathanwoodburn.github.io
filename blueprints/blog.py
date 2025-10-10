@@ -1,34 +1,37 @@
 import os
-from flask import render_template
+from flask import Blueprint, render_template, request
 import markdown
 from bs4 import BeautifulSoup
 import re
+
+blog_bp = Blueprint('blog', __name__)
 
 
 def list_blog_page_files():
     blog_pages = os.listdir("data/blog")
     # Remove .md extension
-    blog_pages = [page.removesuffix(".md") for page in blog_pages if page.endswith(".md")]
+    blog_pages = [page.removesuffix(".md")
+                  for page in blog_pages if page.endswith(".md")]
 
     return blog_pages
 
 
-def render_blog_page(date,handshake_scripts=None):
+def render_blog_page(date, handshake_scripts=None):
     # Convert md to html
     if not os.path.exists(f"data/blog/{date}.md"):
         return render_template("404.html"), 404
-    
+
     with open(f"data/blog/{date}.md", "r") as f:
         content = f.read()
     # Get the title from the file name
     title = date.removesuffix(".md").replace("_", " ")
     # Convert the md to html
-    content = markdown.markdown(content, extensions=['sane_lists', 'codehilite', 'fenced_code'])
+    content = markdown.markdown(
+        content, extensions=['sane_lists', 'codehilite', 'fenced_code'])
     # Add target="_blank" to all links
     content = content.replace('<a href="', '<a target="_blank" href="')
 
     content = content.replace("<h4", "<h4 style='margin-bottom:0px;'")
-
     content = fix_numbered_lists(content)
 
     return render_template(
@@ -45,7 +48,7 @@ def fix_numbered_lists(html):
     # Find the <p> tag containing numbered steps
     paragraphs = soup.find_all('p')
     for p in paragraphs:
-        content = p.decode_contents() # type: ignore
+        content = p.decode_contents()  # type: ignore
 
         # Check for likely numbered step structure
         if re.search(r'1\.\s', content):
@@ -62,7 +65,8 @@ def fix_numbered_lists(html):
             for i in range(0, len(steps), 2):
                 if i+1 < len(steps):
                     step_html = steps[i+1].strip()
-                    ol_items.append(f"<li style='list-style: auto;'>{step_html}</li>")
+                    ol_items.append(
+                        f"<li style='list-style: auto;'>{step_html}</li>")
 
             # Build the final list HTML
             ol_html = "<ol>\n" + "\n".join(ol_items) + "\n</ol>"
@@ -85,7 +89,7 @@ def render_blog_home(handshake_scripts=None):
     blog_pages = [
         f"""<li class="list-group-item">
         
-            <p style="margin-bottom: 0px;"><a href='/blog/{page}'>{page.replace("_"," ")}</a></p>
+            <p style="margin-bottom: 0px;"><a href='/blog/{page}'>{page.replace("_", " ")}</a></p>
         </li>"""
         for page in blog_pages
     ]
@@ -97,3 +101,34 @@ def render_blog_home(handshake_scripts=None):
         blogs=blog_pages,
         handshake_scripts=handshake_scripts,
     )
+
+
+@blog_bp.route("/")
+def blog_index_get():
+    global handshake_scripts
+
+    # If localhost, don't load handshake
+    if (
+        request.host == "localhost:5000"
+        or request.host == "127.0.0.1:5000"
+        or os.getenv("dev") == "true"
+        or request.host == "test.nathan.woodburn.au"
+    ):
+        handshake_scripts = ""
+
+    return render_blog_home(handshake_scripts)
+
+
+@blog_bp.route("/<path:path>")
+def blog_path_get(path):
+    global handshake_scripts
+    # If localhost, don't load handshake
+    if (
+        request.host == "localhost:5000"
+        or request.host == "127.0.0.1:5000"
+        or os.getenv("dev") == "true"
+        or request.host == "test.nathan.woodburn.au"
+    ):
+        handshake_scripts = ""
+
+    return render_blog_page(path, handshake_scripts)

@@ -20,19 +20,20 @@ from qrcode.constants import ERROR_CORRECT_L, ERROR_CORRECT_H
 from ansi2html import Ansi2HTMLConverter
 from functools import cache
 from PIL import Image
-from mail import sendEmail
-from now import (
-    list_now_dates,
-    get_latest_now_date,
-    list_now_page_files,
-    render_latest_now,
-    render_now_page,
-)
-from blog import render_blog_home, render_blog_page
+from blueprints.now import now_bp
+from blueprints.blog import blog_bp
+from blueprints.wellknown import wk_bp
+from blueprints.api import api_bp, getGitCommit, getClientIP
 from sol import create_transaction
 
 app = Flask(__name__)
 CORS(app)
+
+# Register the now blueprint with the URL prefix
+app.register_blueprint(now_bp, url_prefix='/now')
+app.register_blueprint(blog_bp, url_prefix='/blog')
+app.register_blueprint(wk_bp, url_prefix='/.well-known')
+app.register_blueprint(api_bp, url_prefix='/api/v1')
 
 dotenv.load_dotenv()
 
@@ -92,35 +93,6 @@ def getFilePath(name, path):
         if name in files:
             return os.path.join(root, name)
 
-
-def getClientIP(request):
-    x_forwarded_for = request.headers.get("X-Forwarded-For")
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(",")[0]
-    else:
-        ip = request.remote_addr
-    return ip
-
-
-def getGitCommit():
-    # if .git exists, get the latest commit hash
-    if os.path.isdir(".git"):
-        git_dir = ".git"
-        head_ref = ""
-        with open(os.path.join(git_dir, "HEAD")) as file:
-            head_ref = file.read().strip()
-        if head_ref.startswith("ref: "):
-            head_ref = head_ref[5:]
-            with open(os.path.join(git_dir, head_ref)) as file:
-                return file.read().strip()
-        else:
-            return head_ref
-
-    # Check if env SOURCE_COMMIT is set
-    if "SOURCE_COMMIT" in os.environ:
-        return os.environ["SOURCE_COMMIT"]
-
-    return "failed to get version"
 
 # endregion
 
@@ -191,68 +163,6 @@ def javascript_get(name):
     return send_from_directory("templates/assets/js", request.path.split("/")[-1])
 
 # endregion
-
-# region Well-known routes
-
-
-@app.route("/.well-known/<path:path>")
-def wk_index_get(path):
-    return send_from_directory(".well-known", path)
-
-
-@app.route("/.well-known/wallets/<path:path>")
-def wk_wallet_get(path):
-    if path[0] == "." and 'proof' not in path:
-        return send_from_directory(
-            ".well-known/wallets", path, mimetype="application/json"
-        )
-    elif os.path.isfile(".well-known/wallets/" + path):
-        address = ""
-        with open(".well-known/wallets/" + path) as file:
-            address = file.read()
-        address = address.strip()
-        return make_response(address, 200, {"Content-Type": "text/plain"})
-
-    if os.path.isfile(".well-known/wallets/" + path.upper()):
-        return redirect("/.well-known/wallets/" + path.upper(), code=302)
-
-    return render_template("404.html"), 404
-
-
-@app.route("/.well-known/nostr.json")
-def wk_nostr_get():
-    # Get name parameter
-    name = request.args.get("name")
-    if name:
-        return jsonify(
-            {
-                "names": {
-                    name: "b57b6a06fdf0a4095eba69eee26e2bf6fa72bd1ce6cbe9a6f72a7021c7acaa82"
-                }
-            }
-        )
-    return jsonify(
-        {
-            "names": {
-                "nathan": "b57b6a06fdf0a4095eba69eee26e2bf6fa72bd1ce6cbe9a6f72a7021c7acaa82",
-                "_": "b57b6a06fdf0a4095eba69eee26e2bf6fa72bd1ce6cbe9a6f72a7021c7acaa82",
-            }
-        }
-    )
-
-
-@app.route("/.well-known/xrp-ledger.toml")
-def wk_xrp_get():
-    # Create a response with the xrp-ledger.toml file
-    with open(".well-known/xrp-ledger.toml") as file:
-        toml = file.read()
-
-    response = make_response(toml, 200, {"Content-Type": "application/toml"})
-    # Set cors headers
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    return response
-
-# endregion
 # region PWA routes
 
 
@@ -279,236 +189,6 @@ def serviceWorker_get():
 # endregion
 
 
-# region Solana Links
-SOLANA_HEADERS = {
-    "Content-Type": "application/json",
-    "X-Action-Version": "2.4.2",
-    "X-Blockchain-Ids": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
-}
-
-
-@app.route("/actions.json")
-def sol_actions_get():
-    return jsonify(
-        {"rules": [{"pathPattern": "/donate**", "apiPath": "/api/donate**"}]}
-    )
-
-
-@app.route("/api/donate", methods=["GET", "OPTIONS"])
-def sol_donate_get():
-    data = {
-        "icon": "https://nathan.woodburn.au/assets/img/profile.png",
-        "label": "Donate to Nathan.Woodburn/",
-        "title": "Donate to Nathan.Woodburn/",
-        "description": "Student, developer, and crypto enthusiast",
-        "links": {
-            "actions": [
-                {"label": "0.01 SOL", "href": "/api/donate/0.01"},
-                {"label": "0.1 SOL", "href": "/api/donate/0.1"},
-                {"label": "1 SOL", "href": "/api/donate/1"},
-                {
-                    "href": "/api/donate/{amount}",
-                    "label": "Donate",
-                    "parameters": [
-                        {"name": "amount", "label": "Enter a custom SOL amount"}
-                    ],
-                },
-            ]
-        },
-    }
-
-    response = make_response(jsonify(data), 200, SOLANA_HEADERS)
-
-    if request.method == "OPTIONS":
-        response.headers["Access-Control-Allow-Origin"] = "*"
-        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, OPTIONS"
-        response.headers["Access-Control-Allow-Headers"] = (
-            "Content-Type,Authorization,Content-Encoding,Accept-Encoding,X-Action-Version,X-Blockchain-Ids"
-        )
-
-    return response
-
-
-@app.route("/api/donate/<amount>")
-def sol_donate_amount_get(amount):
-    data = {
-        "icon": "https://nathan.woodburn.au/assets/img/profile.png",
-        "label": f"Donate {amount} SOL to Nathan.Woodburn/",
-        "title": "Donate to Nathan.Woodburn/",
-        "description": f"Donate {amount} SOL to Nathan.Woodburn/",
-    }
-    return jsonify(data), 200, SOLANA_HEADERS
-
-
-@app.route("/api/donate/<amount>", methods=["POST"])
-def sol_donate_post(amount):
-    if not request.json:
-        return jsonify({"message": "Error: No JSON data provided"}), 400, SOLANA_HEADERS
-
-    if "account" not in request.json:
-        return jsonify({"message": "Error: No account provided"}), 400, SOLANA_HEADERS
-
-    sender = request.json["account"]
-
-    # Make sure amount is a number
-    try:
-        amount = float(amount)
-    except ValueError:
-        return jsonify({"message": "Error: Invalid amount"}), 400, SOLANA_HEADERS
-
-    if amount < 0.0001:
-        return jsonify({"message": "Error: Amount too small"}), 400, SOLANA_HEADERS
-
-    transaction = create_transaction(sender, amount)
-    return jsonify({"message": "Success", "transaction": transaction}), 200, SOLANA_HEADERS
-
-# endregion
-
-# region API routes
-
-
-@app.route("/api/version")
-@app.route("/api/v1/version")
-def api_version_get():
-    return jsonify({"version": getGitCommit()})
-
-@app.route("/api")
-@app.route("/api/")
-@app.route("/api/v1")
-@app.route("/api/v1/")
-@app.route("/api/help")
-def api_help_get():
-    return jsonify({
-        "message": "Welcome to Nathan.Woodburn/ API! This is a personal website. For more information, visit https://nathan.woodburn.au",
-        "endpoints": {
-            "/api/v1/time": "Get the current time",
-            "/api/v1/timezone": "Get the current timezone",
-            "/api/v1/message": "Get the message from the config",
-            "/api/v1/ip": "Get your IP address",
-            "/api/v1/project": "Get the current project from git",
-            "/api/v1/version": "Get the current version of the website",
-            "/api/v1/help": "Get this help message"
-        },
-        "version": getGitCommit()
-    })
-
-
-@app.route("/api/time")
-@app.route("/api/v1/time")
-def api_time_get():
-    timezone_offset = datetime.timedelta(hours=ncConfig["time-zone"])
-    timezone = datetime.timezone(offset=timezone_offset)
-    time = datetime.datetime.now(tz=timezone)
-    return jsonify({
-        "timestring": time.strftime("%A, %B %d, %Y %I:%M %p"),
-        "timestamp": time.timestamp(),
-        "timezone": ncConfig["time-zone"],
-        "timeISO": time.isoformat()
-    })
-
-
-@app.route("/api/timezone")
-@app.route("/api/v1/timezone")
-def api_timezone_get():
-    return jsonify({"timezone": ncConfig["time-zone"]})
-
-
-@app.route("/api/timezone", methods=["POST"])
-@app.route("/api/v1/timezone", methods=["POST"])
-def api_timezone_post():
-    # Refresh config
-    global ncConfig
-    conf = requests.get(
-        "https://cloud.woodburn.au/s/4ToXgFe3TnnFcN7/download/website-conf.json")
-    if conf.status_code != 200:
-        return jsonify({"message": "Error: Could not get timezone"})
-    if not conf.json():
-        return jsonify({"message": "Error: Could not get timezone"})
-    conf = conf.json()
-    if "time-zone" not in conf:
-        return jsonify({"message": "Error: Could not get timezone"})
-
-    ncConfig = conf
-    return jsonify({"message": "Successfully pulled latest timezone", "timezone": ncConfig["time-zone"]})
-
-
-@app.route("/api/message")
-@app.route("/api/v1/message")
-def api_message_get():
-    return jsonify({"message": ncConfig["message"]})
-
-
-@app.route("/api/ip")
-@app.route("/api/v1/ip")
-def api_ip_get():
-    return jsonify({"ip": getClientIP(request)})
-
-
-@app.route("/api/email", methods=["POST"])
-@app.route("/api/v1/email", methods=["POST"])
-def api_email_post():
-    # Verify json
-    if not request.is_json:
-        return jsonify({
-            "status": 400,
-            "error": "Bad request JSON Data missing"
-        })
-
-    # Check if api key sent
-    data = request.json
-    if not data:
-        return jsonify({
-            "status": 400,
-            "error": "Bad request JSON Data missing"
-        })
-
-    if "key" not in data:
-        return jsonify({
-            "status": 401,
-            "error": "Unauthorized 'key' missing"
-        })
-
-    if data["key"] != os.getenv("EMAIL_KEY"):
-        return jsonify({
-            "status": 401,
-            "error": "Unauthorized 'key' invalid"
-        })
-
-    return sendEmail(data)
-
-
-@app.route("/api/v1/project")
-def api_project_get():
-    try:
-        git = requests.get(
-            "https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1",
-            headers={"Authorization": os.getenv("git_token")},
-        )
-        git = git.json()
-        git = git[0]
-        repo_name = git["repo"]["name"]
-        repo_name = repo_name.lower()
-        repo_description = git["repo"]["description"]
-    except Exception as e:
-        repo_name = "nathanwoodburn.github.io"
-        repo_description = "Personal website"
-        git = {
-            "repo": {
-                "html_url": "https://nathan.woodburn.au",
-                "name": "nathanwoodburn.github.io",
-                "description": "Personal website",
-            }
-        }
-        print(f"Error getting git data: {e}")
-
-    return jsonify({
-        "repo_name": repo_name,
-        "repo_description": repo_description,
-        "git": git,
-    })
-
-# endregion
-
 # region Misc routes
 
 
@@ -529,6 +209,17 @@ def links_get():
 @app.route("/generator/")
 def generator_get():
     return render_template(request.path.split("/")[-2] + ".html")
+
+@app.route("/api/<path:function>")
+def api_old_get(function):
+    return redirect(f"/api/v1/{function}", code=301)
+
+@app.route("/actions.json")
+def sol_actions_get():
+    return jsonify(
+        {"rules": [{"pathPattern": "/donate**", "apiPath": "/api/v1/donate**"}]}
+    )
+
 
 # endregion
 
@@ -728,138 +419,6 @@ def index_get():
     resp.set_cookie("loaded", "true", max_age=604800)
 
     return resp
-
-
-# region Now Pages
-@app.route("/now")
-@app.route("/now/")
-def now_index_get():
-    global handshake_scripts
-
-    # If localhost, don't load handshake
-    if (
-        request.host == "localhost:5000"
-        or request.host == "127.0.0.1:5000"
-        or os.getenv("dev") == "true"
-        or request.host == "test.nathan.woodburn.au"
-    ):
-        handshake_scripts = ""
-
-    return render_latest_now(handshake_scripts)
-
-
-@app.route("/now/<path:path>")
-def now_path_get(path):
-    global handshake_scripts
-    # If localhost, don't load handshake
-    if (
-        request.host == "localhost:5000"
-        or request.host == "127.0.0.1:5000"
-        or os.getenv("dev") == "true"
-        or request.host == "test.nathan.woodburn.au"
-    ):
-        handshake_scripts = ""
-
-    return render_now_page(path, handshake_scripts)
-
-
-@app.route("/old")
-@app.route("/old/")
-@app.route("/now/old")
-@app.route("/now/old/")
-def now_old_get():
-    global handshake_scripts
-    # If localhost, don't load handshake
-    if (
-        request.host == "localhost:5000"
-        or request.host == "127.0.0.1:5000"
-        or os.getenv("dev") == "true"
-        or request.host == "test.nathan.woodburn.au"
-    ):
-        handshake_scripts = ""
-
-    now_dates = list_now_dates()[1:]
-    html = '<ul class="list-group">'
-    html += f'<a style="text-decoration:none;" href="/now"><li class="list-group-item" style="background-color:#000000;color:#ffffff;">{get_latest_now_date(True)}</li></a>'
-
-    for date in now_dates:
-        link = date
-        date = datetime.datetime.strptime(date, "%y_%m_%d")
-        date = date.strftime("%A, %B %d, %Y")
-        html += f'<a style="text-decoration:none;" href="/now/{link}"><li class="list-group-item" style="background-color:#000000;color:#ffffff;">{date}</li></a>'
-
-    html += "</ul>"
-    return render_template(
-        "now/old.html", handshake_scripts=handshake_scripts, now_pages=html
-    )
-
-
-@app.route("/now.rss")
-@app.route("/now.xml")
-@app.route("/rss.xml")
-def now_rss_get():
-    host = "https://" + request.host
-    if ":" in request.host:
-        host = "http://" + request.host
-    # Generate RSS feed
-    now_pages = list_now_page_files()
-    rss = f'<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Nathan.Woodburn/</title><link>{host}</link><description>See what I\'ve been up to</description><language>en-us</language><lastBuildDate>{datetime.datetime.now(tz=datetime.timezone.utc).strftime("%a, %d %b %Y %H:%M:%S %z")}</lastBuildDate><atom:link href="{host}/now.rss" rel="self" type="application/rss+xml" />'
-    for page in now_pages:
-        link = page.strip(".html")
-        date = datetime.datetime.strptime(link, "%y_%m_%d")
-        date = date.strftime("%A, %B %d, %Y")
-        rss += f'<item><title>What\'s Happening {date}</title><link>{host}/now/{link}</link><description>Latest updates for {date}</description><guid>{host}/now/{link}</guid></item>'
-    rss += "</channel></rss>"
-    return make_response(rss, 200, {"Content-Type": "application/rss+xml"})
-
-
-@app.route("/now.json")
-def now_json_get():
-    now_pages = list_now_page_files()
-    host = "https://" + request.host
-    if ":" in request.host:
-        host = "http://" + request.host
-    now_pages = [{"url": host+"/now/"+page.strip(".html"), "date": datetime.datetime.strptime(page.strip(".html"), "%y_%m_%d").strftime(
-        "%A, %B %d, %Y"), "title": "What's Happening "+datetime.datetime.strptime(page.strip(".html"), "%y_%m_%d").strftime("%A, %B %d, %Y")} for page in now_pages]
-    return jsonify(now_pages)
-
-# endregion
-
-# region Blog Pages
-
-
-@app.route("/blog")
-@app.route("/blog/")
-def blog_index_get():
-    global handshake_scripts
-
-    # If localhost, don't load handshake
-    if (
-        request.host == "localhost:5000"
-        or request.host == "127.0.0.1:5000"
-        or os.getenv("dev") == "true"
-        or request.host == "test.nathan.woodburn.au"
-    ):
-        handshake_scripts = ""
-
-    return render_blog_home(handshake_scripts)
-
-
-@app.route("/blog/<path:path>")
-def blog_path_get(path):
-    global handshake_scripts
-    # If localhost, don't load handshake
-    if (
-        request.host == "localhost:5000"
-        or request.host == "127.0.0.1:5000"
-        or os.getenv("dev") == "true"
-        or request.host == "test.nathan.woodburn.au"
-    ):
-        handshake_scripts = ""
-
-    return render_blog_page(path, handshake_scripts)
-
-# endregion
 
 # region Donate
 

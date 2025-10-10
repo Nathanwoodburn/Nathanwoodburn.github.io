@@ -40,3 +40,8 @@ def create_transaction(sender_address: str, amount: float) -> str:
     raw_bytes = binascii.unhexlify(tx)
     base64_string = base64.b64encode(raw_bytes).decode("utf-8")
     return base64_string
+
+def get_solana_address() -> str:
+    if SOLANA_ADDRESS is None:
+        raise ValueError("SOLANA_ADDRESS is not set. Please ensure the .well-known/wallets/SOL file exists and contains a valid address.")
+    return str(SOLANA_ADDRESS) 
