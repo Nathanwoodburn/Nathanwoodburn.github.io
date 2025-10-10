@@ -80,7 +80,7 @@ ncConfig = ncReq.json()
 if 'time-zone' not in ncConfig:
     ncConfig['time-zone'] = 10
 
-
+# region Helper Functions
 @cache
 def getAddress(coin: str) -> str:
     address = ""
@@ -90,15 +90,46 @@ def getAddress(coin: str) -> str:
     return address
 
 
-def find(name, path):
+def getFilePath(name, path):
     for root, dirs, files in os.walk(path):
         if name in files:
             return os.path.join(root, name)
 
+def getClientIP(request):
+    x_forwarded_for = request.headers.get("X-Forwarded-For")
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(",")[0]
+    else:
+        ip = request.remote_addr
+    return ip
 
-# Assets routes
+
+def getGitCommit():
+    # if .git exists, get the latest commit hash
+    if os.path.isdir(".git"):
+        git_dir = ".git"
+        head_ref = ""
+        with open(os.path.join(git_dir, "HEAD")) as file:
+            head_ref = file.read().strip()
+        if head_ref.startswith("ref: "):
+            head_ref = head_ref[5:]
+            with open(os.path.join(git_dir, head_ref)) as file:
+                return file.read().strip()
+        else:
+            return head_ref
+
+    # Check if env SOURCE_COMMIT is set
+    if "SOURCE_COMMIT" in os.environ:
+        return os.environ["SOURCE_COMMIT"]
+
+    return "failed to get version"
+
+# endregion
+
+
+# region Assets routes
 @app.route("/assets/<path:path>")
-def send_report(path):
+def asset_get(path):
     if path.endswith(".json"):
         return send_from_directory(
             "templates/assets", path, mimetype="application/json"
@@ -135,55 +166,9 @@ def send_report(path):
 
     return render_template("404.html"), 404
 
-
-def getClientIP(request):
-    x_forwarded_for = request.headers.get("X-Forwarded-For")
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(",")[0]
-    else:
-        ip = request.remote_addr
-    return ip
-
-
-def getVersion():
-    # if .git exists, get the latest commit hash
-    if os.path.isdir(".git"):
-        git_dir = ".git"
-        head_ref = ""
-        with open(os.path.join(git_dir, "HEAD")) as file:
-            head_ref = file.read().strip()
-        if head_ref.startswith("ref: "):
-            head_ref = head_ref[5:]
-            with open(os.path.join(git_dir, head_ref)) as file:
-                return file.read().strip()
-        else:
-            return head_ref
-
-    # Check if env SOURCE_COMMIT is set
-    if "SOURCE_COMMIT" in os.environ:
-        return os.environ["SOURCE_COMMIT"]
-
-    return "failed to get version"
-
-
-# region Special routes
-@app.route("/meet")
-@app.route("/meeting")
-@app.route("/appointment")
-def meet():
-    return redirect(
-        "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr", code=302
-    )
-
-
-@app.route("/links")
-def links():
-    return render_template("link.html")
-
-
 @app.route("/sitemap")
 @app.route("/sitemap.xml")
-def sitemap():
+def sitemap_get():
     # Remove all .html from sitemap
     with open("templates/sitemap.xml") as file:
         sitemap = file.read()
@@ -191,37 +176,28 @@ def sitemap():
     sitemap = sitemap.replace(".html", "")
     return make_response(sitemap, 200, {"Content-Type": "application/xml"})
 
+@app.route("/favicon.<ext>")
+def favicon_get(ext):
+    if ext not in ("png", "svg", "ico"):
+        return render_template("404.html"), 404
+    return send_from_directory("templates/assets/img/favicon", f"favicon.{ext}")
 
-@app.route("/favicon.png")
-def faviconPNG():
-    return send_from_directory("templates/assets/img/favicon", "favicon.png")
-
-
-@app.route("/favicon.svg")
-def faviconSVG():
-    return send_from_directory("templates/assets/img/favicon", "favicon.svg")
-
-
-@app.route("/favicon.ico")
-def faviconICO():
-    return send_from_directory("templates/assets/img/favicon", "favicon.ico")
-
-
-@app.route("/https.js")
-@app.route("/handshake.js")
-@app.route("/redirect.js")
-def handshake():
-    # return request.path
+@app.route("/<name>.js")
+def javascript_get(name):
+    # Check if file in js directory
+    if not os.path.isfile("templates/assets/js/" + request.path.split("/")[-1]):
+        return render_template("404.html"), 404
     return send_from_directory("templates/assets/js", request.path.split("/")[-1])
 
+# endregion
 
-@app.route("/generator/")
-def removeTrailingSlash():
-    return render_template(request.path.split("/")[-2] + ".html")
-
+# region Well-known routes
+@app.route("/.well-known/<path:path>")
+def wk_index_get(path):
+    return send_from_directory(".well-known", path)
 
 @app.route("/.well-known/wallets/<path:path>")
-def wallet(path):
+def wk_wallet_get(path):
     if path[0] == "." and 'proof' not in path:
         return send_from_directory(
             ".well-known/wallets", path, mimetype="application/json"
@@ -238,9 +214,8 @@ def wallet(path):
 
     return render_template("404.html"), 404
 
-
 @app.route("/.well-known/nostr.json")
-def nostr():
+def wk_nostr_get():
     # Get name parameter
     name = request.args.get("name")
     if name:
@@ -260,9 +235,8 @@ def nostr():
         }
     )
 
-
 @app.route("/.well-known/xrp-ledger.toml")
-def xrpLedger():
+def wk_xrp_get():
     # Create a response with the xrp-ledger.toml file
     with open(".well-known/xrp-ledger.toml") as file:
         toml = file.read()
@@ -272,9 +246,10 @@ def xrpLedger():
     response.headers["Access-Control-Allow-Origin"] = "*"
     return response
 
-
+# endregion
+# region PWA routes
 @app.route("/manifest.json")
-def manifest():
+def manifest_get():
     host = request.host
 
     # Read as json
@@ -288,23 +263,21 @@ def manifest():
     manifest["scope"] = url
     return jsonify(manifest)
 
-
 @app.route("/sw.js")
-def pw():
+def serviceWorker_get():
     return send_from_directory("pwa", "sw.js")
 
+# endregion
 
-# region Sol Links
+# region Solana Links
 @app.route("/actions.json")
-def actionsJson():
+def sol_actions_get():
     return jsonify(
         {"rules": [{"pathPattern": "/donate**", "apiPath": "/api/donate**"}]}
     )
 
-
 @app.route("/api/donate", methods=["GET", "OPTIONS"])
-def donateAPI():
-
+def sol_donate_get():
     data = {
         "icon": "https://nathan.woodburn.au/assets/img/profile.png",
         "label": "Donate to Nathan.Woodburn/",
@@ -341,9 +314,8 @@ def donateAPI():
 
     return response
 
-
 @app.route("/api/donate/<amount>")
-def donateAmount(amount):
+def sol_donate_amount_get(amount):
     data = {
         "icon": "https://nathan.woodburn.au/assets/img/profile.png",
         "label": f"Donate {amount} SOL to Nathan.Woodburn/",
@@ -352,9 +324,8 @@ def donateAmount(amount):
     }
     return jsonify(data)
 
-
 @app.route("/api/donate/<amount>", methods=["POST"])
-def donateAmountPost(amount):
+def sol_donate_post(amount):
     if not request.json:
         return jsonify({"message": "Error: No JSON data provided"})
 
@@ -405,21 +376,20 @@ def donateAmountPost(amount):
 
     return jsonify({"message": "Success", "transaction": base64_string}), 200, headers
 
-
 # endregion
 
-# region Other API routes
+# region API routes
 @app.route("/api/version")
 @app.route("/api/v1/version")
-def version():
-    return jsonify({"version": getVersion()})
+def api_version_get():
+    return jsonify({"version": getGitCommit()})
 
 @app.route("/api")
 @app.route("/api/")
 @app.route("/api/v1")
 @app.route("/api/v1/")
 @app.route("/api/help")
-def help():
+def api_help_get():
     return jsonify({
         "message": "Welcome to Nathan.Woodburn/ API! This is a personal website. For more information, visit https://nathan.woodburn.au",
         "endpoints": {
@@ -431,13 +401,13 @@ def help():
             "/api/v1/version": "Get the current version of the website",
             "/api/v1/help": "Get this help message"
         },
-        "version": getVersion()
+        "version": getGitCommit()
     })
 
 
 @app.route("/api/time")
 @app.route("/api/v1/time")
-def time():
+def api_time_get():
     timezone_offset = datetime.timedelta(hours=ncConfig["time-zone"])
     timezone = datetime.timezone(offset=timezone_offset)
     time = datetime.datetime.now(tz=timezone)
@@ -451,13 +421,13 @@ def time():
 
 @app.route("/api/timezone")
 @app.route("/api/v1/timezone")
-def timezone():
+def api_timezone_get():
     return jsonify({"timezone": ncConfig["time-zone"]})
 
 
 @app.route("/api/timezone", methods=["POST"])
 @app.route("/api/v1/timezone", methods=["POST"])
-def timezonePost():
+def api_timezone_post():
     # Refresh config
     global ncConfig
     conf = requests.get(
@@ -476,19 +446,19 @@ def timezonePost():
 
 @app.route("/api/message")
 @app.route("/api/v1/message")
-def nc():
+def api_message_get():
     return jsonify({"message": ncConfig["message"]})
 
 
 @app.route("/api/ip")
 @app.route("/api/v1/ip")
-def ip():
+def api_ip_get():
     return jsonify({"ip": getClientIP(request)})
 
 
 @app.route("/api/email", methods=["POST"])
 @app.route("/api/v1/email", methods=["POST"])
-def email():
+def api_email_post():
     # Verify json
     if not request.is_json:
         return jsonify({
@@ -520,7 +490,7 @@ def email():
 
 
 @app.route("/api/v1/project")
-def getCurrentProject():
+def api_project_get():
     try:
         git = requests.get(
             "https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1",
@@ -549,14 +519,30 @@ def getCurrentProject():
         "git": git,
     })
 
-
-# endregion
 # endregion
 
+# region Misc routes
+@app.route("/meet")
+@app.route("/meeting")
+@app.route("/appointment")
+def meetingLink_get():
+    return redirect(
+        "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr", code=302
+    )
+
+@app.route("/links")
+def links_get():
+    return render_template("link.html")
+
+@app.route("/generator/")
+def generator_get():
+    return render_template(request.path.split("/")[-2] + ".html")
+
+# endregion
 
 # region Main routes
 @app.route("/")
-def index():
+def index_get():
     global handshake_scripts
     global projects
     global projectsUpdated
@@ -586,7 +572,7 @@ def index():
                     "message": "Welcome to Nathan.Woodburn/! This is a personal website. For more information, visit https://nathan.woodburn.au",
                     "ip": getClientIP(request),
                     "dev": handshake_scripts == "",
-                    "version": getVersion()
+                    "version": getGitCommit()
                 }
             )
 
@@ -753,7 +739,7 @@ def index():
 # region Now Pages
 @app.route("/now")
 @app.route("/now/")
-def now_page():
+def now_index_get():
     global handshake_scripts
 
     # If localhost, don't load handshake
@@ -769,7 +755,7 @@ def now_page():
 
 
 @app.route("/now/<path:path>")
-def now_path(path):
+def now_path_get(path):
     global handshake_scripts
     # If localhost, don't load handshake
     if (
@@ -787,7 +773,7 @@ def now_path(path):
 @app.route("/old/")
 @app.route("/now/old")
 @app.route("/now/old/")
-def now_old():
+def now_old_get():
     global handshake_scripts
     # If localhost, don't load handshake
     if (
@@ -817,7 +803,7 @@ def now_old():
 @app.route("/now.rss")
 @app.route("/now.xml")
 @app.route("/rss.xml")
-def now_rss():
+def now_rss_get():
     host = "https://" + request.host
     if ":" in request.host:
         host = "http://" + request.host
@@ -834,7 +820,7 @@ def now_rss():
 
 
 @app.route("/now.json")
-def now_json():
+def now_json_get():
     now_pages = now.list_now_page_files()
     host = "https://" + request.host
     if ":" in request.host:
@@ -845,12 +831,11 @@ def now_json():
 
 # endregion
 
-# region blog Pages
-
+# region Blog Pages
 
 @app.route("/blog")
 @app.route("/blog/")
-def blog_page():
+def blog_index_get():
     global handshake_scripts
 
     # If localhost, don't load handshake
@@ -866,7 +851,7 @@ def blog_page():
 
 
 @app.route("/blog/<path:path>")
-def blog_path(path):
+def blog_path_get(path):
     global handshake_scripts
     # If localhost, don't load handshake
     if (
@@ -881,10 +866,9 @@ def blog_path(path):
 
 # endregion
 
-
 # region Donate
 @app.route("/donate")
-def donate():
+def donate_get():
     global handshake_scripts
     # If localhost, don't load handshake
     if (
@@ -1010,7 +994,7 @@ def donate():
 
 
 @app.route("/address/<path:address>")
-def addressQR(address):
+def qraddress_get(address):
     qr = qrcode.QRCode(
         version=1,
         error_correction=ERROR_CORRECT_L,
@@ -1028,10 +1012,9 @@ def addressQR(address):
     # Return the QR code image as a response
     return send_file(qr_image_path, mimetype="image/png")
 
-
 @app.route("/qrcode/<path:data>")
 @app.route("/qr/<path:data>")
-def qr_code(data):
+def qrcode_get(data):
     qr = qrcode.QRCode(
         error_correction=ERROR_CORRECT_H, box_size=10, border=2)
     qr.add_data(data)
@@ -1053,12 +1036,10 @@ def qr_code(data):
     qr_image.save("/tmp/qr_code.png")
     return send_file("/tmp/qr_code.png", mimetype="image/png")
 
-
 # endregion
 
-
 @app.route("/supersecretpath")
-def supersecretpath():
+def supersecretpath_get():
     ascii_art = ""
     if os.path.isfile("data/ascii.txt"):
         with open("data/ascii.txt") as file:
@@ -1068,9 +1049,8 @@ def supersecretpath():
     ascii_art_html = converter.convert(ascii_art)
     return render_template("ascii.html", ascii_art=ascii_art_html)
 
-
 @app.route("/download/<path:path>")
-def download(path):
+def download_get(path):
     # Check if file exists
     if path in downloads:
         path = downloads[path]
@@ -1079,13 +1059,8 @@ def download(path):
     return render_template("404.html"), 404
 
 
-@app.route("/.well-known/<path:path>")
-def wellknown(path):
-    return send_from_directory(".well-known", path)
-
-
 @app.route("/hosting/send-enquiry", methods=["POST"])
-def hosting_send_enquiry():
+def hosting_post():
     global email_request_count
     global ip_request_count
 
@@ -1194,9 +1169,100 @@ def hosting_send_enquiry():
         return jsonify({"status": "error", "message": "Failed to send enquiry"}), 500
     return jsonify({"status": "success", "message": "Enquiry sent successfully"}), 200
 
+@app.route("/resume.pdf")
+def resume_pdf_get():
+    # Check if file exists
+    if os.path.isfile("data/resume.pdf"):
+        return send_file("data/resume.pdf")
+    return render_template("404.html"), 404
 
+# endregion
+
+# region ACME route
+@app.route("/hnsdoh-acme", methods=["POST"])
+def acme_post():
+    print(f"ACME request from {getClientIP(request)}")
+
+    # Get the TXT record from the request
+    if not request.json:
+        print("No JSON data provided for ACME")
+        return jsonify({"status": "error", "error": "No JSON data provided"})
+    if "txt" not in request.json or "auth" not in request.json:
+        print("Missing required data for ACME")
+        return jsonify({"status": "error", "error": "Missing required data"})
+
+    txt = request.json["txt"]
+    auth = request.json["auth"]
+    if auth != os.getenv("CF_AUTH"):
+        print("Invalid auth for ACME")
+        return jsonify({"status": "error", "error": "Invalid auth"})
+
+    cf = Cloudflare(api_token=os.getenv("CF_TOKEN"))
+    zone = cf.zones.list(name="hnsdoh.com").to_dict()
+    zone_id = zone["result"][0]["id"] # type: ignore
+    existing_records = cf.dns.records.list(
+        zone_id=zone_id, type="TXT", name="_acme-challenge.hnsdoh.com" # type: ignore
+    ).to_dict()
+    record_id = existing_records["result"][0]["id"] # type: ignore
+    cf.dns.records.delete(dns_record_id=record_id, zone_id=zone_id)
+    cf.dns.records.create(
+        zone_id=zone_id,
+        type="TXT",
+        name="_acme-challenge",
+        content=txt,
+    )
+    print(f"ACME request successful: {txt}")
+    return jsonify({"status": "success"})
+
+# endregion
+
+# region Podcast routes
+@app.route("/ID1")
+def podcast_index_get():
+    # Proxy to ID1 url
+    req = requests.get("https://podcasts.c.woodburn.au/ID1")
+    return make_response(
+        req.content, 200, {"Content-Type": req.headers["Content-Type"]}
+    )
+
+@app.route("/ID1/")
+def podcast_contents_get():
+    # Proxy to ID1 url
+    req = requests.get("https://podcasts.c.woodburn.au/ID1/")
+    return make_response(
+        req.content, 200, {"Content-Type": req.headers["Content-Type"]}
+    )
+
+@app.route("/ID1/<path:path>")
+def podcast_path_get(path):
+    # Proxy to ID1 url
+    req = requests.get("https://podcasts.c.woodburn.au/ID1/" + path)
+    return make_response(
+        req.content, 200, {"Content-Type": req.headers["Content-Type"]}
+    )
+
+@app.route("/ID1.xml")
+def podcast_xml_get():
+    # Proxy to ID1 url
+    req = requests.get("https://podcasts.c.woodburn.au/ID1.xml")
+    return make_response(
+        req.content, 200, {"Content-Type": req.headers["Content-Type"]}
+    )
+
+@app.route("/podsync.opml")
+def podcast_podsync_get():
+    req = requests.get("https://podcasts.c.woodburn.au/podsync.opml")
+    return make_response(
+        req.content, 200, {"Content-Type": req.headers["Content-Type"]}
+    )
+
+# endregion
+
+# region Error Catching
+
+# Catch all for GET requests
 @app.route("/<path:path>")
-def catch_all(path: str):
+def catch_all_get(path: str):
     global handshake_scripts
     # If localhost, don't load handshake
     if (
@@ -1231,7 +1297,7 @@ def catch_all(path: str):
     # Try to find a file matching
     if path.count("/") < 1:
         # Try to find a file matching
-        filename = find(path, "templates")
+        filename = getFilePath(path, "templates")
         if filename:
             return send_file(filename)
 
@@ -1247,106 +1313,6 @@ def catch_all(path: str):
             ), 404
     return render_template("404.html"), 404
 
-
-@app.route("/resume.pdf")
-def resume_pdf():
-    # Check if file exists
-    if os.path.isfile("data/resume.pdf"):
-        return send_file("data/resume.pdf")
-    return render_template("404.html"), 404
-
-
-# endregion
-
-
-# region ACME
-@app.route("/hnsdoh-acme", methods=["POST"])
-def hnsdoh_acme():
-    print(f"ACME request from {getClientIP(request)}")
-
-    # Get the TXT record from the request
-    if not request.json:
-        print("No JSON data provided for ACME")
-        return jsonify({"status": "error", "error": "No JSON data provided"})
-    if "txt" not in request.json or "auth" not in request.json:
-        print("Missing required data for ACME")
-        return jsonify({"status": "error", "error": "Missing required data"})
-
-    txt = request.json["txt"]
-    auth = request.json["auth"]
-    if auth != os.getenv("CF_AUTH"):
-        print("Invalid auth for ACME")
-        return jsonify({"status": "error", "error": "Invalid auth"})
-
-    cf = Cloudflare(api_token=os.getenv("CF_TOKEN"))
-    zone = cf.zones.list(name="hnsdoh.com").to_dict()
-    zone_id = zone["result"][0]["id"] # type: ignore
-    existing_records = cf.dns.records.list(
-        zone_id=zone_id, type="TXT", name="_acme-challenge.hnsdoh.com" # type: ignore
-    ).to_dict()
-    record_id = existing_records["result"][0]["id"] # type: ignore
-    cf.dns.records.delete(dns_record_id=record_id, zone_id=zone_id)
-    cf.dns.records.create(
-        zone_id=zone_id,
-        type="TXT",
-        name="_acme-challenge",
-        content=txt,
-    )
-    print(f"ACME request successful: {txt}")
-    return jsonify({"status": "success"})
-
-
-# endregion
-
-
-# region Podcast
-@app.route("/ID1")
-def ID1():
-    # Proxy to ID1 url
-    req = requests.get("https://podcasts.c.woodburn.au/ID1")
-    return make_response(
-        req.content, 200, {"Content-Type": req.headers["Content-Type"]}
-    )
-
-
-@app.route("/ID1/")
-def ID1_slash():
-    # Proxy to ID1 url
-    req = requests.get("https://podcasts.c.woodburn.au/ID1/")
-    return make_response(
-        req.content, 200, {"Content-Type": req.headers["Content-Type"]}
-    )
-
-
-@app.route("/ID1/<path:path>")
-def ID1_path(path):
-    # Proxy to ID1 url
-    req = requests.get("https://podcasts.c.woodburn.au/ID1/" + path)
-    return make_response(
-        req.content, 200, {"Content-Type": req.headers["Content-Type"]}
-    )
-
-
-@app.route("/ID1.xml")
-def ID1_xml():
-    # Proxy to ID1 url
-    req = requests.get("https://podcasts.c.woodburn.au/ID1.xml")
-    return make_response(
-        req.content, 200, {"Content-Type": req.headers["Content-Type"]}
-    )
-
-
-@app.route("/podsync.opml")
-def podsync():
-    req = requests.get("https://podcasts.c.woodburn.au/podsync.opml")
-    return make_response(
-        req.content, 200, {"Content-Type": req.headers["Content-Type"]}
-    )
-
-
-# endregion
-
-# region Error Catching
 # 404 catch all
 @app.errorhandler(404)
 def not_found(e):
