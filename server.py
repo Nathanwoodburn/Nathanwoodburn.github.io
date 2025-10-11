@@ -75,9 +75,6 @@ NC_CONFIG = requests.get(
     "https://cloud.woodburn.au/s/4ToXgFe3TnnFcN7/download/website-conf.json"
 ).json()
 
-if 'time-zone' not in NC_CONFIG:
-    NC_CONFIG['time-zone'] = 10
-
 # endregion
 
 # region Assets routes
@@ -400,7 +397,7 @@ def index_get():
             sites=SITES,
             projects=PROJECTS,
             time=time,
-            message=NC_CONFIG["message"],
+            message=NC_CONFIG.get("message",""),
         ),
         200,
         {"Content-Type": "text/html"},

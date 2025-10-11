@@ -9,13 +9,12 @@ from tools import getClientIP, getGitCommit, json_response
 
 api_bp = Blueprint('api', __name__)
 
-ncReq = requests.get(
+NC_CONFIG = requests.get(
     "https://cloud.woodburn.au/s/4ToXgFe3TnnFcN7/download/website-conf.json"
-)
-ncConfig = ncReq.json()
+).json()
 
-if 'time-zone' not in ncConfig:
-    ncConfig['time-zone'] = 10
+if 'time-zone' not in NC_CONFIG:
+    NC_CONFIG['time-zone'] = 10
 
 
 @api_bp.route("/")
@@ -46,13 +45,13 @@ def version_get():
 
 @api_bp.route("/time")
 def time_get():
-    timezone_offset = datetime.timedelta(hours=ncConfig["time-zone"])
+    timezone_offset = datetime.timedelta(hours=NC_CONFIG["time-zone"])
     timezone = datetime.timezone(offset=timezone_offset)
     time = datetime.datetime.now(tz=timezone)
     return jsonify({
         "timestring": time.strftime("%A, %B %d, %Y %I:%M %p"),
         "timestamp": time.timestamp(),
-        "timezone": ncConfig["time-zone"],
+        "timezone": NC_CONFIG["time-zone"],
         "timeISO": time.isoformat(),
         "ip": getClientIP(request),
         "status": 200
@@ -62,39 +61,15 @@ def time_get():
 @api_bp.route("/timezone")
 def timezone_get():
     return jsonify({
-        "timezone": ncConfig["time-zone"],
+        "timezone": NC_CONFIG["time-zone"],
         "ip": getClientIP(request),
         "status": 200
     })
-
-
-@api_bp.route("/timezone", methods=["POST"])
-def timezone_post():
-    # Refresh config
-    global ncConfig
-    conf = requests.get(
-        "https://cloud.woodburn.au/s/4ToXgFe3TnnFcN7/download/website-conf.json")
-    if conf.status_code != 200:
-        return json_response(request, "Error: Could not get timezone", 500)
-    if not conf.json():
-        return json_response(request, "Error: Could not get timezone", 500)
-    conf = conf.json()
-    if "time-zone" not in conf:
-        return json_response(request, "Error: Could not get timezone", 500)
-
-    ncConfig = conf
-    return jsonify({
-        "message": "Successfully pulled latest timezone",
-        "timezone": ncConfig["time-zone"],
-        "ip": getClientIP(request),
-        "status": 200
-    })
-
 
 @api_bp.route("/message")
 def message_get():
     return jsonify({
-        "message": ncConfig["message"],
+        "message": NC_CONFIG["message"],
         "ip": getClientIP(request),
         "status": 200
     })
