@@ -58,15 +58,19 @@ def getFilePath(name, path):
         if name in files:
             return os.path.join(root, name)
 
-def error_response(request: Request, message: str = "404 Not Found", code: int = 404):
-    if isCurl(request):
-        return jsonify(
-            {
-                "status": code,
-                "message": message,
-                "ip": getClientIP(request),
-            }
-        ), code
+def json_response(request: Request, message: str = "404 Not Found", code: int = 404):
+    return jsonify(
+        {
+            "status": code,
+            "message": message,
+            "ip": getClientIP(request),
+        }
+    ), code
+
+
+def error_response(request: Request, message: str = "404 Not Found", code: int = 404, force_json: bool = False):
+    if force_json or isCurl(request):
+        return json_response(request, message, code)
     
     # Check if <error code>.html exists in templates
     if os.path.isfile(f"templates/{code}.html"):

@@ -13,7 +13,6 @@ from flask_cors import CORS
 import os
 import dotenv
 import requests
-from cloudflare import Cloudflare
 import datetime
 import qrcode
 from qrcode.constants import ERROR_CORRECT_L, ERROR_CORRECT_H
@@ -24,6 +23,7 @@ from blueprints.blog import blog_bp
 from blueprints.wellknown import wk_bp
 from blueprints.api import api_bp, getGitCommit
 from blueprints.podcast import podcast_bp
+from blueprints.acme import acme_bp
 from tools import isCurl, isCrawler, getAddress, getFilePath, error_response, getClientIP
 
 app = Flask(__name__)
@@ -35,6 +35,7 @@ app.register_blueprint(blog_bp, url_prefix='/blog')
 app.register_blueprint(wk_bp, url_prefix='/.well-known')
 app.register_blueprint(api_bp, url_prefix='/api/v1')
 app.register_blueprint(podcast_bp)
+app.register_blueprint(acme_bp)
 
 dotenv.load_dotenv()
 
@@ -712,47 +713,6 @@ def resume_pdf_get():
     return error_response(request, message="Resume not found")
 
 # endregion
-
-# region ACME route
-
-
-@app.route("/hnsdoh-acme", methods=["POST"])
-def acme_post():
-    print(f"ACME request from {getClientIP(request)}")
-
-    # Get the TXT record from the request
-    if not request.json:
-        print("No JSON data provided for ACME")
-        return jsonify({"status": "error", "error": "No JSON data provided"})
-    if "txt" not in request.json or "auth" not in request.json:
-        print("Missing required data for ACME")
-        return jsonify({"status": "error", "error": "Missing required data"})
-
-    txt = request.json["txt"]
-    auth = request.json["auth"]
-    if auth != os.getenv("CF_AUTH"):
-        print("Invalid auth for ACME")
-        return jsonify({"status": "error", "error": "Invalid auth"})
-
-    cf = Cloudflare(api_token=os.getenv("CF_TOKEN"))
-    zone = cf.zones.list(name="hnsdoh.com").to_dict()
-    zone_id = zone["result"][0]["id"]  # type: ignore
-    existing_records = cf.dns.records.list(
-        zone_id=zone_id, type="TXT", name="_acme-challenge.hnsdoh.com"  # type: ignore
-    ).to_dict()
-    record_id = existing_records["result"][0]["id"]  # type: ignore
-    cf.dns.records.delete(dns_record_id=record_id, zone_id=zone_id)
-    cf.dns.records.create(
-        zone_id=zone_id,
-        type="TXT",
-        name="_acme-challenge",
-        content=txt,
-    )
-    print(f"ACME request successful: {txt}")
-    return jsonify({"status": "success"})
-
-# endregion
-
 # region Error Catching
 
 # Catch all for GET requests
