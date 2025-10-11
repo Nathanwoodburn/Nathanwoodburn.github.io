@@ -3,8 +3,7 @@ import os
 import datetime
 import requests
 from mail import sendEmail
-from sol import create_transaction, get_solana_address
-import json
+from sol import create_transaction
 
 
 api_bp = Blueprint('api', __name__)
@@ -48,7 +47,7 @@ def getGitCommit():
 
 @api_bp.route("/")
 @api_bp.route("/help")
-def api_help_get():
+def help_get():
     return jsonify({
         "message": "Welcome to Nathan.Woodburn/ API! This is a personal website. For more information, visit https://nathan.woodburn.au",
         "endpoints": {
@@ -64,11 +63,11 @@ def api_help_get():
     })
 
 @api_bp.route("/version")
-def api_version_get():
+def version_get():
     return jsonify({"version": getGitCommit()})
 
 @api_bp.route("/time")
-def api_time_get():
+def time_get():
     timezone_offset = datetime.timedelta(hours=ncConfig["time-zone"])
     timezone = datetime.timezone(offset=timezone_offset)
     time = datetime.datetime.now(tz=timezone)
@@ -80,11 +79,11 @@ def api_time_get():
     })
 
 @api_bp.route("/timezone")
-def api_timezone_get():
+def timezone_get():
     return jsonify({"timezone": ncConfig["time-zone"]})
 
 @api_bp.route("/timezone", methods=["POST"])
-def api_timezone_post():
+def timezone_post():
     # Refresh config
     global ncConfig
     conf = requests.get(
@@ -101,17 +100,17 @@ def api_timezone_post():
     return jsonify({"message": "Successfully pulled latest timezone", "timezone": ncConfig["time-zone"]})
 
 @api_bp.route("/message")
-def api_message_get():
+def message_get():
     return jsonify({"message": ncConfig["message"]})
 
 
 @api_bp.route("/ip")
-def api_ip_get():
+def ip_get():
     return jsonify({"ip": getClientIP(request)})
 
 
 @api_bp.route("/email", methods=["POST"])
-def api_email_post():
+def email_post():
     # Verify json
     if not request.is_json:
         return jsonify({
@@ -143,7 +142,7 @@ def api_email_post():
 
 
 @api_bp.route("/project")
-def api_project_get():
+def project_get():
     try:
         git = requests.get(
             "https://git.woodburn.au/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1",
