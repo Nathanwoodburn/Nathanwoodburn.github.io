@@ -18,18 +18,19 @@ import qrcode
 from qrcode.constants import ERROR_CORRECT_L, ERROR_CORRECT_H
 from ansi2html import Ansi2HTMLConverter
 from PIL import Image
+# Import blueprints
 from blueprints.now import now_bp
 from blueprints.blog import blog_bp
 from blueprints.wellknown import wk_bp
 from blueprints.api import api_bp, getGitCommit
 from blueprints.podcast import podcast_bp
 from blueprints.acme import acme_bp
-from tools import isCurl, isCrawler, getAddress, getFilePath, error_response, getClientIP
+from tools import isCurl, isCrawler, getAddress, getFilePath, error_response, getClientIP, json_response
 
 app = Flask(__name__)
 CORS(app)
 
-# Register the now blueprint with the URL prefix
+# Register blueprints
 app.register_blueprint(now_bp, url_prefix='/now')
 app.register_blueprint(blog_bp, url_prefix='/blog')
 app.register_blueprint(wk_bp, url_prefix='/.well-known')
@@ -599,15 +600,15 @@ def hosting_post():
     global EMAIL_REQUEST_COUNT
     global IP_REQUEST_COUNT
 
-    if not request.json:
-        return jsonify({"status": "error", "message": "No JSON data provided"}), 400
+    if not request.is_json or not request.json:
+        return json_response(request, "No JSON data provided", 415)
 
     # Keys
     # email, cpus, memory, disk, backups, message
     required_keys = ["email", "cpus", "memory", "disk", "backups", "message"]
     for key in required_keys:
         if key not in request.json:
-            return jsonify({"status": "error", "message": f"Missing key: {key}"}), 400
+            return json_response(request, f"Missing key: {key}", 400)
 
     email = request.json["email"]
     ip = getClientIP(request)
@@ -626,10 +627,7 @@ def hosting_post():
             # Increment counter
             EMAIL_REQUEST_COUNT[email]["count"] += 1
             if EMAIL_REQUEST_COUNT[email]["count"] > EMAIL_RATE_LIMIT:
-                return jsonify({
-                    "status": "error",
-                    "message": "Rate limit exceeded. Please try again later."
-                }), 429
+                return json_response(request, "Rate limit exceeded. Please try again later.", 429)
     else:
         # First request for this email
         EMAIL_REQUEST_COUNT[email] = {"count": 1, "last_reset": current_time}
@@ -643,10 +641,7 @@ def hosting_post():
             # Increment counter
             IP_REQUEST_COUNT[ip]["count"] += 1
             if IP_REQUEST_COUNT[ip]["count"] > IP_RATE_LIMIT:
-                return jsonify({
-                    "status": "error",
-                    "message": "Rate limit exceeded. Please try again later."
-                }), 429
+                return json_response(request, "Rate limit exceeded. Please try again later.", 429)
     else:
         # First request for this IP
         IP_REQUEST_COUNT[ip] = {"count": 1, "last_reset": current_time}
@@ -666,26 +661,27 @@ def hosting_post():
         message = str(message)
         email = str(email)
     except ValueError:
-        return jsonify({"status": "error", "message": "Invalid data types"}), 400
+        return json_response(request, "Invalid data types", 400)
 
     # Basic validation
     if not isinstance(cpus, int) or cpus < 1 or cpus > 64:
-        return jsonify({"status": "error", "message": "Invalid CPUs"}), 400
+        return json_response(request, "Invalid CPUs", 400)
     if not isinstance(memory, float) or memory < 0.5 or memory > 512:
-        return jsonify({"status": "error", "message": "Invalid memory"}), 400
+        return json_response(request, "Invalid memory", 400)
     if not isinstance(disk, int) or disk < 10 or disk > 500:
-        return jsonify({"status": "error", "message": "Invalid disk"}), 400
+        return json_response(request, "Invalid disk", 400)
     if not isinstance(backups, bool):
-        return jsonify({"status": "error", "message": "Invalid backups"}), 400
+        return json_response(request, "Invalid backups", 400)
     if not isinstance(message, str) or len(message) > 1000:
-        return jsonify({"status": "error", "message": "Invalid message"}), 400
+        return json_response(request, "Invalid message", 400)
     if not isinstance(email, str) or len(email) > 100 or "@" not in email:
-        return jsonify({"status": "error", "message": "Invalid email"}), 400
+        return json_response(request, "Invalid email", 400)
 
     # Send to Discord webhook
     webhook_url = os.getenv("HOSTING_WEBHOOK")
     if not webhook_url:
-        return jsonify({"status": "error", "message": "Hosting webhook not set"}), 500
+        return json_response(request, "Hosting webhook not set", 500)
+    
     data = {
         "content": "",
         "embeds": [
@@ -701,8 +697,8 @@ def hosting_post():
     }
     response = requests.post(webhook_url, json=data, headers=headers)
     if response.status_code != 204 and response.status_code != 200:
-        return jsonify({"status": "error", "message": "Failed to send enquiry"}), 500
-    return jsonify({"status": "success", "message": "Enquiry sent successfully"}), 200
+        return json_response(request, "Failed to send enquiry", 500)
+    return json_response(request, "Enquiry sent", 200)
 
 
 @app.route("/resume.pdf")
