@@ -22,8 +22,8 @@ from PIL import Image
 from blueprints.now import now_bp
 from blueprints.blog import blog_bp
 from blueprints.wellknown import wk_bp
-from blueprints.api import api_bp, getGitCommit, getClientIP
-from tools import isCurl, isCrawler, getAddress, getFilePath
+from blueprints.api import api_bp, getGitCommit
+from tools import isCurl, isCrawler, getAddress, getFilePath, error_response, getClientIP
 
 app = Flask(__name__)
 CORS(app)
@@ -115,13 +115,15 @@ def asset_get(path):
         if os.path.isfile("templates/assets/img/favicon/" + filename):
             return send_from_directory("templates/assets/img/favicon", filename)
 
-    return render_template("404.html"), 404
+    return error_response(request)
 
 
 @app.route("/sitemap")
 @app.route("/sitemap.xml")
 def sitemap_get():
     # Remove all .html from sitemap
+    if not os.path.isfile("templates/sitemap.xml"):
+        return error_response(request)
     with open("templates/sitemap.xml") as file:
         sitemap = file.read()
 
@@ -132,7 +134,7 @@ def sitemap_get():
 @app.route("/favicon.<ext>")
 def favicon_get(ext):
     if ext not in ("png", "svg", "ico"):
-        return render_template("404.html"), 404
+        return error_response(request)
     return send_from_directory("templates/assets/img/favicon", f"favicon.{ext}")
 
 
@@ -140,7 +142,7 @@ def favicon_get(ext):
 def javascript_get(name):
     # Check if file in js directory
     if not os.path.isfile("templates/assets/js/" + request.path.split("/")[-1]):
-        return render_template("404.html"), 404
+        return error_response(request)
     return send_from_directory("templates/assets/js", request.path.split("/")[-1])
 
 # endregion
@@ -580,12 +582,13 @@ def supersecretpath_get():
 @app.route("/download/<path:path>")
 def download_get(path):
     if path not in DOWNLOAD_ROUTES:
-        return render_template("404.html"), 404
+        return error_response(request, message="Invalid download")
     # Check if file exists
     path = DOWNLOAD_ROUTES[path]
     if os.path.isfile(path):
         return send_file(path)
-    return render_template("404.html"), 404
+    
+    return error_response(request, message="File not found")
 
 
 @app.route("/hosting/send-enquiry", methods=["POST"])
@@ -704,7 +707,7 @@ def resume_pdf_get():
     # Check if file exists
     if os.path.isfile("data/resume.pdf"):
         return send_file("data/resume.pdf")
-    return render_template("404.html"), 404
+    return error_response(request, message="Resume not found")
 
 # endregion
 
@@ -814,7 +817,7 @@ def catch_all_get(path: str):
         HANDSHAKE_SCRIPTS = ""
 
     if path.lower().replace(".html", "") in RESTRICTED_ROUTES:
-        return render_template("404.html"), 404
+        return error_response(request, message="Restricted route", code=403)
 
     if path in REDIRECT_ROUTES:
         return redirect(REDIRECT_ROUTES[path], code=302)
@@ -841,34 +844,11 @@ def catch_all_get(path: str):
         if filename:
             return send_file(filename)
 
-    if isCurl(request):
-        return jsonify(
-            {
-                "status": 404,
-                "message": "Page not found",
-                "ip": getClientIP(request),
-            }
-        ), 404
-    return render_template("404.html"), 404
-
-# 404 catch all
-
+    return error_response(request)
 
 @app.errorhandler(404)
 def not_found(e):
-    if isCurl(request):
-        return jsonify(
-            {
-                "status": 404,
-                "message": "Page not found",
-                "ip": getClientIP(request),
-            }
-        ), 404
-
-    return render_template("404.html"), 404
-
-
-# endregion
+    return error_response(request)
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000, host="127.0.0.1")

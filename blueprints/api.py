@@ -4,6 +4,7 @@ import datetime
 import requests
 from mail import sendEmail
 from sol import create_transaction
+from tools import getClientIP
 
 
 api_bp = Blueprint('api', __name__)
@@ -16,14 +17,6 @@ ncConfig = ncReq.json()
 if 'time-zone' not in ncConfig:
     ncConfig['time-zone'] = 10
 
-
-def getClientIP(request):
-    x_forwarded_for = request.headers.get("X-Forwarded-For")
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(",")[0]
-    else:
-        ip = request.remote_addr
-    return ip
 
 def getGitCommit():
     # if .git exists, get the latest commit hash

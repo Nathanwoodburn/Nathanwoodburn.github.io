@@ -1,6 +1,14 @@
-from flask import Request
+from flask import Request, render_template, jsonify
 import os
 from functools import cache
+
+def getClientIP(request):
+    x_forwarded_for = request.headers.get("X-Forwarded-For")
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(",")[0]
+    else:
+        ip = request.remote_addr
+    return ip
 
 def isCurl(request: Request) -> bool:
     """
@@ -49,3 +57,18 @@ def getFilePath(name, path):
     for root, dirs, files in os.walk(path):
         if name in files:
             return os.path.join(root, name)
+
+def error_response(request: Request, message: str = "404 Not Found", code: int = 404):
+    if isCurl(request):
+        return jsonify(
+            {
+                "status": code,
+                "message": message,
+                "ip": getClientIP(request),
+            }
+        ), code
+    
+    # Check if <error code>.html exists in templates
+    if os.path.isfile(f"templates/{code}.html"):
+        return render_template(f"{code}.html"), code
+    return render_template("404.html"), code
