@@ -205,8 +205,11 @@ def links_get():
 @app.route("/api/<path:function>")
 def api_legacy_get(function):
     # Check if function is in api blueprint
-    
-    return redirect(f"/api/v1/{function}", code=301)
+    for rule in app.url_map.iter_rules():
+        # Check if the redirect route exists
+        if rule.rule == f"/api/v1/{function}":
+            return redirect(f"/api/v1/{function}", code=301)
+    return error_response(request, message="404 Not Found", code=404)
 
 
 @app.route("/actions.json")
