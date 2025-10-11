@@ -4,7 +4,7 @@ import datetime
 import requests
 from mail import sendEmail
 from sol import create_transaction
-from tools import getClientIP, getGitCommit
+from tools import getClientIP, getGitCommit, json_response
 
 
 api_bp = Blueprint('api', __name__)
@@ -32,12 +32,17 @@ def help_get():
             "/version": "Get the current version of the website",
             "/help": "Get this help message"
         },
-        "version": getGitCommit()
+        "base_url": "/api/v1",
+        "version": getGitCommit(),
+        "ip": getClientIP(request),
+        "status": 200
     })
+
 
 @api_bp.route("/version")
 def version_get():
     return jsonify({"version": getGitCommit()})
+
 
 @api_bp.route("/time")
 def time_get():
@@ -48,12 +53,20 @@ def time_get():
         "timestring": time.strftime("%A, %B %d, %Y %I:%M %p"),
         "timestamp": time.timestamp(),
         "timezone": ncConfig["time-zone"],
-        "timeISO": time.isoformat()
+        "timeISO": time.isoformat(),
+        "ip": getClientIP(request),
+        "status": 200
     })
+
 
 @api_bp.route("/timezone")
 def timezone_get():
-    return jsonify({"timezone": ncConfig["time-zone"]})
+    return jsonify({
+        "timezone": ncConfig["time-zone"],
+        "ip": getClientIP(request),
+        "status": 200
+    })
+
 
 @api_bp.route("/timezone", methods=["POST"])
 def timezone_post():
@@ -62,87 +75,92 @@ def timezone_post():
     conf = requests.get(
         "https://cloud.woodburn.au/s/4ToXgFe3TnnFcN7/download/website-conf.json")
     if conf.status_code != 200:
-        return jsonify({"message": "Error: Could not get timezone"})
+        return json_response(request, "Error: Could not get timezone", 500)
     if not conf.json():
-        return jsonify({"message": "Error: Could not get timezone"})
+        return json_response(request, "Error: Could not get timezone", 500)
     conf = conf.json()
     if "time-zone" not in conf:
-        return jsonify({"message": "Error: Could not get timezone"})
+        return json_response(request, "Error: Could not get timezone", 500)
 
     ncConfig = conf
-    return jsonify({"message": "Successfully pulled latest timezone", "timezone": ncConfig["time-zone"]})
+    return jsonify({
+        "message": "Successfully pulled latest timezone",
+        "timezone": ncConfig["time-zone"],
+        "ip": getClientIP(request),
+        "status": 200
+    })
+
 
 @api_bp.route("/message")
 def message_get():
-    return jsonify({"message": ncConfig["message"]})
+    return jsonify({
+        "message": ncConfig["message"],
+        "ip": getClientIP(request),
+        "status": 200
+    })
 
 
 @api_bp.route("/ip")
 def ip_get():
-    return jsonify({"ip": getClientIP(request)})
+    return jsonify({
+        "ip": getClientIP(request),
+        "status": 200
+    })
 
 
 @api_bp.route("/email", methods=["POST"])
 def email_post():
     # Verify json
     if not request.is_json:
-        return jsonify({
-            "status": 400,
-            "error": "Bad request JSON Data missing"
-        })
+        return json_response(request, "415 Unsupported Media Type", 415)
 
     # Check if api key sent
     data = request.json
     if not data:
-        return jsonify({
-            "status": 400,
-            "error": "Bad request JSON Data missing"
-        })
+        return json_response(request, "400 Bad Request", 400)
 
     if "key" not in data:
-        return jsonify({
-            "status": 401,
-            "error": "Unauthorized 'key' missing"
-        })
+        return json_response(request, "400 Bad Request 'key' missing", 400)
 
     if data["key"] != os.getenv("EMAIL_KEY"):
-        return jsonify({
-            "status": 401,
-            "error": "Unauthorized 'key' invalid"
-        })
+        return json_response(request, "401 Unauthorized", 401)
 
+    # TODO: Add client info to email
     return sendEmail(data)
 
 
 @api_bp.route("/project")
 def project_get():
+    gitinfo = {
+        "website": None,
+    }
     try:
         git = requests.get(
-            "https://git.woodburn.au/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1",
+            "https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1",
             headers={"Authorization": os.getenv("git_token")},
         )
-        git = git.json()
+        git = git.json()        
         git = git[0]
         repo_name = git["repo"]["name"]
         repo_name = repo_name.lower()
         repo_description = git["repo"]["description"]
+        gitinfo["name"] = repo_name
+        gitinfo["description"] = repo_description
+        gitinfo["url"] = git["repo"]["html_url"]
+        if "website" in git["repo"]:
+            gitinfo["website"] = git["repo"]["website"]
     except Exception as e:
-        repo_name = "nathanwoodburn.github.io"
-        repo_description = "Personal website"
-        git = {
-            "repo": {
-                "html_url": "https://nathan.woodburn.au",
-                "name": "nathanwoodburn.github.io",
-                "description": "Personal website",
-            }
-        }
         print(f"Error getting git data: {e}")
+        return json_response(request, "500 Internal Server Error", 500)
 
     return jsonify({
         "repo_name": repo_name,
         "repo_description": repo_description,
-        "git": git,
+        "repo": gitinfo,
+        "ip": getClientIP(request),
+        "status": 200
     })
+
 
 # region Solana Links
 SOLANA_HEADERS = {
@@ -150,7 +168,6 @@ SOLANA_HEADERS = {
     "X-Action-Version": "2.4.2",
     "X-Blockchain-Ids": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
 }
-
 
 
 @api_bp.route("/donate", methods=["GET", "OPTIONS"])
@@ -204,8 +221,7 @@ def sol_donate_post(amount):
 
     if not request.json:
         return jsonify({"message": "Error: No JSON data provided"}), 400, SOLANA_HEADERS
-    
-    
+
     if "account" not in request.json:
         return jsonify({"message": "Error: No account provided"}), 400, SOLANA_HEADERS
 
@@ -215,7 +231,7 @@ def sol_donate_post(amount):
     try:
         amount = float(amount)
     except ValueError:
-        amount = 1 # Default to 1 SOL if invalid
+        amount = 1  # Default to 1 SOL if invalid
 
     if amount < 0.0001:
         return jsonify({"message": "Error: Amount too small"}), 400, SOLANA_HEADERS
@@ -224,4 +240,3 @@ def sol_donate_post(amount):
     return jsonify({"message": "Success", "transaction": transaction}), 200, SOLANA_HEADERS
 
 # endregion
-

@@ -207,6 +207,8 @@ def links_get():
 
 @app.route("/api/<path:function>")
 def api_legacy_get(function):
+    # Check if function is in api blueprint
+    
     return redirect(f"/api/v1/{function}", code=301)
 
 
