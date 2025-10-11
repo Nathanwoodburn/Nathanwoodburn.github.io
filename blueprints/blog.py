@@ -1,8 +1,9 @@
 import os
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, jsonify
 import markdown
 from bs4 import BeautifulSoup
 import re
+from tools import isCurl, getClientIP
 
 blog_bp = Blueprint('blog', __name__)
 
@@ -105,30 +106,76 @@ def render_blog_home(handshake_scripts=None):
 
 @blog_bp.route("/")
 def blog_index_get():
-    global handshake_scripts
+    if not isCurl(request):
+        global handshake_scripts
 
-    # If localhost, don't load handshake
-    if (
-        request.host == "localhost:5000"
-        or request.host == "127.0.0.1:5000"
-        or os.getenv("dev") == "true"
-        or request.host == "test.nathan.woodburn.au"
-    ):
-        handshake_scripts = ""
+        # If localhost, don't load handshake
+        if (
+            request.host == "localhost:5000"
+            or request.host == "127.0.0.1:5000"
+            or os.getenv("dev") == "true"
+            or request.host == "test.nathan.woodburn.au"
+        ):
+            handshake_scripts = ""    
+        return render_blog_home(handshake_scripts)
+    
+    # Get a list of pages
+    blog_pages = list_blog_page_files()
+    # Create a html list of pages
+    blog_pages = [
+        {"name":page.replace("_", " "),"url":f"/blog/{page}", "download": f"/blog/{page}.md"} for page in blog_pages
+    ]
 
-    return render_blog_home(handshake_scripts)
+    
+    # Render the template
+    return jsonify({
+        "status": 200,
+        "message": "Check out my various blog postsa",
+        "ip": getClientIP(request),
+        "blogs": blog_pages
+    }), 200
+
 
 
 @blog_bp.route("/<path:path>")
 def blog_path_get(path):
-    global handshake_scripts
-    # If localhost, don't load handshake
-    if (
-        request.host == "localhost:5000"
-        or request.host == "127.0.0.1:5000"
-        or os.getenv("dev") == "true"
-        or request.host == "test.nathan.woodburn.au"
-    ):
-        handshake_scripts = ""
+    if not isCurl(request):
+        global handshake_scripts
+        # If localhost, don't load handshake
+        if (
+            request.host == "localhost:5000"
+            or request.host == "127.0.0.1:5000"
+            or os.getenv("dev") == "true"
+            or request.host == "test.nathan.woodburn.au"
+        ):
+            handshake_scripts = ""
 
-    return render_blog_page(path, handshake_scripts)
+        return render_blog_page(path, handshake_scripts)
+    
+    # Convert md to html
+    if not os.path.exists(f"data/blog/{path}.md"):
+        return render_template("404.html"), 404
+
+    with open(f"data/blog/{path}.md", "r") as f:
+        content = f.read()
+    # Get the title from the file name
+    title = path.replace("_", " ")
+    return jsonify({
+        "status": 200,
+        "message": f"Blog post: {title}",
+        "ip": getClientIP(request),
+        "title": title,
+        "content": content,
+        "download": f"/blog/{path}.md"
+    }), 200
+
+@blog_bp.route("/<path:path>.md")
+def blog_path_md_get(path):
+    if not os.path.exists(f"data/blog/{path}.md"):
+        return render_template("404.html"), 404
+
+    with open(f"data/blog/{path}.md", "r") as f:
+        content = f.read()
+    
+    # Return the raw markdown file
+    return content, 200, {'Content-Type': 'text/plain; charset=utf-8'}
