@@ -23,6 +23,7 @@ from blueprints.now import now_bp
 from blueprints.blog import blog_bp
 from blueprints.wellknown import wk_bp
 from blueprints.api import api_bp, getGitCommit
+from blueprints.podcast import podcast_bp
 from tools import isCurl, isCrawler, getAddress, getFilePath, error_response, getClientIP
 
 app = Flask(__name__)
@@ -33,6 +34,7 @@ app.register_blueprint(now_bp, url_prefix='/now')
 app.register_blueprint(blog_bp, url_prefix='/blog')
 app.register_blueprint(wk_bp, url_prefix='/.well-known')
 app.register_blueprint(api_bp, url_prefix='/api/v1')
+app.register_blueprint(podcast_bp)
 
 dotenv.load_dotenv()
 
@@ -751,54 +753,6 @@ def acme_post():
 
 # endregion
 
-# region Podcast routes
-
-
-@app.route("/ID1")
-def podcast_index_get():
-    # Proxy to ID1 url
-    req = requests.get("https://podcasts.c.woodburn.au/ID1")
-    return make_response(
-        req.content, 200, {"Content-Type": req.headers["Content-Type"]}
-    )
-
-
-@app.route("/ID1/")
-def podcast_contents_get():
-    # Proxy to ID1 url
-    req = requests.get("https://podcasts.c.woodburn.au/ID1/")
-    return make_response(
-        req.content, 200, {"Content-Type": req.headers["Content-Type"]}
-    )
-
-
-@app.route("/ID1/<path:path>")
-def podcast_path_get(path):
-    # Proxy to ID1 url
-    req = requests.get("https://podcasts.c.woodburn.au/ID1/" + path)
-    return make_response(
-        req.content, 200, {"Content-Type": req.headers["Content-Type"]}
-    )
-
-
-@app.route("/ID1.xml")
-def podcast_xml_get():
-    # Proxy to ID1 url
-    req = requests.get("https://podcasts.c.woodburn.au/ID1.xml")
-    return make_response(
-        req.content, 200, {"Content-Type": req.headers["Content-Type"]}
-    )
-
-
-@app.route("/podsync.opml")
-def podcast_podsync_get():
-    req = requests.get("https://podcasts.c.woodburn.au/podsync.opml")
-    return make_response(
-        req.content, 200, {"Content-Type": req.headers["Content-Type"]}
-    )
-
-# endregion
-
 # region Error Catching
 
 # Catch all for GET requests
@@ -849,6 +803,8 @@ def catch_all_get(path: str):
 @app.errorhandler(404)
 def not_found(e):
     return error_response(request)
+
+# endregion
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000, host="127.0.0.1")
