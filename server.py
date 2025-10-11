@@ -149,6 +149,18 @@ def javascript_get(name):
         return error_response(request)
     return send_from_directory("templates/assets/js", request.path.split("/")[-1])
 
+
+@app.route("/download/<path:path>")
+def download_get(path):
+    if path not in DOWNLOAD_ROUTES:
+        return error_response(request, message="Invalid download")
+    # Check if file exists
+    path = DOWNLOAD_ROUTES[path]
+    if os.path.isfile(path):
+        return send_file(path)
+
+    return error_response(request, message="File not found")
+
 # endregion
 # region PWA routes
 
@@ -553,7 +565,7 @@ def qrcode_get(data):
     qr.make()
 
     qr_image: Image.Image = qr.make_image(
-        fill_color="black", back_color="white").convert('RGB') # type: ignore
+        fill_color="black", back_color="white").convert('RGB')  # type: ignore
 
     # Add logo
     logo = Image.open("templates/assets/img/favicon/logo.png")
@@ -581,18 +593,6 @@ def supersecretpath_get():
     converter = Ansi2HTMLConverter()
     ascii_art_html = converter.convert(ascii_art)
     return render_template("ascii.html", ascii_art=ascii_art_html)
-
-
-@app.route("/download/<path:path>")
-def download_get(path):
-    if path not in DOWNLOAD_ROUTES:
-        return error_response(request, message="Invalid download")
-    # Check if file exists
-    path = DOWNLOAD_ROUTES[path]
-    if os.path.isfile(path):
-        return send_file(path)
-    
-    return error_response(request, message="File not found")
 
 
 @app.route("/hosting/send-enquiry", methods=["POST"])
@@ -681,7 +681,7 @@ def hosting_post():
     webhook_url = os.getenv("HOSTING_WEBHOOK")
     if not webhook_url:
         return json_response(request, "Hosting webhook not set", 500)
-    
+
     data = {
         "content": "",
         "embeds": [
@@ -756,11 +756,13 @@ def catch_all_get(path: str):
 
     return error_response(request)
 
+
 @app.errorhandler(404)
 def not_found(e):
     return error_response(request)
 
 # endregion
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000, host="127.0.0.1")

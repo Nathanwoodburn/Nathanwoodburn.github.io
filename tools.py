@@ -1,6 +1,7 @@
-from flask import Request, render_template, jsonify
+from flask import Request, render_template, jsonify, make_response
 import os
 from functools import cache
+
 
 def getClientIP(request):
     x_forwarded_for = request.headers.get("X-Forwarded-For")
@@ -9,6 +10,7 @@ def getClientIP(request):
     else:
         ip = request.remote_addr
     return ip
+
 
 def getGitCommit():
     # if .git exists, get the latest commit hash
@@ -34,7 +36,7 @@ def getGitCommit():
 def isCurl(request: Request) -> bool:
     """
     Check if the request is from curl
-    
+
     Args:
         request (Request): The Flask request object
     Returns:
@@ -46,6 +48,7 @@ def isCurl(request: Request) -> bool:
         if "curl" in request.headers.get("User-Agent", "curl"):
             return True
     return False
+
 
 def isCrawler(request: Request) -> bool:
     """
@@ -79,6 +82,7 @@ def getFilePath(name, path):
         if name in files:
             return os.path.join(root, name)
 
+
 def json_response(request: Request, message: str = "404 Not Found", code: int = 404):
     return jsonify(
         {
@@ -92,8 +96,14 @@ def json_response(request: Request, message: str = "404 Not Found", code: int = 
 def error_response(request: Request, message: str = "404 Not Found", code: int = 404, force_json: bool = False):
     if force_json or isCurl(request):
         return json_response(request, message, code)
-    
+
     # Check if <error code>.html exists in templates
+    response = make_response(render_template(
+        "404.html", code=code, message=message), code)
     if os.path.isfile(f"templates/{code}.html"):
-        return render_template(f"{code}.html"), code
-    return render_template("404.html"), code
+        response = make_response(render_template(
+            f"{code}.html", code=code, message=message), code)
+
+    # Add message to response headers
+    response.headers["X-Error-Message"] = message
+    return response
