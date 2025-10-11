@@ -4,7 +4,7 @@ import datetime
 import requests
 from mail import sendEmail
 from sol import create_transaction
-from tools import getClientIP
+from tools import getClientIP, getGitCommit
 
 
 api_bp = Blueprint('api', __name__)
@@ -17,26 +17,6 @@ ncConfig = ncReq.json()
 if 'time-zone' not in ncConfig:
     ncConfig['time-zone'] = 10
 
-
-def getGitCommit():
-    # if .git exists, get the latest commit hash
-    if os.path.isdir(".git"):
-        git_dir = ".git"
-        head_ref = ""
-        with open(os.path.join(git_dir, "HEAD")) as file:
-            head_ref = file.read().strip()
-        if head_ref.startswith("ref: "):
-            head_ref = head_ref[5:]
-            with open(os.path.join(git_dir, head_ref)) as file:
-                return file.read().strip()
-        else:
-            return head_ref
-
-    # Check if env SOURCE_COMMIT is set
-    if "SOURCE_COMMIT" in os.environ:
-        return os.environ["SOURCE_COMMIT"]
-
-    return "failed to get version"
 
 @api_bp.route("/")
 @api_bp.route("/help")

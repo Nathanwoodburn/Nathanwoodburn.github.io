@@ -22,10 +22,10 @@ from PIL import Image
 from blueprints.now import now_bp
 from blueprints.blog import blog_bp
 from blueprints.wellknown import wk_bp
-from blueprints.api import api_bp, getGitCommit
+from blueprints.api import api_bp
 from blueprints.podcast import podcast_bp
 from blueprints.acme import acme_bp
-from tools import isCurl, isCrawler, getAddress, getFilePath, error_response, getClientIP, json_response
+from tools import isCurl, isCrawler, getAddress, getFilePath, error_response, getClientIP, json_response, getGitCommit
 
 app = Flask(__name__)
 CORS(app)
