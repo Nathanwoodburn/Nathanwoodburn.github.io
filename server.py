@@ -81,7 +81,7 @@ NC_CONFIG = requests.get(
 
 
 @app.route("/assets/<path:path>")
-def asset_get(path):
+def asset(path):
     if path.endswith(".json"):
         return send_from_directory(
             "templates/assets", path, mimetype="application/json"
@@ -121,7 +121,7 @@ def asset_get(path):
 
 @app.route("/sitemap")
 @app.route("/sitemap.xml")
-def sitemap_get():
+def sitemap():
     # Remove all .html from sitemap
     if not os.path.isfile("templates/sitemap.xml"):
         return error_response(request)
@@ -133,14 +133,14 @@ def sitemap_get():
 
 
 @app.route("/favicon.<ext>")
-def favicon_get(ext):
+def favicon(ext):
     if ext not in ("png", "svg", "ico"):
         return error_response(request)
     return send_from_directory("templates/assets/img/favicon", f"favicon.{ext}")
 
 
 @app.route("/<name>.js")
-def javascript_get(name):
+def javascript(name):
     # Check if file in js directory
     if not os.path.isfile("templates/assets/js/" + request.path.split("/")[-1]):
         return error_response(request)
@@ -148,7 +148,7 @@ def javascript_get(name):
 
 
 @app.route("/download/<path:path>")
-def download_get(path):
+def download(path):
     if path not in DOWNLOAD_ROUTES:
         return error_response(request, message="Invalid download")
     # Check if file exists
@@ -163,7 +163,7 @@ def download_get(path):
 
 
 @app.route("/manifest.json")
-def manifest_get():
+def manifest():
     host = request.host
 
     # Read as json
@@ -179,7 +179,7 @@ def manifest_get():
 
 
 @app.route("/sw.js")
-def serviceWorker_get():
+def serviceWorker():
     return send_from_directory("pwa", "sw.js")
 
 # endregion
@@ -191,19 +191,19 @@ def serviceWorker_get():
 @app.route("/meet")
 @app.route("/meeting")
 @app.route("/appointment")
-def meetingLink_get():
+def meetingLink():
     return redirect(
         "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr", code=302
     )
 
 
 @app.route("/links")
-def links_get():
+def links():
     return render_template("link.html")
 
 
 @app.route("/api/<path:function>")
-def api_legacy_get(function):
+def api_legacy(function):
     # Check if function is in api blueprint
     for rule in app.url_map.iter_rules():
         # Check if the redirect route exists
@@ -213,7 +213,7 @@ def api_legacy_get(function):
 
 
 @app.route("/actions.json")
-def sol_actions_get():
+def sol_actions():
     return jsonify(
         {"rules": [{"pathPattern": "/donate**", "apiPath": "/api/v1/donate**"}]}
     )
@@ -224,7 +224,7 @@ def sol_actions_get():
 
 
 @app.route("/")
-def index_get():
+def index():
     global HANDSHAKE_SCRIPTS
     global PROJECTS
     global PROJECTS_UPDATED
@@ -413,7 +413,7 @@ def index_get():
 
 
 @app.route("/donate")
-def donate_get():
+def donate():
     global HANDSHAKE_SCRIPTS
     # If localhost, don't load handshake
     if (
@@ -539,7 +539,7 @@ def donate_get():
 
 
 @app.route("/address/<path:address>")
-def qraddress_get(address):
+def qraddress(address):
     qr = qrcode.QRCode(
         version=1,
         error_correction=ERROR_CORRECT_L,
@@ -560,7 +560,7 @@ def qraddress_get(address):
 
 @app.route("/qrcode/<path:data>")
 @app.route("/qr/<path:data>")
-def qrcode_get(data):
+def qrcodee(data):
     qr = qrcode.QRCode(
         error_correction=ERROR_CORRECT_H, box_size=10, border=2)
     qr.add_data(data)
@@ -586,7 +586,7 @@ def qrcode_get(data):
 
 
 @app.route("/supersecretpath")
-def supersecretpath_get():
+def supersecretpath():
     ascii_art = ""
     if os.path.isfile("data/ascii.txt"):
         with open("data/ascii.txt") as file:
@@ -704,7 +704,7 @@ def hosting_post():
 
 
 @app.route("/resume.pdf")
-def resume_pdf_get():
+def resume_pdf():
     # Check if file exists
     if os.path.isfile("data/resume.pdf"):
         return send_file("data/resume.pdf")
@@ -717,7 +717,7 @@ def resume_pdf_get():
 
 
 @app.route("/<path:path>")
-def catch_all_get(path: str):
+def catch_all(path: str):
     global HANDSHAKE_SCRIPTS
     # If localhost, don't load handshake
     if (

@@ -5,7 +5,7 @@ import os
 # Create blueprint
 now_bp = Blueprint('now', __name__)
 
-def list_now_page_files():
+def list_page_files():
     now_pages = os.listdir("templates/now")
     now_pages = [
         page for page in now_pages if page != "template.html" and page != "old.html"
@@ -13,31 +13,31 @@ def list_now_page_files():
     now_pages.sort(reverse=True)
     return now_pages
 
-def list_now_dates():
-    now_pages = list_now_page_files()
+def list_dates():
+    now_pages = list_page_files()
     now_dates = [page.split(".")[0] for page in now_pages]
     return now_dates
 
-def get_latest_now_date(formatted=False):
+def get_latest_date(formatted=False):
     if formatted:
-        date=list_now_dates()[0]
+        date=list_dates()[0]
         date = datetime.datetime.strptime(date, "%y_%m_%d")
         date = date.strftime("%A, %B %d, %Y")
         return date
-    return list_now_dates()[0]
+    return list_dates()[0]
 
-def render_latest_now(handshake_scripts=None):
-    now_page = list_now_dates()[0]
-    return render_now_page(now_page,handshake_scripts=handshake_scripts)
+def render_latest(handshake_scripts=None):
+    now_page = list_dates()[0]
+    return render(now_page,handshake_scripts=handshake_scripts)
 
-def render_now_page(date,handshake_scripts=None):
+def render(date,handshake_scripts=None):
     # If the date is not available, render the latest page
     if date is None:
-        return render_latest_now(handshake_scripts=handshake_scripts)
+        return render_latest(handshake_scripts=handshake_scripts)
     # Remove .html
     date = date.removesuffix(".html")
 
-    if date not in list_now_dates():
+    if date not in list_dates():
         return render_template("404.html"), 404
 
 
@@ -46,7 +46,7 @@ def render_now_page(date,handshake_scripts=None):
     return render_template(f"now/{date}.html",DATE=date_formatted,handshake_scripts=handshake_scripts)
 
 @now_bp.route("/")
-def now_index_get():
+def index():
     handshake_scripts = ''
     # If localhost, don't load handshake
     if (
@@ -59,11 +59,11 @@ def now_index_get():
     else:
         handshake_scripts = '<script src="https://nathan.woodburn/handshake.js" domain="nathan.woodburn" async></script><script src="https://nathan.woodburn/https.js" async></script>'
 
-    return render_latest_now(handshake_scripts)
+    return render_latest(handshake_scripts)
 
 
 @now_bp.route("/<path:path>")
-def now_path_get(path):
+def path(path):
     handshake_scripts = ''
     # If localhost, don't load handshake
     if (
@@ -76,12 +76,12 @@ def now_path_get(path):
     else:
         handshake_scripts = '<script src="https://nathan.woodburn/handshake.js" domain="nathan.woodburn" async></script><script src="https://nathan.woodburn/https.js" async></script>'
 
-    return render_now_page(path, handshake_scripts)
+    return render(path, handshake_scripts)
 
 
 @now_bp.route("/old")
 @now_bp.route("/old/")
-def now_old_get():
+def old():
     handshake_scripts = ''
     # If localhost, don't load handshake
     if (
@@ -94,9 +94,9 @@ def now_old_get():
     else:
         handshake_scripts = '<script src="https://nathan.woodburn/handshake.js" domain="nathan.woodburn" async></script><script src="https://nathan.woodburn/https.js" async></script>'
 
-    now_dates = list_now_dates()[1:]
+    now_dates = list_dates()[1:]
     html = '<ul class="list-group">'
-    html += f'<a style="text-decoration:none;" href="/now"><li class="list-group-item" style="background-color:#000000;color:#ffffff;">{get_latest_now_date(True)}</li></a>'
+    html += f'<a style="text-decoration:none;" href="/now"><li class="list-group-item" style="background-color:#000000;color:#ffffff;">{get_latest_date(True)}</li></a>'
 
     for date in now_dates:
         link = date
@@ -113,12 +113,12 @@ def now_old_get():
 @now_bp.route("/now.rss")
 @now_bp.route("/now.xml")
 @now_bp.route("/rss.xml")
-def now_rss_get():
+def rss():
     host = "https://" + request.host
     if ":" in request.host:
         host = "http://" + request.host
     # Generate RSS feed
-    now_pages = list_now_page_files()
+    now_pages = list_page_files()
     rss = f'<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Nathan.Woodburn/</title><link>{host}</link><description>See what I\'ve been up to</description><language>en-us</language><lastBuildDate>{datetime.datetime.now(tz=datetime.timezone.utc).strftime("%a, %d %b %Y %H:%M:%S %z")}</lastBuildDate><atom:link href="{host}/now.rss" rel="self" type="application/rss+xml" />'
     for page in now_pages:
         link = page.strip(".html")
@@ -130,8 +130,8 @@ def now_rss_get():
 
 
 @now_bp.route("/now.json")
-def now_json_get():
-    now_pages = list_now_page_files()
+def json():
+    now_pages = list_page_files()
     host = "https://" + request.host
     if ":" in request.host:
         host = "http://" + request.host

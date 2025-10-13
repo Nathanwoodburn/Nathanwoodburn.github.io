@@ -5,7 +5,7 @@ import requests
 podcast_bp = Blueprint('podcast', __name__)
 
 @podcast_bp.route("/ID1")
-def podcast_index_get():
+def index():
     # Proxy to ID1 url
     req = requests.get("https://podcasts.c.woodburn.au/ID1")
     if req.status_code != 200:
@@ -17,7 +17,7 @@ def podcast_index_get():
 
 
 @podcast_bp.route("/ID1/")
-def podcast_contents_get():
+def contents():
     # Proxy to ID1 url
     req = requests.get("https://podcasts.c.woodburn.au/ID1/")
     if req.status_code != 200:
@@ -28,7 +28,7 @@ def podcast_contents_get():
 
 
 @podcast_bp.route("/ID1/<path:path>")
-def podcast_path_get(path):
+def path(path):
     # Proxy to ID1 url
     req = requests.get("https://podcasts.c.woodburn.au/ID1/" + path)
     if req.status_code != 200:
@@ -39,7 +39,7 @@ def podcast_path_get(path):
 
 
 @podcast_bp.route("/ID1.xml")
-def podcast_xml_get():
+def xml():
     # Proxy to ID1 url
     req = requests.get("https://podcasts.c.woodburn.au/ID1.xml")
     if req.status_code != 200:
@@ -50,7 +50,7 @@ def podcast_xml_get():
 
 
 @podcast_bp.route("/podsync.opml")
-def podcast_podsync_get():
+def podsync():
     req = requests.get("https://podcasts.c.woodburn.au/podsync.opml")
     if req.status_code != 200:
         return error_response(request, "Error from Podcast Server", req.status_code)

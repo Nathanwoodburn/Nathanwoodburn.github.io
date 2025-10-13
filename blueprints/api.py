@@ -1,13 +1,16 @@
-from flask import Blueprint, request, jsonify, make_response
+from flask import Blueprint, request, jsonify
 import os
 import datetime
 import requests
 from mail import sendEmail
-from sol import create_transaction
 from tools import getClientIP, getGitCommit, json_response
+from blueprints.sol import sol_bp
 
 
 api_bp = Blueprint('api', __name__)
+# Register solana blueprint
+
+api_bp.register_blueprint(sol_bp)
 
 NC_CONFIG = requests.get(
     "https://cloud.woodburn.au/s/4ToXgFe3TnnFcN7/download/website-conf.json"
@@ -19,7 +22,7 @@ if 'time-zone' not in NC_CONFIG:
 
 @api_bp.route("/")
 @api_bp.route("/help")
-def help_get():
+def help():
     return jsonify({
         "message": "Welcome to Nathan.Woodburn/ API! This is a personal website. For more information, visit https://nathan.woodburn.au",
         "endpoints": {
@@ -39,12 +42,12 @@ def help_get():
 
 
 @api_bp.route("/version")
-def version_get():
+def version():
     return jsonify({"version": getGitCommit()})
 
 
 @api_bp.route("/time")
-def time_get():
+def time():
     timezone_offset = datetime.timedelta(hours=NC_CONFIG["time-zone"])
     timezone = datetime.timezone(offset=timezone_offset)
     time = datetime.datetime.now(tz=timezone)
@@ -59,7 +62,7 @@ def time_get():
 
 
 @api_bp.route("/timezone")
-def timezone_get():
+def timezone():
     return jsonify({
         "timezone": NC_CONFIG["time-zone"],
         "ip": getClientIP(request),
@@ -67,7 +70,7 @@ def timezone_get():
     })
 
 @api_bp.route("/message")
-def message_get():
+def message():
     return jsonify({
         "message": NC_CONFIG["message"],
         "ip": getClientIP(request),
@@ -76,7 +79,7 @@ def message_get():
 
 
 @api_bp.route("/ip")
-def ip_get():
+def ip():
     return jsonify({
         "ip": getClientIP(request),
         "status": 200
@@ -105,7 +108,7 @@ def email_post():
 
 
 @api_bp.route("/project")
-def project_get():
+def project():
     gitinfo = {
         "website": None,
     }
@@ -135,83 +138,3 @@ def project_get():
         "ip": getClientIP(request),
         "status": 200
     })
-
-
-# region Solana Links
-SOLANA_HEADERS = {
-    "Content-Type": "application/json",
-    "X-Action-Version": "2.4.2",
-    "X-Blockchain-Ids": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
-}
-
-
-@api_bp.route("/donate", methods=["GET", "OPTIONS"])
-def sol_donate_get():
-    data = {
-        "icon": "https://nathan.woodburn.au/assets/img/profile.png",
-        "label": "Donate to Nathan.Woodburn/",
-        "title": "Donate to Nathan.Woodburn/",
-        "description": "Student, developer, and crypto enthusiast",
-        "links": {
-            "actions": [
-                {"label": "0.01 SOL", "href": "/api/v1/donate/0.01"},
-                {"label": "0.1 SOL", "href": "/api/v1/donate/0.1"},
-                {"label": "1 SOL", "href": "/api/v1/donate/1"},
-                {
-                    "href": "/api/v1/donate/{amount}",
-                    "label": "Donate",
-                    "parameters": [
-                        {"name": "amount", "label": "Enter a custom SOL amount"}
-                    ],
-                },
-            ]
-        },
-    }
-
-    response = make_response(jsonify(data), 200, SOLANA_HEADERS)
-
-    if request.method == "OPTIONS":
-        response.headers["Access-Control-Allow-Origin"] = "*"
-        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, OPTIONS"
-        response.headers["Access-Control-Allow-Headers"] = (
-            "Content-Type,Authorization,Content-Encoding,Accept-Encoding,X-Action-Version,X-Blockchain-Ids"
-        )
-
-    return response
-
-
-@api_bp.route("/donate/<amount>")
-def sol_donate_amount_get(amount):
-    data = {
-        "icon": "https://nathan.woodburn.au/assets/img/profile.png",
-        "label": f"Donate {amount} SOL to Nathan.Woodburn/",
-        "title": "Donate to Nathan.Woodburn/",
-        "description": f"Donate {amount} SOL to Nathan.Woodburn/",
-    }
-    return jsonify(data), 200, SOLANA_HEADERS
-
-
-@api_bp.route("/donate/<amount>", methods=["POST"])
-def sol_donate_post(amount):
-
-    if not request.json:
-        return jsonify({"message": "Error: No JSON data provided"}), 400, SOLANA_HEADERS
-
-    if "account" not in request.json:
-        return jsonify({"message": "Error: No account provided"}), 400, SOLANA_HEADERS
-
-    sender = request.json["account"]
-
-    # Make sure amount is a number
-    try:
-        amount = float(amount)
-    except ValueError:
-        amount = 1  # Default to 1 SOL if invalid
-
-    if amount < 0.0001:
-        return jsonify({"message": "Error: Amount too small"}), 400, SOLANA_HEADERS
-
-    transaction = create_transaction(sender, amount)
-    return jsonify({"message": "Success", "transaction": transaction}), 200, SOLANA_HEADERS
-
-# endregion

@@ -35,7 +35,7 @@ def getGitCommit():
 
 def isCurl(request: Request) -> bool:
     """
-    Check if the request is from curl
+    Check if the request is from curl or hurl
 
     Args:
         request (Request): The Flask request object
@@ -45,7 +45,9 @@ def isCurl(request: Request) -> bool:
     """
     if request.headers and request.headers.get("User-Agent"):
         # Check if curl
-        if "curl" in request.headers.get("User-Agent", "curl"):
+        if "curl" in request.headers.get("User-Agent", ""):
+            return True
+        if "hurl" in request.headers.get("User-Agent",""):
             return True
     return False
 

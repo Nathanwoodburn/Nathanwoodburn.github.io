@@ -7,7 +7,7 @@ acme_bp = Blueprint('acme', __name__)
 
 
 @acme_bp.route("/hnsdoh-acme", methods=["POST"])
-def acme_post():
+def post():
     # Get the TXT record from the request
     if not request.is_json or not request.json:
         return json_response(request, "415 Unsupported Media Type", 415)

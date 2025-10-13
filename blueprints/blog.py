@@ -8,7 +8,7 @@ from tools import isCurl, getClientIP
 blog_bp = Blueprint('blog', __name__)
 
 
-def list_blog_page_files():
+def list_page_files():
     blog_pages = os.listdir("data/blog")
     # Remove .md extension
     blog_pages = [page.removesuffix(".md")
@@ -17,7 +17,7 @@ def list_blog_page_files():
     return blog_pages
 
 
-def render_blog_page(date, handshake_scripts=None):
+def render_page(date, handshake_scripts=None):
     # Convert md to html
     if not os.path.exists(f"data/blog/{date}.md"):
         return render_template("404.html"), 404
@@ -83,9 +83,9 @@ def fix_numbered_lists(html):
     return str(soup)
 
 
-def render_blog_home(handshake_scripts=None):
+def render_home(handshake_scripts=None):
     # Get a list of pages
-    blog_pages = list_blog_page_files()
+    blog_pages = list_page_files()
     # Create a html list of pages
     blog_pages = [
         f"""<li class="list-group-item">
@@ -105,7 +105,7 @@ def render_blog_home(handshake_scripts=None):
 
 
 @blog_bp.route("/")
-def blog_index_get():
+def index():
     if not isCurl(request):
         global handshake_scripts
 
@@ -117,10 +117,10 @@ def blog_index_get():
             or request.host == "test.nathan.woodburn.au"
         ):
             handshake_scripts = ""    
-        return render_blog_home(handshake_scripts)
+        return render_home(handshake_scripts)
     
     # Get a list of pages
-    blog_pages = list_blog_page_files()
+    blog_pages = list_page_files()
     # Create a html list of pages
     blog_pages = [
         {"name":page.replace("_", " "),"url":f"/blog/{page}", "download": f"/blog/{page}.md"} for page in blog_pages
@@ -138,7 +138,7 @@ def blog_index_get():
 
 
 @blog_bp.route("/<path:path>")
-def blog_path_get(path):
+def path(path):
     if not isCurl(request):
         global handshake_scripts
         # If localhost, don't load handshake
@@ -150,7 +150,7 @@ def blog_path_get(path):
         ):
             handshake_scripts = ""
 
-        return render_blog_page(path, handshake_scripts)
+        return render_page(path, handshake_scripts)
     
     # Convert md to html
     if not os.path.exists(f"data/blog/{path}.md"):
@@ -170,7 +170,7 @@ def blog_path_get(path):
     }), 200
 
 @blog_bp.route("/<path:path>.md")
-def blog_path_md_get(path):
+def path_md(path):
     if not os.path.exists(f"data/blog/{path}.md"):
         return render_template("404.html"), 404
 

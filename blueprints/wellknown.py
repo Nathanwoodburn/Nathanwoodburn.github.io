@@ -5,12 +5,12 @@ wk_bp = Blueprint('well-known', __name__)
 
 
 @wk_bp.route("/<path:path>")
-def wk_index_get(path):
+def index(path):
     return send_from_directory(".well-known", path)
 
 
 @wk_bp.route("/wallets/<path:path>")
-def wk_wallet_get(path):
+def wallets(path):
     if path[0] == "." and 'proof' not in path:
         return send_from_directory(
             ".well-known/wallets", path, mimetype="application/json"
@@ -29,7 +29,7 @@ def wk_wallet_get(path):
 
 
 @wk_bp.route("/nostr.json")
-def wk_nostr_get():
+def nostr():
     # Get name parameter
     name = request.args.get("name")
     if name:
@@ -51,7 +51,7 @@ def wk_nostr_get():
 
 
 @wk_bp.route("/xrp-ledger.toml")
-def wk_xrp_get():
+def xrp():
     # Create a response with the xrp-ledger.toml file
     with open(".well-known/xrp-ledger.toml") as file:
         toml = file.read()
