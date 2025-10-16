@@ -1,5 +1,6 @@
 FROM --platform=$BUILDPLATFORM python:3.10-alpine AS builder
 
+RUN apk add curl
 WORKDIR /app
 
 COPY requirements.txt /app
