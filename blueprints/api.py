@@ -42,6 +42,9 @@ def help():
             "/ip": "Get your IP address",
             "/project": "Get the current project from git",
             "/version": "Get the current version of the website",
+            "/page_date?url=URL&verbose=BOOL": "Get the last modified date of a webpage (verbose is optional, default false)",
+            "/status": "Just check if the site is up",
+            "/ping": "Just check if the site is up",
             "/help": "Get this help message"
         },
         "base_url": "/api/v1",
@@ -50,6 +53,10 @@ def help():
         "status": HTTP_OK
     })
 
+@api_bp.route("/status")
+@api_bp.route("/ping")
+def status():
+    return json_response(request, "200 OK", HTTP_OK)
 
 @api_bp.route("/version")
 def version():
