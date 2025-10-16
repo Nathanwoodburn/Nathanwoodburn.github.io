@@ -1,6 +1,6 @@
 from flask import Request, render_template, jsonify, make_response
 import os
-from functools import cache
+from functools import lru_cache as cache
 import datetime
 from typing import Optional, Dict, Union, Tuple
 import re
@@ -15,10 +15,10 @@ HTTP_NOT_FOUND = 404
 def getClientIP(request: Request) -> str:
     """
     Get the client's IP address from the request.
-    
+
     Args:
         request (Request): The Flask request object
-        
+
     Returns:
         str: The client's IP address
     """
@@ -31,11 +31,11 @@ def getClientIP(request: Request) -> str:
         ip = "unknown"
     return ip
 
-
+@cache
 def getGitCommit() -> str:
     """
     Get the current git commit hash.
-    
+
     Returns:
         str: The current git commit hash or a failure message
     """
@@ -65,7 +65,7 @@ def isCurl(request: Request) -> bool:
 
     Args:
         request (Request): The Flask request object
-        
+
     Returns:
         bool: True if the request is from curl or hurl, False otherwise
     """
@@ -78,10 +78,10 @@ def isCurl(request: Request) -> bool:
 def isCrawler(request: Request) -> bool:
     """
     Check if the request is from a web crawler (e.g., Googlebot, Bingbot).
-    
+
     Args:
         request (Request): The Flask request object
-        
+
     Returns:
         bool: True if the request is from a web crawler, False otherwise
     """
@@ -90,15 +90,49 @@ def isCrawler(request: Request) -> bool:
         return "Googlebot" in user_agent or "Bingbot" in user_agent
     return False
 
+@cache
+def isDev(host: str) -> bool:
+    """
+    Check if the host indicates a development environment.
+
+    Args:
+        host (str): The host string from the request
+
+    Returns:
+        bool: True if in development environment, False otherwise
+    """
+    if (
+        host == "localhost:5000"
+        or host == "127.0.0.1:5000"
+        or os.getenv("DEV") == "true"
+        or host == "test.nathan.woodburn.au"
+    ):
+        return True
+    return False
+
+@cache
+def getHandshakeScript(host: str) -> str:
+    """
+    Get the handshake script HTML snippet.
+
+    Args:
+        domain (str): The domain to use in the handshake script
+
+    Returns:
+        str: The handshake script HTML snippet
+    """
+    if isDev(host):
+        return ""
+    return '<script src="https://nathan.woodburn/handshake.js" domain="nathan.woodburn" async></script><script src="https://nathan.woodburn/https.js" async></script>'
 
 @cache
 def getAddress(coin: str) -> str:
     """
     Get the wallet address for a cryptocurrency.
-    
+
     Args:
         coin (str): The cryptocurrency code
-        
+
     Returns:
         str: The wallet address or empty string if not found
     """
@@ -110,14 +144,15 @@ def getAddress(coin: str) -> str:
     return address
 
 
+@cache
 def getFilePath(name: str, path: str) -> Optional[str]:
     """
     Find a file in a directory tree.
-    
+
     Args:
         name (str): The filename to find
         path (str): The root directory to search
-        
+
     Returns:
         Optional[str]: The full path to the file or None if not found
     """
@@ -130,12 +165,12 @@ def getFilePath(name: str, path: str) -> Optional[str]:
 def json_response(request: Request, message: Union[str, Dict] = "404 Not Found", code: int = 404):
     """
     Create a JSON response with standard formatting.
-    
+
     Args:
         request (Request): The Flask request object
         message (Union[str, Dict]): The response message or data
         code (int): The HTTP status code
-        
+
     Returns:
         Tuple[Dict, int]: The JSON response and HTTP status code
     """
@@ -144,7 +179,7 @@ def json_response(request: Request, message: Union[str, Dict] = "404 Not Found",
         message["status"] = code
         message["ip"] = getClientIP(request)
         return jsonify(message), code
-    
+
     return jsonify({
         "status": code,
         "message": message,
@@ -153,20 +188,20 @@ def json_response(request: Request, message: Union[str, Dict] = "404 Not Found",
 
 
 def error_response(
-    request: Request, 
-    message: str = "404 Not Found", 
-    code: int = 404, 
+    request: Request,
+    message: str = "404 Not Found",
+    code: int = 404,
     force_json: bool = False
 ) -> Union[Tuple[Dict, int], object]:
     """
     Create an error response in JSON or HTML format.
-    
+
     Args:
         request (Request): The Flask request object
         message (str): The error message
         code (int): The HTTP status code
         force_json (bool): Whether to force JSON response regardless of client
-        
+
     Returns:
         Union[Tuple[Dict, int], object]: The JSON or HTML response
     """
@@ -174,7 +209,8 @@ def error_response(
         return json_response(request, message, code)
 
     # Check if <error code>.html exists in templates
-    template_name = f"{code}.html" if os.path.isfile(f"templates/{code}.html") else "404.html"
+    template_name = f"{code}.html" if os.path.isfile(
+        f"templates/{code}.html") else "404.html"
     response = make_response(render_template(
         template_name, code=code, message=message), code)
 
@@ -200,7 +236,8 @@ def parse_date(date_groups: list[str]) -> str | None:
         date_str = " ".join(date_groups).strip()
 
         # Remove ordinal suffixes
-        date_str = re.sub(r'(\d+)(st|nd|rd|th)', r'\1', date_str, flags=re.IGNORECASE)
+        date_str = re.sub(r'(\d+)(st|nd|rd|th)', r'\1',
+                          date_str, flags=re.IGNORECASE)
 
         # Parse with dateutil, default day=1 if missing
         dt = parse(date_str, default=datetime.datetime(1900, 1, 1))
@@ -213,4 +250,3 @@ def parse_date(date_groups: list[str]) -> str | None:
 
     except (ValueError, TypeError):
         return None
-

@@ -25,7 +25,7 @@ from blueprints.wellknown import wk_bp
 from blueprints.api import api_bp
 from blueprints.podcast import podcast_bp
 from blueprints.acme import acme_bp
-from tools import isCurl, isCrawler, getAddress, getFilePath, error_response, getClientIP, json_response, getGitCommit
+from tools import isCurl, isCrawler, getAddress, getFilePath, error_response, getClientIP, json_response, getGitCommit, isDev, getHandshakeScript
 
 app = Flask(__name__)
 CORS(app)
@@ -48,8 +48,6 @@ IP_REQUEST_COUNT = {}     # Track requests by IP
 EMAIL_RATE_LIMIT = 3      # Max 3 requests per email per hour
 IP_RATE_LIMIT = 5         # Max 5 requests per IP per hour
 RATE_LIMIT_WINDOW = 3600  # 1 hour in seconds
-
-HANDSHAKE_SCRIPTS = '<script src="https://nathan.woodburn/handshake.js" domain="nathan.woodburn" async></script><script src="https://nathan.woodburn/https.js" async></script>'
 
 RESTRICTED_ROUTES = ["ascii"]
 REDIRECT_ROUTES = {
@@ -225,7 +223,6 @@ def sol_actions():
 
 @app.route("/")
 def index():
-    global HANDSHAKE_SCRIPTS
     global PROJECTS
     global PROJECTS_UPDATED
 
@@ -249,7 +246,7 @@ def index():
             {
                 "message": "Welcome to Nathan.Woodburn/! This is a personal website. For more information, visit https://nathan.woodburn.au",
                 "ip": getClientIP(request),
-                "dev": HANDSHAKE_SCRIPTS == "",
+                "dev": isDev(request.host),
                 "version": getGitCommit()
             }
         )
@@ -269,7 +266,7 @@ def index():
     try:
         git = requests.get(
             "https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1",
-            headers={"Authorization": os.getenv("git_token")},
+            headers={"Authorization": os.getenv("GIT_AUTH") if os.getenv("GIT_AUTH") else os.getenv("git_token")},
         )
         git = git.json()
         git = git[0]
@@ -344,15 +341,7 @@ def index():
         repo_name = "Nathan.Woodburn/"
 
     html_url = git["repo"]["html_url"]
-    repo = '<a href="' + html_url + '" target="_blank">' + repo_name + "</a>"
-    # If localhost, don't load handshake
-    if (
-        request.host == "localhost:5000"
-        or request.host == "127.0.0.1:5000"
-        or os.getenv("dev") == "true"
-        or request.host == "test.nathan.woodburn.au"
-    ):
-        HANDSHAKE_SCRIPTS = ""
+    repo = '<a href="' + html_url + '" target="_blank">' + repo_name + "</a>"        
 
     # Get time
     timezone_offset = datetime.timedelta(hours=NC_CONFIG["time-zone"])
@@ -389,7 +378,7 @@ def index():
     resp = make_response(
         render_template(
             "index.html",
-            handshake_scripts=HANDSHAKE_SCRIPTS,
+            handshake_scripts=getHandshakeScript(request.host),
             HNS=HNSaddress,
             SOL=SOLaddress,
             BTC=BTCaddress,
@@ -414,16 +403,6 @@ def index():
 
 @app.route("/donate")
 def donate():
-    global HANDSHAKE_SCRIPTS
-    # If localhost, don't load handshake
-    if (
-        request.host == "localhost:5000"
-        or request.host == "127.0.0.1:5000"
-        or os.getenv("dev") == "true"
-        or request.host == "test.nathan.woodburn.au"
-    ):
-        HANDSHAKE_SCRIPTS = ""
-
     coinList = os.listdir(".well-known/wallets")
     coinList = [file for file in coinList if file[0] != "."]
     coinList.sort()
@@ -461,7 +440,7 @@ def donate():
         )
         return render_template(
             "donate.html",
-            handshake_scripts=HANDSHAKE_SCRIPTS,
+            handshake_scripts=getHandshakeScript(request.host),
             coins=coins,
             default_coins=default_coins,
             crypto=instructions,
@@ -531,7 +510,7 @@ def donate():
 
     return render_template(
         "donate.html",
-        handshake_scripts=HANDSHAKE_SCRIPTS,
+        handshake_scripts=getHandshakeScript(request.host),
         crypto=cryptoHTML,
         coins=coins,
         default_coins=default_coins,
@@ -718,16 +697,7 @@ def resume_pdf():
 
 @app.route("/<path:path>")
 def catch_all(path: str):
-    global HANDSHAKE_SCRIPTS
-    # If localhost, don't load handshake
-    if (
-        request.host == "localhost:5000"
-        or request.host == "127.0.0.1:5000"
-        or os.getenv("dev") == "true"
-        or request.host == "test.nathan.woodburn.au"
-    ):
-        HANDSHAKE_SCRIPTS = ""
-
+    
     if path.lower().replace(".html", "") in RESTRICTED_ROUTES:
         return error_response(request, message="Restricted route", code=403)
 
@@ -736,17 +706,17 @@ def catch_all(path: str):
 
     # If file exists, load it
     if os.path.isfile("templates/" + path):
-        return render_template(path, handshake_scripts=HANDSHAKE_SCRIPTS, sites=SITES)
+        return render_template(path, handshake_scripts=getHandshakeScript(request.host), sites=SITES)
 
     # Try with .html
     if os.path.isfile("templates/" + path + ".html"):
         return render_template(
-            path + ".html", handshake_scripts=HANDSHAKE_SCRIPTS, sites=SITES
+            path + ".html", handshake_scripts=getHandshakeScript(request.host), sites=SITES
         )
 
     if os.path.isfile("templates/" + path.strip("/") + ".html"):
         return render_template(
-            path.strip("/") + ".html", handshake_scripts=HANDSHAKE_SCRIPTS, sites=SITES
+            path.strip("/") + ".html", handshake_scripts=getHandshakeScript(request.host), sites=SITES
         )
 
     # Try to find a file matching

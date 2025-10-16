@@ -3,7 +3,7 @@ from flask import Blueprint, render_template, request, jsonify
 import markdown
 from bs4 import BeautifulSoup
 import re
-from tools import isCurl, getClientIP
+from tools import isCurl, getClientIP, getHandshakeScript
 
 blog_bp = Blueprint('blog', __name__)
 
@@ -83,7 +83,7 @@ def fix_numbered_lists(html):
     return str(soup)
 
 
-def render_home(handshake_scripts=None):
+def render_home(handshake_scripts: str | None = None):
     # Get a list of pages
     blog_pages = list_page_files()
     # Create a html list of pages
@@ -107,26 +107,15 @@ def render_home(handshake_scripts=None):
 @blog_bp.route("/")
 def index():
     if not isCurl(request):
-        global handshake_scripts
+        return render_home(handshake_scripts=getHandshakeScript(request.host))
 
-        # If localhost, don't load handshake
-        if (
-            request.host == "localhost:5000"
-            or request.host == "127.0.0.1:5000"
-            or os.getenv("dev") == "true"
-            or request.host == "test.nathan.woodburn.au"
-        ):
-            handshake_scripts = ""    
-        return render_home(handshake_scripts)
-    
     # Get a list of pages
     blog_pages = list_page_files()
     # Create a html list of pages
     blog_pages = [
-        {"name":page.replace("_", " "),"url":f"/blog/{page}", "download": f"/blog/{page}.md"} for page in blog_pages
+        {"name": page.replace("_", " "), "url": f"/blog/{page}", "download": f"/blog/{page}.md"} for page in blog_pages
     ]
 
-    
     # Render the template
     return jsonify({
         "status": 200,
@@ -136,22 +125,11 @@ def index():
     }), 200
 
 
-
 @blog_bp.route("/<path:path>")
 def path(path):
     if not isCurl(request):
-        global handshake_scripts
-        # If localhost, don't load handshake
-        if (
-            request.host == "localhost:5000"
-            or request.host == "127.0.0.1:5000"
-            or os.getenv("dev") == "true"
-            or request.host == "test.nathan.woodburn.au"
-        ):
-            handshake_scripts = ""
+        return render_page(path, handshake_scripts=getHandshakeScript(request.host))
 
-        return render_page(path, handshake_scripts)
-    
     # Convert md to html
     if not os.path.exists(f"data/blog/{path}.md"):
         return render_template("404.html"), 404
@@ -169,6 +147,7 @@ def path(path):
         "download": f"/blog/{path}.md"
     }), 200
 
+
 @blog_bp.route("/<path:path>.md")
 def path_md(path):
     if not os.path.exists(f"data/blog/{path}.md"):
@@ -176,6 +155,6 @@ def path_md(path):
 
     with open(f"data/blog/{path}.md", "r") as f:
         content = f.read()
-    
+
     # Return the raw markdown file
     return content, 200, {'Content-Type': 'text/plain; charset=utf-8'}

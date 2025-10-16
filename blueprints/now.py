@@ -1,9 +1,11 @@
 from flask import Blueprint, render_template, make_response, request, jsonify
 import datetime
 import os
+from tools import getHandshakeScript
 
 # Create blueprint
 now_bp = Blueprint('now', __name__)
+
 
 def list_page_files():
     now_pages = os.listdir("templates/now")
@@ -13,24 +15,28 @@ def list_page_files():
     now_pages.sort(reverse=True)
     return now_pages
 
+
 def list_dates():
     now_pages = list_page_files()
     now_dates = [page.split(".")[0] for page in now_pages]
     return now_dates
 
+
 def get_latest_date(formatted=False):
     if formatted:
-        date=list_dates()[0]
+        date = list_dates()[0]
         date = datetime.datetime.strptime(date, "%y_%m_%d")
         date = date.strftime("%A, %B %d, %Y")
         return date
     return list_dates()[0]
 
+
 def render_latest(handshake_scripts=None):
     now_page = list_dates()[0]
-    return render(now_page,handshake_scripts=handshake_scripts)
+    return render(now_page, handshake_scripts=handshake_scripts)
 
-def render(date,handshake_scripts=None):
+
+def render(date, handshake_scripts=None):
     # If the date is not available, render the latest page
     if date is None:
         return render_latest(handshake_scripts=handshake_scripts)
@@ -40,60 +46,24 @@ def render(date,handshake_scripts=None):
     if date not in list_dates():
         return render_template("404.html"), 404
 
-
     date_formatted = datetime.datetime.strptime(date, "%y_%m_%d")
     date_formatted = date_formatted.strftime("%A, %B %d, %Y")
-    return render_template(f"now/{date}.html",DATE=date_formatted,handshake_scripts=handshake_scripts)
+    return render_template(f"now/{date}.html", DATE=date_formatted, handshake_scripts=handshake_scripts)
+
 
 @now_bp.route("/")
 def index():
-    handshake_scripts = ''
-    # If localhost, don't load handshake
-    if (
-        request.host == "localhost:5000"
-        or request.host == "127.0.0.1:5000"
-        or os.getenv("dev") == "true"
-        or request.host == "test.nathan.woodburn.au"
-    ):
-        handshake_scripts = ""
-    else:
-        handshake_scripts = '<script src="https://nathan.woodburn/handshake.js" domain="nathan.woodburn" async></script><script src="https://nathan.woodburn/https.js" async></script>'
-
-    return render_latest(handshake_scripts)
+    return render_latest(handshake_scripts=getHandshakeScript(request.host))
 
 
 @now_bp.route("/<path:path>")
 def path(path):
-    handshake_scripts = ''
-    # If localhost, don't load handshake
-    if (
-        request.host == "localhost:5000"
-        or request.host == "127.0.0.1:5000"
-        or os.getenv("dev") == "true"
-        or request.host == "test.nathan.woodburn.au"
-    ):
-        handshake_scripts = ""
-    else:
-        handshake_scripts = '<script src="https://nathan.woodburn/handshake.js" domain="nathan.woodburn" async></script><script src="https://nathan.woodburn/https.js" async></script>'
-
-    return render(path, handshake_scripts)
+    return render(path, handshake_scripts=getHandshakeScript(request.host))
 
 
 @now_bp.route("/old")
 @now_bp.route("/old/")
 def old():
-    handshake_scripts = ''
-    # If localhost, don't load handshake
-    if (
-        request.host == "localhost:5000"
-        or request.host == "127.0.0.1:5000"
-        or os.getenv("dev") == "true"
-        or request.host == "test.nathan.woodburn.au"
-    ):
-        handshake_scripts = ""
-    else:
-        handshake_scripts = '<script src="https://nathan.woodburn/handshake.js" domain="nathan.woodburn" async></script><script src="https://nathan.woodburn/https.js" async></script>'
-
     now_dates = list_dates()[1:]
     html = '<ul class="list-group">'
     html += f'<a style="text-decoration:none;" href="/now"><li class="list-group-item" style="background-color:#000000;color:#ffffff;">{get_latest_date(True)}</li></a>'
@@ -106,7 +76,7 @@ def old():
 
     html += "</ul>"
     return render_template(
-        "now/old.html", handshake_scripts=handshake_scripts, now_pages=html
+        "now/old.html", handshake_scripts=getHandshakeScript(request.host), now_pages=html
     )
 
 
