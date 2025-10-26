@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM python:3.10-alpine AS builder
+FROM --platform=$BUILDPLATFORM python:3.13-alpine AS builder
 
 RUN apk add curl
 WORKDIR /app
