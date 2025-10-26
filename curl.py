@@ -1,5 +1,5 @@
 from flask import render_template
-from tools import error_response, getAddress, get_tools_data
+from tools import error_response, getAddress, get_tools_data, getClientIP
 import os
 from functools import lru_cache
 import requests
@@ -81,7 +81,7 @@ def curl_response(request):
     # Handle special cases
     if path == "index":
         # Get current project
-        return render_template("index.ascii",header=get_header(),repo=get_current_project()), 200, {'Content-Type': 'text/plain; charset=utf-8'}
+        return render_template("index.ascii",repo=get_current_project(), ip=getClientIP(request)), 200, {'Content-Type': 'text/plain; charset=utf-8'}
     if path == "projects":
         # Get projects
         return render_template("projects.ascii",header=get_header(),projects=get_projects()), 200, {'Content-Type': 'text/plain; charset=utf-8'}

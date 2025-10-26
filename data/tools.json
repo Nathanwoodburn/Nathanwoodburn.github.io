@@ -25,13 +25,13 @@
     },
     {
         "name": "Zellij",
-        "type": "terminal",
+        "type": "Terminal Tools",
         "url": "https://zellij.dev/",
         "description": "A terminal workspace and multiplexer"
     },
     {
         "name": "Fx",
-        "type": "terminal",
+        "type": "Terminal Tools",
         "url": "https://fx.wtf/",
         "description": "A command-line JSON viewer and processor",
         "demo": "<script src=\"https://asciinema.c.woodburn.au/a/4.js\" id=\"asciicast-4\" async=\"true\"></script>",
@@ -39,7 +39,7 @@
     },
     {
         "name": "Zoxide",
-        "type": "terminal",
+        "type": "Terminal Tools",
         "url": "https://github.com/ajeetdsouza/zoxide",
         "description": "cd but with fuzzy matching and other cool features",
         "demo": "<script src=\"https://asciinema.c.woodburn.au/a/5.js\" id=\"asciicast-5\" async=\"true\"></script>",
@@ -47,7 +47,7 @@
     },
     {
         "name": "Atuin",
-        "type": "terminal",
+        "type": "Terminal Tools",
         "url": "https://atuin.sh/",
         "description": "A next-generation shell history manager",
         "demo": "<script src=\"https://asciinema.c.woodburn.au/a/6.js\" id=\"asciicast-6\" async=\"true\"></script>",
@@ -55,7 +55,7 @@
     },
     {
         "name": "Tmate",
-        "type": "terminal",
+        "type": "Terminal Tools",
         "url": "https://tmate.io/",
         "description": "Instant terminal sharing",
         "demo": "<script src=\"https://asciinema.c.woodburn.au/a/7.js\" id=\"asciicast-7\" async=\"true\"></script>",
@@ -63,7 +63,7 @@
     },
     {
         "name": "Eza",
-        "type": "terminal",
+        "type": "Terminal Tools",
         "url": "https://eza.rocks/",
         "description": "A modern replacement for 'ls'",
         "demo": "<script src=\"https://asciinema.c.woodburn.au/a/8.js\" id=\"asciicast-8\" async=\"true\"></script>",
@@ -71,7 +71,7 @@
     },
     {
         "name": "Bat",
-        "type": "terminal",
+        "type": "Terminal Tools",
         "url": "https://github.com/sharkdp/bat",
         "description": "A cat clone with syntax highlighting and Git integration",
         "demo": "<script src=\"https://asciinema.c.woodburn.au/a/9.js\" id=\"asciicast-9\" async=\"true\"></script>",
@@ -79,7 +79,7 @@
     },
     {
         "name": "Oh My Zsh",
-        "type": "terminal",
+        "type": "Terminal Tools",
         "url": "https://ohmyz.sh/",
         "description": "A delightful community-driven framework for managing your Zsh configuration"
     },

@@ -14,4 +14,7 @@ GET http://127.0.0.1:5000/api/v1/message
 HTTP 200
 GET http://127.0.0.1:5000/api/v1/project
 HTTP 200
-
+GET http://127.0.0.1:5000/api/v1/tools
+HTTP 200
+[Asserts]
+jsonpath "$.tools" count > 5
