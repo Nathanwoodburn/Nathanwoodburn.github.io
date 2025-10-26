@@ -3,6 +3,7 @@ from tools import error_response, getAddress, get_tools_data, getClientIP
 import os
 from functools import lru_cache
 import requests
+from blueprints.spotify import get_spotify_track
 
 
 def clean_path(path:str):
@@ -32,7 +33,9 @@ def get_current_project():
     repo_name = git["repo"]["name"]
     repo_name = repo_name.lower()
     repo_description = git["repo"]["description"]    
-    return f"[1m{repo_name}[0m - {repo_description}"
+    if not repo_description:
+        return f"[1;36m{repo_name}[0m"
+    return f"[1;36m{repo_name}[0m - [1m{repo_description}[0m"
 
 
 @lru_cache(maxsize=1)
@@ -81,7 +84,7 @@ def curl_response(request):
     # Handle special cases
     if path == "index":
         # Get current project
-        return render_template("index.ascii",repo=get_current_project(), ip=getClientIP(request)), 200, {'Content-Type': 'text/plain; charset=utf-8'}
+        return render_template("index.ascii",repo=get_current_project(), ip=getClientIP(request), spotify=get_spotify_track()), 200, {'Content-Type': 'text/plain; charset=utf-8'}
     if path == "projects":
         # Get projects
         return render_template("projects.ascii",header=get_header(),projects=get_projects()), 200, {'Content-Type': 'text/plain; charset=utf-8'}

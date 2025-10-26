@@ -24,6 +24,7 @@ I'm also one of the founders of [1;36mHandshake AU[0m [https://hns.au],
 working to grow Handshake adoption across Australia.
 
 I'm currently working on: {{ repo | safe }}
+{% if not spotify.message %}Currently listening to: [1;36m{{ spotify.song_name }}[0m by [1;36m{{ spotify.artist }}[0m{% endif %}
 
 [1;36m───────────────────────────────────────────────[0m
 [1;36m SKILLS [0m

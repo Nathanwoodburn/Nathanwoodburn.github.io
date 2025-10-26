@@ -48,8 +48,6 @@ def refresh_access_token():
     TOKEN_EXPIRES = time.time() + token_info.get("expires_in", 3600)
     return ACCESS_TOKEN
 
-
-
 @spotify_bp.route("/login")
 def login():
     auth_query = (
@@ -120,3 +118,31 @@ def currently_playing():
         "is_playing": data["is_playing"]
     }
     return json_response(request, {"spotify":track}, 200)
+
+def get_spotify_track():
+    """Internal function to get current playing track without HTTP context."""
+    token = refresh_access_token()
+    if not token:
+        return json_response(request, {"error": "Failed to refresh access token"}, 500)
+
+    headers = {"Authorization": f"Bearer {token}"}
+    response = requests.get(SPOTIFY_CURRENTLY_PLAYING_URL, headers=headers)
+
+    if response.status_code == 204:
+        return {"error": "Nothing is currently playing."}
+    elif response.status_code != 200:
+        return {"error": "Spotify API error", "status": response.status_code}
+
+    data = response.json()
+    if not data.get("item"):
+        return {"error": "Nothing is currently playing."}
+
+
+    track = {
+        "song_name": data["item"]["name"],
+        "artist": ", ".join([artist["name"] for artist in data["item"]["artists"]]),
+        "album_name": data["item"]["album"]["name"],
+        "album_art": data["item"]["album"]["images"][0]["url"],
+        "is_playing": data["is_playing"]
+    }
+    return track
