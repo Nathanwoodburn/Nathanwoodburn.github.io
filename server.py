@@ -25,6 +25,7 @@ from blueprints.wellknown import wk_bp
 from blueprints.api import api_bp
 from blueprints.podcast import podcast_bp
 from blueprints.acme import acme_bp
+from blueprints.spotify import spotify_bp
 from tools import isCurl, isCrawler, getAddress, getFilePath, error_response, getClientIP, json_response, getHandshakeScript, get_tools_data
 from curl import curl_response
 
@@ -38,6 +39,7 @@ app.register_blueprint(wk_bp, url_prefix='/.well-known')
 app.register_blueprint(api_bp, url_prefix='/api/v1')
 app.register_blueprint(podcast_bp)
 app.register_blueprint(acme_bp)
+app.register_blueprint(spotify_bp, url_prefix='/spotify')
 
 dotenv.load_dotenv()
 
