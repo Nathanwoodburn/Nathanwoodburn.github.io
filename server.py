@@ -26,10 +26,12 @@ from blueprints.api import api_bp
 from blueprints.podcast import podcast_bp
 from blueprints.acme import acme_bp
 from blueprints.spotify import spotify_bp
+from blueprints.terminal import terminal_bp
 from tools import isCurl, isCrawler, getAddress, getFilePath, error_response, getClientIP, json_response, getHandshakeScript, get_tools_data
-from curl import curl_response
+from curl import curl_response, valid_curl_path
 
 app = Flask(__name__)
+app.secret_key = os.getenv("FLASK_SECRET_KEY", "supersecretkey")
 CORS(app)
 
 # Register blueprints
@@ -40,6 +42,7 @@ app.register_blueprint(api_bp, url_prefix='/api/v1')
 app.register_blueprint(podcast_bp)
 app.register_blueprint(acme_bp)
 app.register_blueprint(spotify_bp, url_prefix='/spotify')
+app.register_blueprint(terminal_bp)
 
 dotenv.load_dotenv()
 
@@ -704,7 +707,7 @@ def catch_all(path: str):
         return error_response(request, message="Restricted route", code=403)
 
     # If curl request, return curl response
-    if isCurl(request):
+    if isCurl(request) and valid_curl_path(path):
         return curl_response(request)
 
     if path in REDIRECT_ROUTES:

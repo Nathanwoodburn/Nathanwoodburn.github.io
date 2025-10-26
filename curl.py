@@ -77,6 +77,35 @@ def get_projects():
         
     return projects
 
+@lru_cache(maxsize=32)
+def valid_curl_path(path: str) -> bool:
+    """Check if the given path corresponds to a valid curl/ascii response."""
+    path = clean_path(path)
+
+    # Special cases
+    special_paths = [
+        "index",
+        "projects",
+        "donate",
+        "donate/more",
+        "tools"
+    ]
+    if path in special_paths:
+        return True
+
+    # Check for donate/<coin> pattern
+    if path.startswith("donate/"):
+        coin = path.split("/")[1]
+        address = getAddress(coin)
+        if address != "":
+            return True
+
+    # Check if .ascii template exists
+    if os.path.exists(f"templates/{path}.ascii"):
+        return True
+
+    return False
+
 def curl_response(request):
     # Check if <path>.ascii exists
     path = clean_path(request.path)
@@ -118,9 +147,5 @@ def curl_response(request):
 
     if os.path.exists(f"templates/{path}.ascii"):
         return render_template(f"{path}.ascii",header=get_header()), 200, {'Content-Type': 'text/plain; charset=utf-8'}
-    
-    # Fallback to html if it exists
-    if os.path.exists(f"templates/{path}.html"):
-        return render_template(f"{path}.html")
     
     return error_response(request)

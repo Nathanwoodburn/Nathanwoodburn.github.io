@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #000;
+            font-family: 'Courier New', monospace;
+            color: #0f0;
+            overflow: hidden;
+        }
+        #terminal {
+            width: 100vw;
+            height: 100vh;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .line { margin-bottom: 5px; }
+        .prompt { color: #0f0; white-space: pre; }
+        .prompt-line { color: #0f0; }
+        .output { color: #fff; white-space: pre-wrap; }
+        .error { color: #f00; }
+        #input-line {
+            display: block;
+        }
+        .input-row {
+            display: flex;
+        }
+        #command-input {
+            background: transparent;
+            border: none;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            outline: none;
+            flex: 1;
+            caret-color: #0f0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="terminal">
+        <div class="line output">Nathan.Woodburn/</div>
+        <div class="line output">Type 'help' for available commands</div>
+        <div class="line output"></div>
+        <div id="input-line">
+            <div class="prompt-line">┌──({{user}}@NathanWoodburn)-[~]</div>
+            <div class="input-row">
+                <span class="prompt-line">└─$&nbsp;</span>
+                <input type="text" id="command-input" autofocus autocomplete="off" spellcheck="false">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const terminal = document.getElementById('terminal');
+        const input = document.getElementById('command-input');
+        const inputLine = document.getElementById('input-line');
+        let commandHistory = [];
+        let historyIndex = -1;
+        let currentPwd = '~';
+
+        // Function to update the prompt with current pwd
+        async function updatePrompt() {
+            try {
+                const response = await fetch('/terminal/pwd');
+                const data = await response.json();
+                if (data.output) {
+                    currentPwd = data.output;
+                    inputLine.querySelector('.prompt-line:first-child').textContent = `┌──({{user}}@NathanWoodburn)-[${currentPwd}]`;
+                }
+            } catch (err) {
+                console.error('Failed to fetch pwd:', err);
+            }
+        }
+
+        // Update prompt on load
+        updatePrompt();
+
+        input.addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter') {
+                const command = input.value.trim();
+                
+                // Disable input and hide prompt during execution
+                input.disabled = true;
+                inputLine.style.display = 'none';
+                
+                // Display command
+                const cmdLine = document.createElement('div');
+                cmdLine.className = 'line';
+                cmdLine.innerHTML = `<span class="prompt">┌──({{user}}@NathanWoodburn)-[${currentPwd}]\n└─$ </span>${command}`;
+                terminal.appendChild(cmdLine);
+                
+                // Add to history
+                if (command) {
+                    commandHistory.push(command);
+                    historyIndex = commandHistory.length;
+                }
+                
+                input.value = '';
+                
+                // Handle clear command locally
+                if (command === 'clear') {
+                    terminal.innerHTML = '';
+                    terminal.appendChild(inputLine);
+                    inputLine.style.display = 'block';
+                    input.disabled = false;
+                    input.focus();
+                    return;
+                }
+                if (command === 'exit') {
+                    // Redirect to /
+                    window.location.href = '/';
+                    return;
+                }
+                
+                // Execute command
+                if (command) {
+                    try {
+                        // Split command by space
+                        const parts = command.split(' ');
+                        const baseCommand = parts[0];
+                        const args = parts.slice(1).join(' ');
+                        
+                        // POST request to /terminal/execute/command
+                        const response = await fetch(`/terminal/execute/${encodeURIComponent(baseCommand)}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ args: args })
+                        });
+                        const data = await response.json();
+                        
+                        if (data.output) {
+                            const outputLine = document.createElement('div');
+                            outputLine.className = 'line output';
+                            outputLine.textContent = data.output;
+                            terminal.appendChild(outputLine);
+                        }
+
+                        // Update prompt after cd command
+                        if (baseCommand === 'cd' || baseCommand === 'reset') {
+                            await updatePrompt();
+                        }
+                    } catch (err) {
+                        const errorLine = document.createElement('div');
+                        errorLine.className = 'line error';
+                        errorLine.textContent = 'Error: ' + err.message;
+                        terminal.appendChild(errorLine);
+                    }
+                }
+                
+                // Show prompt and re-enable input after command completes
+                terminal.appendChild(inputLine);
+                inputLine.style.display = 'block';
+                input.disabled = false;
+                input.focus();
+                terminal.scrollTop = terminal.scrollHeight;
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    input.value = commandHistory[historyIndex];
+                }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (historyIndex < commandHistory.length - 1) {
+                    historyIndex++;
+                    input.value = commandHistory[historyIndex];
+                } else {
+                    historyIndex = commandHistory.length;
+                    input.value = '';
+                }
+            }
+        });
+
+        // Keep input focused
+        document.addEventListener('click', () => input.focus());
+        input.focus();
+    </script>
+</body>
+</html>
