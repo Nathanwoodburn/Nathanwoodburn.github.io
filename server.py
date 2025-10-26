@@ -685,6 +685,8 @@ def resume_pdf():
 
 @app.route("/tools")
 def tools():
+    if isCurl(request):
+        return curl_response(request)
     return render_template("tools.html", tools=get_tools_data())
 
 # endregion

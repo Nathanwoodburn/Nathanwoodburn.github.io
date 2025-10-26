@@ -1,5 +1,5 @@
 from flask import render_template
-from tools import error_response, getAddress
+from tools import error_response, getAddress, get_tools_data
 import os
 from functools import lru_cache
 import requests
@@ -99,10 +99,8 @@ def curl_response(request):
         coinList.sort()
         return render_template("donate_more.ascii",header=get_header(),
                                coins=coinList
-                               ), 200, {'Content-Type': 'text/plain; charset=utf-8'}
+                               ), 200, {'Content-Type': 'text/plain; charset=utf-8'}        
 
-        
-                               
     # For other donation pages, fall back to ascii if it exists
     if path.startswith("donate/"):
         coin = path.split("/")[1]
@@ -110,6 +108,10 @@ def curl_response(request):
         if address != "":
             return render_template("donate_coin.ascii",header=get_header(),coin=coin.upper(),address=address), 200, {'Content-Type': 'text/plain; charset=utf-8'}
     
+    if path == "tools":
+        tools = get_tools_data()
+        return render_template("tools.ascii",header=get_header(),tools=tools), 200, {'Content-Type': 'text/plain; charset=utf-8'}
+
 
     if os.path.exists(f"templates/{path}.ascii"):
         return render_template(f"{path}.ascii",header=get_header()), 200, {'Content-Type': 'text/plain; charset=utf-8'}
