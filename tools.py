@@ -12,6 +12,21 @@ HTTP_OK = 200
 HTTP_BAD_REQUEST = 400
 HTTP_NOT_FOUND = 404
 
+CRAWLERS = [
+    "Googlebot",
+    "Bingbot",
+    "Chrome-Lighthouse",
+    "Slurp",
+    "DuckDuckBot",
+    "Baiduspider",
+    "YandexBot",
+    "Sogou",
+    "Exabot",
+    "facebot",
+    "ia_archiver",
+    "Twitterbot"
+]
+
 
 def getClientIP(request: Request) -> str:
     """
@@ -88,7 +103,7 @@ def isCrawler(request: Request) -> bool:
     """
     if request.headers and request.headers.get("User-Agent"):
         user_agent = request.headers.get("User-Agent", "")
-        return "Googlebot" in user_agent or "Bingbot" in user_agent
+        return any(crawler in user_agent for crawler in CRAWLERS)
     return False
 
 @cache
