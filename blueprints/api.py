@@ -7,6 +7,7 @@ from mail import sendEmail
 from tools import getClientIP, getGitCommit, json_response, parse_date, get_tools_data
 from blueprints.sol import sol_bp
 from dateutil import parser as date_parser
+from blueprints.spotify import get_spotify_track
 
 # Constants
 HTTP_OK = 200
@@ -43,6 +44,8 @@ def help():
             "/project": "Get the current project from git",
             "/version": "Get the current version of the website",
             "/page_date?url=URL&verbose=BOOL": "Get the last modified date of a webpage (verbose is optional, default false)",
+            "/tools": "Get a list of tools used by Nathan Woodburn",
+            "/playing": "Get the currently playing Spotify track",
             "/status": "Just check if the site is up",
             "/ping": "Just check if the site is up",
             "/help": "Get this help message"
@@ -179,6 +182,14 @@ def tools():
             tool["demo"] = tool.pop("demo_url")
         
     return json_response(request, {"tools": tools}, HTTP_OK)
+
+@api_bp.route("/playing")
+def playing():
+    """Get the currently playing Spotify track."""
+    track_info = get_spotify_track()
+    if "error" in track_info:
+        return json_response(request, track_info, HTTP_OK)
+    return json_response(request, {"spotify": track_info}, HTTP_OK)
 
 @api_bp.route("/page_date")
 def page_date():
