@@ -34,42 +34,48 @@
         "type": "terminal",
         "url": "https://fx.wtf/",
         "description": "A command-line JSON viewer and processor",
-        "demo": "<script src=\"https://asciinema.c.woodburn.au/a/cx8sr8adsP6Uoi9zpg8MYnVTl.js\" id=\"asciicast-cx8sr8adsP6Uoi9zpg8MYnVTl\" async=\"true\"></script>"
+        "demo": "<script src=\"https://asciinema.c.woodburn.au/a/4.js\" id=\"asciicast-4\" async=\"true\"></script>",
+        "demo_url": "https://asciinema.c.woodburn.au/a/4"
     },
     {
         "name": "Zoxide",
         "type": "terminal",
         "url": "https://github.com/ajeetdsouza/zoxide",
         "description": "cd but with fuzzy matching and other cool features",
-        "demo": "<script src=\"https://asciinema.c.woodburn.au/a/5.js\" id=\"asciicast-5\" async=\"true\"></script>"
+        "demo": "<script src=\"https://asciinema.c.woodburn.au/a/5.js\" id=\"asciicast-5\" async=\"true\"></script>",
+        "demo_url": "https://asciinema.c.woodburn.au/a/5"
     },
     {
         "name": "Atuin",
         "type": "terminal",
         "url": "https://atuin.sh/",
         "description": "A next-generation shell history manager",
-        "demo": "<script src=\"https://asciinema.c.woodburn.au/a/6.js\" id=\"asciicast-6\" async=\"true\"></script>"
+        "demo": "<script src=\"https://asciinema.c.woodburn.au/a/6.js\" id=\"asciicast-6\" async=\"true\"></script>",
+        "demo_url": "https://asciinema.c.woodburn.au/a/6"
     },
     {
         "name": "Tmate",
         "type": "terminal",
         "url": "https://tmate.io/",
         "description": "Instant terminal sharing",
-        "demo": "<script src=\"https://asciinema.c.woodburn.au/a/7.js\" id=\"asciicast-7\" async=\"true\"></script>"
+        "demo": "<script src=\"https://asciinema.c.woodburn.au/a/7.js\" id=\"asciicast-7\" async=\"true\"></script>",
+        "demo_url": "https://asciinema.c.woodburn.au/a/7"
     },
     {
         "name": "Eza",
         "type": "terminal",
         "url": "https://eza.rocks/",
         "description": "A modern replacement for 'ls'",
-        "demo": "<script src=\"https://asciinema.c.woodburn.au/a/8.js\" id=\"asciicast-8\" async=\"true\"></script>"
+        "demo": "<script src=\"https://asciinema.c.woodburn.au/a/8.js\" id=\"asciicast-8\" async=\"true\"></script>",
+        "demo_url": "https://asciinema.c.woodburn.au/a/8"
     },
     {
         "name": "Bat",
         "type": "terminal",
         "url": "https://github.com/sharkdp/bat",
         "description": "A cat clone with syntax highlighting and Git integration",
-        "demo": "<script src=\"https://asciinema.c.woodburn.au/a/9.js\" id=\"asciicast-9\" async=\"true\"></script>"
+        "demo": "<script src=\"https://asciinema.c.woodburn.au/a/9.js\" id=\"asciicast-9\" async=\"true\"></script>",
+        "demo_url": "https://asciinema.c.woodburn.au/a/9"
     },
     {
         "name": "Oh My Zsh",

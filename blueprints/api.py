@@ -4,7 +4,7 @@ import datetime
 import requests
 import re
 from mail import sendEmail
-from tools import getClientIP, getGitCommit, json_response, parse_date
+from tools import getClientIP, getGitCommit, json_response, parse_date, get_tools_data
 from blueprints.sol import sol_bp
 from dateutil import parser as date_parser
 
@@ -164,6 +164,21 @@ def project():
         "status": HTTP_OK
     })
 
+@api_bp.route("/tools")
+def tools():
+    """Get a list of tools used by Nathan Woodburn."""
+    try:
+        tools = get_tools_data()
+    except Exception as e:
+        print(f"Error getting tools data: {e}")
+        return json_response(request, "500 Internal Server Error", HTTP_SERVER_ERROR)
+
+    # Remove demo and move demo_url to demo
+    for tool in tools:
+        if "demo_url" in tool:
+            tool["demo"] = tool.pop("demo_url")
+        
+    return json_response(request, {"tools": tools}, HTTP_OK)
 
 @api_bp.route("/page_date")
 def page_date():
