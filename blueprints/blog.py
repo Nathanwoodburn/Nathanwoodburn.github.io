@@ -10,6 +10,10 @@ blog_bp = Blueprint('blog', __name__)
 
 def list_page_files():
     blog_pages = os.listdir("data/blog")
+    # Sort pages by modified time, newest first
+    blog_pages.sort(
+        key=lambda x: os.path.getmtime(os.path.join("data/blog", x)), reverse=True)
+
     # Remove .md extension
     blog_pages = [page.removesuffix(".md")
                   for page in blog_pages if page.endswith(".md")]

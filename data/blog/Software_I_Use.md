@@ -1,7 +1,9 @@
 G'day,  
 Just thought it might be useful to write down some of the software I use regularly. I've no clue if you'll find any useful :)  
 
+For a more complete list, check out [/tools](/tools)
 
+<br>
 ## Overview  
 OS: Arch Linux | Because it is quick to update and has all the latest tools I can play with  
 DE: Hyprland | Feel free to check out my dotfiles if you're interested  

@@ -25,7 +25,7 @@ from blueprints.wellknown import wk_bp
 from blueprints.api import api_bp
 from blueprints.podcast import podcast_bp
 from blueprints.acme import acme_bp
-from tools import isCurl, isCrawler, getAddress, getFilePath, error_response, getClientIP, json_response, getGitCommit, isDev, getHandshakeScript
+from tools import isCurl, isCrawler, getAddress, getFilePath, error_response, getClientIP, json_response, getGitCommit, isDev, getHandshakeScript, get_tools_data
 
 app = Flask(__name__)
 CORS(app)
@@ -399,8 +399,6 @@ def index():
     return resp
 
 # region Donate
-
-
 @app.route("/donate")
 def donate():
     coinList = os.listdir(".well-known/wallets")
@@ -563,7 +561,6 @@ def qrcodee(data):
 
 # endregion
 
-
 @app.route("/supersecretpath")
 def supersecretpath():
     ascii_art = ""
@@ -688,6 +685,10 @@ def resume_pdf():
     if os.path.isfile("data/resume.pdf"):
         return send_file("data/resume.pdf")
     return error_response(request, message="Resume not found")
+
+@app.route("/tools")
+def tools():
+    return render_template("tools.html", tools=get_tools_data())
 
 # endregion
 # region Error Catching

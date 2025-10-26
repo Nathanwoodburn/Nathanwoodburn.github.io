@@ -1,0 +1,164 @@
+[
+    {
+        "name":"Obsidian", 
+        "type":"Desktop Applications",
+        "url":"https://obsidian.md/",
+        "description":"Note taking app that stores everything in Markdown files"
+    },
+    {
+        "name": "Alacritty",
+        "type": "Desktop Applications",
+        "url": "https://alacritty.org/",
+        "description": "A cross-platform, GPU-accelerated terminal emulator"
+    },
+    {
+        "name": "Brave",
+        "type": "Desktop Applications",
+        "url": "https://brave.com/",
+        "description": "Privacy-focused web browser"
+    },
+    {
+        "name": "VSCode",
+        "type": "Desktop Applications",
+        "url": "https://code.visualstudio.com/",
+        "description": "Source-code editor developed by Microsoft"
+    },
+    {
+        "name": "Zellij",
+        "type": "terminal",
+        "url": "https://zellij.dev/",
+        "description": "A terminal workspace and multiplexer"
+    },
+    {
+        "name": "Fx",
+        "type": "terminal",
+        "url": "https://fx.wtf/",
+        "description": "A command-line JSON viewer and processor",
+        "demo": "<script src=\"https://asciinema.c.woodburn.au/a/cx8sr8adsP6Uoi9zpg8MYnVTl.js\" id=\"asciicast-cx8sr8adsP6Uoi9zpg8MYnVTl\" async=\"true\"></script>"
+    },
+    {
+        "name": "Zoxide",
+        "type": "terminal",
+        "url": "https://github.com/ajeetdsouza/zoxide",
+        "description": "cd but with fuzzy matching and other cool features",
+        "demo": "<script src=\"https://asciinema.c.woodburn.au/a/5.js\" id=\"asciicast-5\" async=\"true\"></script>"
+    },
+    {
+        "name": "Atuin",
+        "type": "terminal",
+        "url": "https://atuin.sh/",
+        "description": "A next-generation shell history manager",
+        "demo": "<script src=\"https://asciinema.c.woodburn.au/a/6.js\" id=\"asciicast-6\" async=\"true\"></script>"
+    },
+    {
+        "name": "Tmate",
+        "type": "terminal",
+        "url": "https://tmate.io/",
+        "description": "Instant terminal sharing",
+        "demo": "<script src=\"https://asciinema.c.woodburn.au/a/7.js\" id=\"asciicast-7\" async=\"true\"></script>"
+    },
+    {
+        "name": "Eza",
+        "type": "terminal",
+        "url": "https://eza.rocks/",
+        "description": "A modern replacement for 'ls'",
+        "demo": "<script src=\"https://asciinema.c.woodburn.au/a/8.js\" id=\"asciicast-8\" async=\"true\"></script>"
+    },
+    {
+        "name": "Bat",
+        "type": "terminal",
+        "url": "https://github.com/sharkdp/bat",
+        "description": "A cat clone with syntax highlighting and Git integration",
+        "demo": "<script src=\"https://asciinema.c.woodburn.au/a/9.js\" id=\"asciicast-9\" async=\"true\"></script>"
+    },
+    {
+        "name": "Oh My Zsh",
+        "type": "terminal",
+        "url": "https://ohmyz.sh/",
+        "description": "A delightful community-driven framework for managing your Zsh configuration"
+    },
+    {
+        "name": "Proxmox",
+        "type": "Server Management",
+        "url": "https://www.proxmox.com/en",
+        "description": "Open-source server virtualization management solution"
+    },
+    {
+        "name": "Portainer",
+        "type": "Server Management",
+        "url": "https://www.portainer.io/",
+        "description": "Lightweight management UI which allows you to easily manage your Docker containers"
+    },
+    {
+        "name": "Coolify",
+        "type": "Server Management",
+        "url": "https://coolify.io/",
+        "description": "An open-source self-hosted Heroku alternative"
+    },
+    {
+        "name": "OpnSense",
+        "type": "Server Management",
+        "url": "https://opnsense.org/",
+        "description": "Open source, easy-to-use and easy-to-build FreeBSD based firewall and routing platform"
+    },
+    {
+        "name": "Nginx Proxy Manager",
+        "type": "Server Management",
+        "url": "https://nginxproxymanager.com/",
+        "description": "A powerful yet easy to use web interface for managing Nginx proxy hosts"
+    },
+    {
+        "name": "Tailscale",
+        "type": "Server Management",
+        "url": "https://tailscale.com/",
+        "description": "A zero-config VPN that just works"
+    },
+    {
+        "name": "Authentik",
+        "type": "Self-Hosting Services",
+        "url": "https://goauthentik.io/",
+        "description": "An open-source identity provider focused on flexibility and ease of use"
+    },
+    {
+        "name": "Uptime Kuma",
+        "type": "Self-Hosting Services",
+        "url": "https://uptime.kuma.pet/",
+        "description": "A fancy self-hosted monitoring tool"
+    },
+    {
+        "name": "Gitea",
+        "type": "Self-Hosting Services",
+        "url": "https://about.gitea.com/",
+        "description": "A painless self-hosted Git service"
+    },
+    {
+        "name": "Nextcloud",
+        "type": "Self-Hosting Services",
+        "url": "https://nextcloud.com/",
+        "description": "A suite of client-server software for creating and using file hosting services"
+    },
+    {
+        "name": "Umami",
+        "type": "Self-Hosting Services",
+        "url": "https://umami.is/",
+        "description": "A simple, fast, privacy-focused alternative to Google Analytics"
+    },
+    {
+        "name": "PhotoPrism",
+        "type": "Self-Hosting Services",
+        "url": "https://photoprism.app/",
+        "description": "AI-powered app for browsing, organizing & sharing your photo collection"
+    },
+    {
+        "name": "FreeScout",
+        "type": "Self-Hosting Services",
+        "url": "https://freescout.net/",
+        "description": "Self hosted email dashboard"
+    },
+    {
+        "name": "Vaultwarden",
+        "type": "Miscellaneous",
+        "url": "https://github.com/dani-garcia/vaultwarden",
+        "description": "Password manager server implementation compatible with Bitwarden clients"
+    }
+]

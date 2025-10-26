@@ -5,6 +5,7 @@ import datetime
 from typing import Optional, Dict, Union, Tuple
 import re
 from dateutil.parser import parse
+import json
 
 # HTTP status codes
 HTTP_OK = 200
@@ -250,3 +251,7 @@ def parse_date(date_groups: list[str]) -> str | None:
 
     except (ValueError, TypeError):
         return None
+
+def get_tools_data():
+    with open("data/tools.json", "r") as f:
+        return json.load(f)
