@@ -1,0 +1,13 @@
+{{header}}
+[1;36m───────────────────────────────────────────────[0m
+[1;36m DONATE [0m
+[1;36m────────[0m
+
+Here is a list of additional cryptocurrencies and donation methods 💙
+For each coin below, you can get the address from [1m/donate/<coin>[0m
+
+{% for coin in coins %}{% if loop.index0 % 4 == 0 and loop.index0 != 0 %}
+{% endif %}[1m{{ coin }}[0m{% if not loop.last %}, {% endif %}{% endfor %}
+
+Thank you for your support! 🙏
+

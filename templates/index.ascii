@@ -1,0 +1,28 @@
+{{header}}
+[1;36m───────────────────────────────────────────────[0m
+[1;36m ABOUT ME [0m
+[1;36m──────────[0m
+
+Hi, I'm [1mNathan Woodburn[0m from Canberra, Australia.  
+I've been homeschooled through Year 12 and am now studying a  
+[1mBachelor of Computer Science[0m.  
+
+I love building random projects, so this site is always evolving.  
+I'm also one of the founders of [1;36mHandshake AU[0m [https://hns.au],  
+working to grow Handshake adoption across Australia.
+
+I'm currently working on: {{ repo | safe }}
+
+[1;36m───────────────────────────────────────────────[0m
+[1;36m SKILLS [0m
+[1;36m────────[0m
+
+- Linux servers & CLI
+- DNS, DNSSEC, and Trustless SSL
+- NGINX web servers
+- Programming:
+  - Python 3
+  - C#
+  - Java
+  - Bash
+

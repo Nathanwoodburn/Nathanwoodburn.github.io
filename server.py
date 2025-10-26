@@ -25,7 +25,8 @@ from blueprints.wellknown import wk_bp
 from blueprints.api import api_bp
 from blueprints.podcast import podcast_bp
 from blueprints.acme import acme_bp
-from tools import isCurl, isCrawler, getAddress, getFilePath, error_response, getClientIP, json_response, getGitCommit, isDev, getHandshakeScript, get_tools_data
+from tools import isCurl, isCrawler, getAddress, getFilePath, error_response, getClientIP, json_response, getHandshakeScript, get_tools_data
+from curl import curl_response
 
 app = Flask(__name__)
 CORS(app)
@@ -242,14 +243,7 @@ def index():
     if request.args.get("load"):
         loaded = False
     if isCurl(request):
-        return jsonify(
-            {
-                "message": "Welcome to Nathan.Woodburn/! This is a personal website. For more information, visit https://nathan.woodburn.au",
-                "ip": getClientIP(request),
-                "dev": isDev(request.host),
-                "version": getGitCommit()
-            }
-        )
+        return curl_response(request)
 
     if not loaded and not isCrawler(request):
         # Set cookie
@@ -401,6 +395,9 @@ def index():
 # region Donate
 @app.route("/donate")
 def donate():
+    if isCurl(request):
+        return curl_response(request)
+
     coinList = os.listdir(".well-known/wallets")
     coinList = [file for file in coinList if file[0] != "."]
     coinList.sort()
@@ -701,6 +698,10 @@ def catch_all(path: str):
     
     if path.lower().replace(".html", "") in RESTRICTED_ROUTES:
         return error_response(request, message="Restricted route", code=403)
+
+    # If curl request, return curl response
+    if isCurl(request):
+        return curl_response(request)
 
     if path in REDIRECT_ROUTES:
         return redirect(REDIRECT_ROUTES[path], code=302)
