@@ -410,38 +410,41 @@ async function updateSpotifyWidget() {
         const data = await res.json();
         // Check if data contains an error or message indicating nothing is playing
         if (data.error || data.message) {
-            widget.style.opacity = 0.5;
-            
             // If existing data
             if (document.getElementById('spotify-song').textContent) {
-                return false;
+                return;
             }
             // Alternate text when nothing is playing
             document.getElementById('spotify-album-art').src = '/assets/img/external/spotify.png';
             document.getElementById('spotify-song').textContent = 'Not Playing';
             document.getElementById('spotify-artist').textContent = '';
             document.getElementById('spotify-album').textContent = '';
-            return false;
+            return;
         }
 
         const track = data.spotify;
+        var firstLoad = false;
+        // Check if this is the first time loading data
+        if (!document.getElementById('spotify-song').textContent) {
+            firstLoad = true;
+        }
+            
 
         document.getElementById('spotify-album-art').src = track.album_art;
         document.getElementById('spotify-song').textContent = track.song_name;
         document.getElementById('spotify-artist').textContent = track.artist;
         document.getElementById('spotify-album').textContent = track.album_name;
+        if (firstLoad) {
+            widget.style.transform = 'translateX(0)'; // slide in on first load            
+        }
 
-        widget.style.opacity = track.is_playing ? 0.9 : 0.5;
-        return true;
     } catch (err) {
         console.error('Failed to fetch Spotify data', err);
     }
 }
 
 // Wait for Spotify API to have responded before initial display
-updateSpotifyWidget().then(success => {
-    if(success) updateVisibility();
-});
+updateSpotifyWidget();
 
 window.addEventListener('resize', updateVisibility);
 setInterval(updateSpotifyWidget, 15000);

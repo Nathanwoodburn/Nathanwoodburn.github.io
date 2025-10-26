@@ -54,7 +54,7 @@ def refresh_access_token():
 def login():
     auth_query = (
         f"{SPOTIFY_AUTH_URL}?response_type=code&client_id={CLIENT_ID}"
-        f"&redirect_uri={url_for("spotify.callback", _external=True)}&scope={SCOPE}"
+        f"&redirect_uri={url_for('spotify.callback', _external=True)}&scope={SCOPE}"
     )
     return redirect(auth_query)
 
