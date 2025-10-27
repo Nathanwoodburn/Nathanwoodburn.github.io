@@ -92,8 +92,6 @@ def setup_path_session():
             {"name": "etc", "type": 0, "children": [], "permissions": 1},
             {"name": "lib", "type": 0, "children": [], "permissions": 1},
             {"name": "lib64", "type": 0, "children": [], "permissions": 1},
-            {"name": "mnt", "type": 0, "children": [], "permissions": 1},
-            {"name": "nix", "type": 0, "children": [], "permissions": 1},
             {"name": "opt", "type": 0, "children": [], "permissions": 1},
             {"name": "proc", "type": 0, "children": [], "permissions": 1},
             {"name": "root", "type": 0, "children": [], "permissions": 1},
