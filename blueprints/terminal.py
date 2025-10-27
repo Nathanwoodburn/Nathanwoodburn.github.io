@@ -24,7 +24,7 @@ COMMANDS = {
     "rm [file]": "Remove a file",
     "tree [path]": "Display directory tree",
     "touch [file]": "Create a new empty file",
-    "nano [file]": "Edit a file (write content)",
+    "nano [file]": "Edit a file",
     "reset": "Reset the terminal session",
     "exit": "Exit the terminal session",
 }
@@ -567,7 +567,6 @@ def tree():
 @terminal_bp.route("/terminal/execute/<command>", methods=["POST"])
 def execute_catch(command):
     try:
-
         # Basic command processing
         if command == "help":
             output = "Available commands:\n" + \
