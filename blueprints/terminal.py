@@ -140,7 +140,6 @@ def is_valid_binary(path: str) -> bool:
     if is_valid_path("/".join(parts[:-1])):
         files = get_nodes_in_directory("/".join(parts[:-1]))
         for item in files:
-            print(item)
             if item["name"] == parts[-1] and item["type"] == 2:
                 return True
     return False
@@ -236,7 +235,6 @@ def ls():
         return json_response(request, {"output": f"ls: cannot access '{path}': No such file or directory"}, 200)
     
     files = get_nodes_in_directory(path)
-    print(files)
     output = [file["name"] for file in files]
     if all_files:
         output.insert(0, ".")
@@ -420,7 +418,7 @@ def nano():
                 return json_response(request, {"output": f"nano: cannot write to '{path}': Permission denied"}, 200)
             
             if update_file_content(path, content):
-                output = f"File '{path}' updated successfully"
+                output = ""
             else:
                 output = f"nano: failed to update '{path}'"
         else:
