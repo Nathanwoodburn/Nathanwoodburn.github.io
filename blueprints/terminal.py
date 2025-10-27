@@ -567,8 +567,6 @@ def tree():
 @terminal_bp.route("/terminal/execute/<command>", methods=["POST"])
 def execute_catch(command):
     try:
-        # data = request.get_json() or {}
-        # args = data.get("args", "")
 
         # Basic command processing
         if command == "help":
