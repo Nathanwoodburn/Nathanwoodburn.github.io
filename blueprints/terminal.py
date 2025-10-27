@@ -29,6 +29,19 @@ COMMANDS = {
     "exit": "Exit the terminal session",
 }
 
+BOOT_FILES = [
+    "amd-ucode.img",
+    "EFI",
+    "initramfs-linux-fallback.img",
+    "initramfs-linux.img",
+    "initramfs-linux-lts-fallback.img",
+    "initramfs-linux-lts.img",
+    "intel-ucode.img",
+    "loader",
+    "vmlinuz-linux",
+    "vmlinuz-linux-lts"
+]
+
 
 def get_nodes_in_directory(path: str) -> list[str]:
     """Simulate getting files in a directory for the terminal."""
@@ -63,6 +76,9 @@ def setup_path_session():
         binaries = []
         for cmd in COMMANDS.keys():
             binaries.append({"name": cmd.split()[0], "type": 2, "content": "", "permissions": 1})
+        boot_files = []
+        for bin_file in BOOT_FILES:
+            boot_files.append({"name": bin_file, "type": 2, "content": "", "permissions": 1})
 
         session["paths"] = [
             {"name": "home", "type": 0, "children": [
@@ -71,7 +87,7 @@ def setup_path_session():
                 ], "permissions": 2}
             ], "permissions": 1},
             {"name": "bin", "type": 0, "children": binaries, "permissions": 1},
-            {"name": "boot", "type": 0, "children": [], "permissions": 1},
+            {"name": "boot", "type": 0, "children": boot_files, "permissions": 1},
             {"name": "dev", "type": 0, "children": [], "permissions": 1},
             {"name": "etc", "type": 0, "children": [], "permissions": 1},
             {"name": "lib", "type": 0, "children": [], "permissions": 1},
