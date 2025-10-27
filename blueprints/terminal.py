@@ -78,7 +78,7 @@ def setup_path_session():
             binaries.append({"name": cmd.split()[0], "type": 2, "content": "", "permissions": 1})
         boot_files = []
         for bin_file in BOOT_FILES:
-            boot_files.append({"name": bin_file, "type": 2, "content": "", "permissions": 1})
+            boot_files.append({"name": bin_file, "type": 1, "content": "", "permissions": 1})
 
         session["paths"] = [
             {"name": "home", "type": 0, "children": [
@@ -239,23 +239,69 @@ def ls():
         all_files = True
         args.remove("--all")
 
-    path = session.get("pwd", f"/home/{getClientIP(request)}")
+    long_format = False
+    if "-l" in args:
+        long_format = True
+        args.remove("-l")
+    elif "--long" in args:
+        long_format = True
+        args.remove("--long")
+
+    for arg in args:
+        if arg.startswith("-") and not arg.startswith("--"):
+            if "l" in arg:
+                long_format = True
+            if "a" in arg:
+                all_files = True
+            args.remove(arg)
+
+
+    ip = getClientIP(request)
+    path = session.get("pwd", f"/home/{ip}")
     if args:
         path = args[0]
         if not path.startswith("/"):
             # Relative path
-            path = sanitize_path(session.get("pwd", f"/home/{getClientIP(request)}") + "/" + path)
+            path = sanitize_path(session.get("pwd", f"/home/{ip}") + "/" + path)
     if not is_valid_path(path):
+        # If it is a file or binary, return it
+        if is_valid_file(path) or is_valid_binary(path):
+            if long_format:
+                node = get_node(path)
+                permissions = node.get("permissions", 0)
+                perm_str = ""
+                perm_str += "r" if permissions > 0 else "-"
+                perm_str += "w" if permissions > 1 else "-"
+                perm_str += "x" if (node.get("type", 0) == 2 and permissions > 1) else "-"
+                user = f"{ip}" if path.startswith(f"/home/{ip}") else "root"
+                output = f"{perm_str} {user} {user} {path.split('/')[-1]}"
+                return json_response(request, {"output": output}, 200)
+            return json_response(request, {"output": path.split("/")[-1]}, 200)
+
         return json_response(request, {"output": f"ls: cannot access '{path}': No such file or directory"}, 200)
     
     files = get_nodes_in_directory(path)
-    output = [file["name"] for file in files]
+    output = []
+    if long_format:
+        for f in files:
+            permissions = f.get("permissions", 0)
+            perm_str = ""
+            perm_str += "r" if permissions > 0 else "-"
+            perm_str += "w" if permissions > 1 else "-"
+            perm_str += "x" if (f.get("type", 0) == 2 and permissions >= 1) else "-"
+            user = f"{ip}" if path.startswith(f"/home/{ip}") else "root"
+            output.append(f"{perm_str} {user} {user} {f['name']}")
+    else:
+        output = [f["name"] for f in files]
     if all_files:
-        output.insert(0, ".")
-        output.insert(1, "..")
+            output.insert(0, ".")
+            output.insert(1, "..")
     else:
         output = [file for file in output if not file.startswith(".")]
-    output = " ".join(output)
+    if long_format:
+        output = "\n".join(output)
+    else:
+        output = " ".join(output)
 
     return json_response(request, {"output": output}, 200)
 

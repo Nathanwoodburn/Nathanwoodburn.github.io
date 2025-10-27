@@ -123,6 +123,9 @@
         let nanoCurrentFile = '';
         let nanoOriginalContent = '';
         let nanoSavePromptActive = false;
+        let tabCompletionIndex = 0;
+        let tabCompletionMatches = [];
+        let lastTabInput = '';
 
         // Function to update the prompt with current pwd
         async function updatePrompt() {
@@ -256,10 +259,98 @@
             }
         });
 
+        // Function to get available commands
+        function getAvailableCommands() {
+            return ['help', 'about', 'clear', 'echo', 'whoami', 'ls', 'pwd', 'date', 'cd', 'cat', 'rm', 'tree', 'touch', 'nano', 'reset', 'exit'];
+        }
+
+        // Function to get files/directories for tab completion
+        async function getFilesForCompletion(path = '') {
+            try {
+                const response = await fetch('/terminal/execute/ls', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ args: path ? path : '' })
+                });
+                const data = await response.json();
+                
+                if (data.output && !data.output.startsWith('ls:')) {
+                    return data.output.split(' ').filter(f => f.length > 0);
+                }
+            } catch (err) {
+                console.error('Failed to get files:', err);
+            }
+            return [];
+        }
+
+        // Function to handle tab completion
+        async function handleTabCompletion(currentInput) {
+            const parts = currentInput.split(' ');
+            const isFirstWord = parts.length === 1;
+            
+            if (isFirstWord) {
+                // Complete command names
+                const commands = getAvailableCommands();
+                const matches = commands.filter(cmd => cmd.startsWith(parts[0]));
+                
+                if (matches.length === 1) {
+                    return matches[0] + ' ';
+                } else if (matches.length > 1) {
+                    // Cycle through matches
+                    if (lastTabInput === currentInput) {
+                        tabCompletionIndex = (tabCompletionIndex + 1) % matches.length;
+                    } else {
+                        tabCompletionIndex = 0;
+                        tabCompletionMatches = matches;
+                    }
+                    lastTabInput = currentInput;
+                    return matches[tabCompletionIndex] + ' ';
+                }
+            } else {
+                // Complete file/directory names
+                const lastPart = parts[parts.length - 1];
+                const files = await getFilesForCompletion();
+                const matches = files.filter(f => f.startsWith(lastPart));
+                
+                if (matches.length === 1) {
+                    parts[parts.length - 1] = matches[0];
+                    return parts.join(' ') + ' ';
+                } else if (matches.length > 1) {
+                    // Cycle through matches
+                    if (lastTabInput === currentInput) {
+                        tabCompletionIndex = (tabCompletionIndex + 1) % matches.length;
+                    } else {
+                        tabCompletionIndex = 0;
+                        tabCompletionMatches = matches;
+                    }
+                    lastTabInput = currentInput;
+                    parts[parts.length - 1] = matches[tabCompletionIndex];
+                    return parts.join(' ');
+                }
+            }
+            
+            return currentInput;
+        }
+
         // Update prompt on load
         updatePrompt();
 
         input.addEventListener('keydown', async (e) => {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const currentInput = input.value;
+                const completed = await handleTabCompletion(currentInput);
+                input.value = completed;
+                return;
+            }
+            
+            // Reset tab completion on any other key
+            if (e.key !== 'Tab') {
+                tabCompletionIndex = 0;
+                tabCompletionMatches = [];
+                lastTabInput = '';
+            }
+            
             if (e.key === 'Enter') {
                 const command = input.value.trim();
                 
