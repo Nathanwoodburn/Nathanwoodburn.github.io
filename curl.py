@@ -123,4 +123,9 @@ def curl_response(request):
     if os.path.exists(f"templates/{path}.html"):
         return render_template(f"{path}.html")
     
-    return error_response(request)
+    # Return curl error page
+    error = {
+        "code": 404,
+        "message": "The requested resource was not found on this server."
+    }
+    return render_template("error.ascii",header=get_header(),error=error), 404, {'Content-Type': 'text/plain; charset=utf-8'}

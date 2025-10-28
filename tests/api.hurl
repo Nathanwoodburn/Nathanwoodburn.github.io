@@ -6,10 +6,15 @@ GET http://127.0.0.1:5000/api/v1/ip
 HTTP 200
 [Asserts]
 jsonpath "$.ip" == "127.0.0.1"
+
 GET http://127.0.0.1:5000/api/v1/time
 HTTP 200
 GET http://127.0.0.1:5000/api/v1/timezone
 HTTP 200
+[Asserts]
+jsonpath "$.timezone" >= 10
+jsonpath "$.timezone" <= 12
+
 GET http://127.0.0.1:5000/api/v1/message
 HTTP 200
 GET http://127.0.0.1:5000/api/v1/project
@@ -18,3 +23,6 @@ GET http://127.0.0.1:5000/api/v1/tools
 HTTP 200
 [Asserts]
 jsonpath "$.tools" count > 5
+
+GET http://127.0.0.1:5000/api/v1/playing
+HTTP 200
