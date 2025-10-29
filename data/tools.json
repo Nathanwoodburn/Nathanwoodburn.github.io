@@ -24,6 +24,12 @@
         "description": "Source-code editor developed by Microsoft"
     },
     {
+        "name": "Vesktop",
+        "type": "Desktop Applications",
+        "url": "https://vesktop.dev/",
+        "description": "Vesktop is a customizable and privacy friendly Discord desktop app!"
+    },
+    {
         "name": "Zellij",
         "type": "Terminal Tools",
         "url": "https://zellij.dev/",
