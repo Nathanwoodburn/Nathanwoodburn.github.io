@@ -7,5 +7,5 @@ jobs:
   RuffCheck:
     runs-on: [ubuntu-latest, amd]
     steps:
-      -  uses: actions/checkout@v2
-      - uses: astral-sh/ruff-action@v3
+      - uses: actions/checkout@v2
+      - uses: https://github.com/astral-sh/ruff-action@v3
