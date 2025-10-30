@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
-        run: sudo apt-get install python3-pip
+        run: apt-get install python3-pip
       - name: Install Ruff
         run: pip install ruff
       - name: Run Ruff
