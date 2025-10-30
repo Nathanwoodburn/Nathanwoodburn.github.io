@@ -40,7 +40,6 @@ def help():
             "/time": "Get the current time",
             "/timezone": "Get the current timezone",
             "/message": "Get the message from the config",
-            "/ip": "Get your IP address",
             "/project": "Get the current project from git",
             "/version": "Get the current version of the website",
             "/page_date?url=URL&verbose=BOOL": "Get the last modified date of a webpage (verbose is optional, default false)",
@@ -48,6 +47,8 @@ def help():
             "/playing": "Get the currently playing Spotify track",
             "/status": "Just check if the site is up",
             "/ping": "Just check if the site is up",
+            "/ip": "Get your IP address",
+            "/headers": "Get your request headers",
             "/help": "Get this help message"
         },
         "base_url": "/api/v1",
@@ -190,6 +191,17 @@ def playing():
     if "error" in track_info:
         return json_response(request, track_info, HTTP_OK)
     return json_response(request, {"spotify": track_info}, HTTP_OK)
+
+
+@api_bp.route("/headers")
+def headers():
+    """Get the request headers."""
+    headers = dict(request.headers)
+    return jsonify({
+        "headers": headers,
+        "ip": getClientIP(request),
+        "status": HTTP_OK
+    })
 
 @api_bp.route("/page_date")
 def page_date():
