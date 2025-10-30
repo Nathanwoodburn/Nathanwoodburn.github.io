@@ -108,7 +108,7 @@ def render_home(handshake_scripts: str | None = None):
     )
 
 
-@app.route("/")
+@app.route("/", strict_slashes=False)
 def index():
     if not isCLI(request):
         return render_home(handshake_scripts=getHandshakeScript(request.host))

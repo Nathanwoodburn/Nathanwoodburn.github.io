@@ -89,7 +89,7 @@ def callback():
     print("Refresh Token:", REFRESH_TOKEN)
     return redirect(url_for("spotify.currently_playing"))
 
-@app.route("/")
+@app.route("/", strict_slashes=False)
 @app.route("/playing")
 def currently_playing():
     """Public endpoint showing your current track."""

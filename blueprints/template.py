@@ -4,6 +4,6 @@ from tools import json_response
 app = Blueprint('template', __name__)
 
 
-@app.route("/")
+@app.route("/", strict_slashes=False)
 def index():
     return json_response(request, "Success", 200)

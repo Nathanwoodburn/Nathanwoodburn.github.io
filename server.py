@@ -179,7 +179,6 @@ def serviceWorker():
 
 # region Misc routes
 
-
 @app.route("/meet")
 @app.route("/meeting")
 @app.route("/appointment")
@@ -202,13 +201,6 @@ def api_legacy(function):
         if rule.rule == f"/api/v1/{function}":
             return redirect(f"/api/v1/{function}", code=301)
     return error_response(request, message="404 Not Found", code=404)
-
-
-@app.route("/actions.json")
-def sol_actions():
-    return jsonify(
-        {"rules": [{"pathPattern": "/donate**", "apiPath": "/api/v1/donate**"}]}
-    )
 
 # endregion
 

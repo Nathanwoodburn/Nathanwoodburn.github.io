@@ -30,7 +30,7 @@ if 'time-zone' not in NC_CONFIG:
     NC_CONFIG['time-zone'] = 10
 
 
-@app.route("/")
+@app.route("/", strict_slashes=False)
 @app.route("/help")
 def help():
     """Provide API documentation and help."""

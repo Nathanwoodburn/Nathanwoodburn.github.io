@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, make_response, request, jsonify, send_from_directory, redirect
+from flask import Blueprint, make_response, request, jsonify, send_from_directory, redirect
+from tools import error_response
 import os
 
 app = Blueprint('well-known', __name__, url_prefix='/.well-known')
@@ -25,7 +26,7 @@ def wallets(path):
     if os.path.isfile(".well-known/wallets/" + path.upper()):
         return redirect("/.well-known/wallets/" + path.upper(), code=302)
 
-    return render_template("404.html"), 404
+    return error_response(request)
 
 
 @app.route("/nostr.json")
