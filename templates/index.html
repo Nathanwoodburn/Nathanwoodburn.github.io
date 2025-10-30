@@ -362,6 +362,21 @@ Check them out here!</blockquote><img class="img-fluid" src="/assets/img/pfront.
             overflow: hidden;
             text-overflow: ellipsis;
         "></div>
+        <!-- Progress Bar -->
+        <div style="
+            margin-top: 6px;
+            height: 4px;
+            background: #333;
+            border-radius: 2px;
+            overflow: hidden;
+        ">
+            <div id="spotify-progress" style="
+                width: 0%;
+                height: 100%;
+                background: #1DB954;
+                transition: width 1s linear;
+            "></div>
+        </div>
     </div>
 </div>
 
@@ -405,6 +420,15 @@ widget.addEventListener('click', (e) => {
     e.stopPropagation();
 });
 
+// Variable to track progress bar animation
+let progressInterval = null;
+let progressSpeed = 0;
+let lastUpdateTime = Date.now();
+let currentProgress = 0;
+let targetProgress = 0;
+let trackDuration = 0;
+let currentTrackId = null;
+
 // --- Spotify fetch ---
 async function updateSpotifyWidget() {
     try {
@@ -423,6 +447,11 @@ async function updateSpotifyWidget() {
             document.getElementById('spotify-song').textContent = 'Not Playing';
             document.getElementById('spotify-artist').textContent = '';
             document.getElementById('spotify-album').textContent = '';
+            document.getElementById('spotify-progress').style.width = '0%';
+            clearInterval(progressInterval);
+            progressInterval = null;
+            currentProgress = 0;
+            currentTrackId = null;
             return;
         }
 
@@ -432,12 +461,49 @@ async function updateSpotifyWidget() {
         if (!document.getElementById('spotify-song').textContent) {
             firstLoad = true;
         }
+
+          // Check if track has changed (new song started)
+        const trackId = track.song_name + track.artist; // Simple track identifier
+        const isNewTrack = currentTrackId !== null && currentTrackId !== trackId;
+        
+        if (isNewTrack) {
+            // Reset progress bar instantly for new track
+            currentProgress = 0;
+            document.getElementById('spotify-progress').style.transition = 'none';
+            document.getElementById('spotify-progress').style.width = '0%';
+            // Force reflow to apply the instant reset
+            document.getElementById('spotify-progress').offsetHeight;
+            // Re-enable transition
+            document.getElementById('spotify-progress').style.transition = 'width 0.1s linear';
+        }
+        
+        currentTrackId = trackId;
             
 
         document.getElementById('spotify-album-art').src = track.album_art;
         document.getElementById('spotify-song').textContent = track.song_name;
         document.getElementById('spotify-artist').textContent = track.artist;
         document.getElementById('spotify-album').textContent = track.album_name;
+        
+        // Update progress bar
+        if (track.is_playing) {
+            currentProgress = (track.progress_ms / track.duration_ms) * 100;
+            trackDuration = track.duration_ms;
+            lastUpdateTime = Date.now();
+            
+            document.getElementById('spotify-progress').style.width = currentProgress + '%';
+            
+            // Clear existing interval
+            if (progressInterval) {
+                clearInterval(progressInterval);
+            }
+            // Start interval to animate progress bar
+            progressInterval = setInterval(animateProgressBar, 100);
+        } else {
+            document.getElementById('spotify-progress').style.width = currentProgress + '%';
+            clearInterval(progressInterval);
+            progressInterval = null;
+        }
         
         // If first load and desktop, slide in the widget
         if (firstLoad) {
@@ -446,6 +512,30 @@ async function updateSpotifyWidget() {
 
     } catch (err) {
         console.error('Failed to fetch Spotify data', err);
+    }
+}
+
+// Animate progress bar
+function animateProgressBar() {
+    if (trackDuration === 0) return;
+    
+    const now = Date.now();
+    const elapsed = now - lastUpdateTime;
+    lastUpdateTime = now;
+    
+    // Calculate progress increment based on elapsed time
+    const progressIncrement = (elapsed / trackDuration) * 100;
+    currentProgress += progressIncrement;
+    
+    if (currentProgress >= 100) {
+        currentProgress = 100;
+        document.getElementById('spotify-progress').style.width = '100%';
+        clearInterval(progressInterval);
+        progressInterval = null;
+        // Refresh API when progress reaches 100%
+        setTimeout(updateSpotifyWidget, 500);
+    } else {
+        document.getElementById('spotify-progress').style.width = currentProgress + '%';
     }
 }
 

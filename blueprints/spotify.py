@@ -93,30 +93,7 @@ def callback():
 @spotify_bp.route("/currently-playing")
 def currently_playing():
     """Public endpoint showing your current track."""
-    token = refresh_access_token()
-    if not token:
-        return json_response(request, {"error": "Failed to refresh access token"}, 500)
-
-    headers = {"Authorization": f"Bearer {token}"}
-    response = requests.get(SPOTIFY_CURRENTLY_PLAYING_URL, headers=headers)
-
-    if response.status_code == 204:
-        return json_response(request, {"message": "Nothing is currently playing."}, 200)
-    elif response.status_code != 200:
-        return json_response(request, {"error": "Spotify API error", "status": response.status_code}, response.status_code)
-
-    data = response.json()
-    if not data.get("item"):
-        return json_response(request, {"message": "Nothing is currently playing."}, 200)
-
-
-    track = {
-        "song_name": data["item"]["name"],
-        "artist": ", ".join([artist["name"] for artist in data["item"]["artists"]]),
-        "album_name": data["item"]["album"]["name"],
-        "album_art": data["item"]["album"]["images"][0]["url"],
-        "is_playing": data["is_playing"]
-    }
+    track = get_spotify_track()
     return json_response(request, {"spotify":track}, 200)
 
 def get_spotify_track():
@@ -137,12 +114,13 @@ def get_spotify_track():
     if not data.get("item"):
         return {"error": "Nothing is currently playing."}
 
-
     track = {
         "song_name": data["item"]["name"],
         "artist": ", ".join([artist["name"] for artist in data["item"]["artists"]]),
         "album_name": data["item"]["album"]["name"],
         "album_art": data["item"]["album"]["images"][0]["url"],
-        "is_playing": data["is_playing"]
+        "is_playing": data["is_playing"],
+        "progress_ms": data.get("progress_ms",0),
+        "duration_ms": data["item"].get("duration_ms",1)
     }
     return track
