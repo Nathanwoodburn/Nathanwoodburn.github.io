@@ -26,7 +26,7 @@ from blueprints.api import api_bp
 from blueprints.podcast import podcast_bp
 from blueprints.acme import acme_bp
 from blueprints.spotify import spotify_bp
-from tools import isCurl, isCrawler, getAddress, getFilePath, error_response, getClientIP, json_response, getHandshakeScript, get_tools_data
+from tools import isCLI, isCrawler, getAddress, getFilePath, error_response, getClientIP, json_response, getHandshakeScript, get_tools_data
 from curl import curl_response
 
 app = Flask(__name__)
@@ -244,7 +244,7 @@ def index():
     # Always load if load is in the query string
     if request.args.get("load"):
         loaded = False
-    if isCurl(request):
+    if isCLI(request):
         return curl_response(request)
 
     if not loaded and not isCrawler(request):
@@ -397,7 +397,7 @@ def index():
 # region Donate
 @app.route("/donate")
 def donate():
-    if isCurl(request):
+    if isCLI(request):
         return curl_response(request)
 
     coinList = os.listdir(".well-known/wallets")
@@ -687,7 +687,7 @@ def resume_pdf():
 
 @app.route("/tools")
 def tools():
-    if isCurl(request):
+    if isCLI(request):
         return curl_response(request)
     return render_template("tools.html", tools=get_tools_data())
 
@@ -704,7 +704,7 @@ def catch_all(path: str):
         return error_response(request, message="Restricted route", code=403)
 
     # If curl request, return curl response
-    if isCurl(request):
+    if isCLI(request):
         return curl_response(request)
 
     if path in REDIRECT_ROUTES:

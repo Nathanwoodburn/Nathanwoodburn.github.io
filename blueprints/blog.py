@@ -3,7 +3,7 @@ from flask import Blueprint, render_template, request, jsonify
 import markdown
 from bs4 import BeautifulSoup
 import re
-from tools import isCurl, getClientIP, getHandshakeScript
+from tools import isCLI, getClientIP, getHandshakeScript
 
 blog_bp = Blueprint('blog', __name__)
 
@@ -110,7 +110,7 @@ def render_home(handshake_scripts: str | None = None):
 
 @blog_bp.route("/")
 def index():
-    if not isCurl(request):
+    if not isCLI(request):
         return render_home(handshake_scripts=getHandshakeScript(request.host))
 
     # Get a list of pages
@@ -131,7 +131,7 @@ def index():
 
 @blog_bp.route("/<path:path>")
 def path(path):
-    if not isCurl(request):
+    if not isCLI(request):
         return render_page(path, handshake_scripts=getHandshakeScript(request.host))
 
     # Convert md to html

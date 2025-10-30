@@ -27,6 +27,12 @@ CRAWLERS = [
     "Twitterbot"
 ]
 
+CLI_AGENTS = [
+    "curl",
+    "hurl",
+    "xh"
+]
+
 
 def getClientIP(request: Request) -> str:
     """
@@ -75,7 +81,7 @@ def getGitCommit() -> str:
     return "failed to get version"
 
 
-def isCurl(request: Request) -> bool:
+def isCLI(request: Request) -> bool:
     """
     Check if the request is from curl or hurl.
 
@@ -87,7 +93,7 @@ def isCurl(request: Request) -> bool:
     """
     if request.headers and request.headers.get("User-Agent"):
         user_agent = request.headers.get("User-Agent", "")
-        return "curl" in user_agent or "hurl" in user_agent
+        return any(agent in user_agent for agent in CLI_AGENTS)
     return False
 
 
@@ -221,7 +227,7 @@ def error_response(
     Returns:
         Union[Tuple[Dict, int], object]: The JSON or HTML response
     """
-    if force_json or isCurl(request):
+    if force_json or isCLI(request):
         return json_response(request, message, code)
 
     # Check if <error code>.html exists in templates
