@@ -1,5 +1,5 @@
 from flask import render_template
-from tools import error_response, getAddress, get_tools_data, getClientIP
+from tools import getAddress, get_tools_data, getClientIP
 import os
 from functools import lru_cache
 import requests

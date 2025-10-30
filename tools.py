@@ -31,7 +31,8 @@ CLI_AGENTS = [
     "curl",
     "hurl",
     "xh",
-    "Posting"
+    "Posting",
+    "HTTPie"
 ]
 
 
