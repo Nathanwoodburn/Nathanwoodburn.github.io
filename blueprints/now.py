@@ -1,7 +1,10 @@
 from flask import Blueprint, render_template, make_response, request, jsonify
 import datetime
 import os
-from tools import getHandshakeScript
+from tools import getHandshakeScript, error_response, isCLI
+from curl import get_header
+from bs4 import BeautifulSoup
+import re
 
 # Create blueprint
 app = Blueprint('now', __name__, url_prefix='/now')
@@ -44,20 +47,82 @@ def render(date, handshake_scripts=None):
     date = date.removesuffix(".html")
 
     if date not in list_dates():
-        return render_template("404.html"), 404
+        return error_response(request)
 
     date_formatted = datetime.datetime.strptime(date, "%y_%m_%d")
     date_formatted = date_formatted.strftime("%A, %B %d, %Y")
     return render_template(f"now/{date}.html", DATE=date_formatted, handshake_scripts=handshake_scripts)
 
+def render_curl(date=None):
+    # If the date is not available, render the latest page
+    if date is None:
+        date = get_latest_date()
+
+    # Remove .html if present
+    date = date.removesuffix(".html")
+
+    if date not in list_dates():
+        return error_response(request)
+
+    # Format the date nicely
+    date_formatted = datetime.datetime.strptime(date, "%y_%m_%d")
+    date_formatted = date_formatted.strftime("%A, %B %d, %Y")
+    
+    # Load HTML
+    with open(f"templates/now/{date}.html", "r", encoding="utf-8") as f:
+        raw_html = f.read().replace("{{ date }}", date_formatted)
+    soup = BeautifulSoup(raw_html, 'html.parser')
+    
+    posts = []
+
+    # Find divs matching your pattern
+    divs = soup.find_all("div", style=re.compile(r"max-width:\s*700px", re.IGNORECASE))
+
+    for div in divs:
+        # header could be h1/h2/h3 inside the div
+        header_tag = div.find(["h1", "h2", "h3"])
+        # content is usually one or more <p> tags inside the div
+        p_tags = div.find_all("p")
+
+        if header_tag and p_tags:
+            header_text = header_tag.get_text(strip=True)
+            content_lines = []
+
+            for p in p_tags:
+                # Extract text
+                text = p.get_text(strip=False)
+
+                # Extract any <a> links in the paragraph
+                links = [a.get("href") for a in p.find_all("a", href=True)]
+                if links:
+                    text += "\nLinks: " + ", ".join(links)
+
+                content_lines.append(text)
+
+            content_text = "\n\n".join(content_lines)
+            posts.append({"header": header_text, "content": content_text})
+
+    # Build final response
+    response = ""
+    for post in posts:
+        response += f"[1m{post['header']}[0m\n\n{post['content']}\n\n"
+
+    return render_template("now.ascii", date=date_formatted, content=response, header=get_header())
+
+
 
 @app.route("/")
 def index():
+    if isCLI(request):
+        return render_curl()
     return render_latest(handshake_scripts=getHandshakeScript(request.host))
 
 
 @app.route("/<path:path>")
 def path(path):
+    if isCLI(request):
+        return render_curl(path)
+
     return render(path, handshake_scripts=getHandshakeScript(request.host))
 
 
@@ -65,6 +130,16 @@ def path(path):
 @app.route("/old/")
 def old():
     now_dates = list_dates()[1:]
+    if isCLI(request):
+        response = ""
+        for date in now_dates:
+            link = date
+            date_fmt = datetime.datetime.strptime(date, "%y_%m_%d")
+            date_fmt = date_fmt.strftime("%A, %B %d, %Y")
+            response += f"{date_fmt} - /now/{link}\n"
+        return render_template("now.ascii", date="Old Now Pages", content=response, header=get_header())
+
+
     html = '<ul class="list-group">'
     html += f'<a style="text-decoration:none;" href="/now"><li class="list-group-item" style="background-color:#000000;color:#ffffff;">{get_latest_date(True)}</li></a>'
 
