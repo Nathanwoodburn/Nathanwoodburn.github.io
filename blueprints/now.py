@@ -4,7 +4,7 @@ import os
 from tools import getHandshakeScript
 
 # Create blueprint
-now_bp = Blueprint('now', __name__)
+app = Blueprint('now', __name__, url_prefix='/now')
 
 
 def list_page_files():
@@ -51,18 +51,18 @@ def render(date, handshake_scripts=None):
     return render_template(f"now/{date}.html", DATE=date_formatted, handshake_scripts=handshake_scripts)
 
 
-@now_bp.route("/")
+@app.route("/")
 def index():
     return render_latest(handshake_scripts=getHandshakeScript(request.host))
 
 
-@now_bp.route("/<path:path>")
+@app.route("/<path:path>")
 def path(path):
     return render(path, handshake_scripts=getHandshakeScript(request.host))
 
 
-@now_bp.route("/old")
-@now_bp.route("/old/")
+@app.route("/old")
+@app.route("/old/")
 def old():
     now_dates = list_dates()[1:]
     html = '<ul class="list-group">'
@@ -80,9 +80,9 @@ def old():
     )
 
 
-@now_bp.route("/now.rss")
-@now_bp.route("/now.xml")
-@now_bp.route("/rss.xml")
+@app.route("/now.rss")
+@app.route("/now.xml")
+@app.route("/rss.xml")
 def rss():
     host = "https://" + request.host
     if ":" in request.host:
@@ -99,7 +99,7 @@ def rss():
     return make_response(rss, 200, {"Content-Type": "application/rss+xml"})
 
 
-@now_bp.route("/now.json")
+@app.route("/now.json")
 def json():
     now_pages = list_page_files()
     host = "https://" + request.host

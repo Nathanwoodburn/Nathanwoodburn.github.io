@@ -3,10 +3,10 @@ import os
 from cloudflare import Cloudflare
 from tools import json_response
 
-acme_bp = Blueprint('acme', __name__)
+app = Blueprint('acme', __name__)
 
 
-@acme_bp.route("/hnsdoh-acme", methods=["POST"])
+@app.route("/hnsdoh-acme", methods=["POST"])
 def post():
     # Get the TXT record from the request
     if not request.is_json or not request.json:

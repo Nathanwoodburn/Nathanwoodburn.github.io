@@ -1,9 +1,9 @@
 from flask import Blueprint, request
 from tools import json_response
 
-template_bp = Blueprint('template', __name__)
+app = Blueprint('template', __name__)
 
 
-@template_bp.route("/")
+@app.route("/")
 def index():
     return json_response(request, "Success", 200)

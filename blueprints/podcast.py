@@ -2,9 +2,9 @@ from flask import Blueprint, make_response, request
 from tools import error_response
 import requests
 
-podcast_bp = Blueprint('podcast', __name__)
+app = Blueprint('podcast', __name__)
 
-@podcast_bp.route("/ID1")
+@app.route("/ID1")
 def index():
     # Proxy to ID1 url
     req = requests.get("https://podcasts.c.woodburn.au/ID1")
@@ -16,7 +16,7 @@ def index():
     )
 
 
-@podcast_bp.route("/ID1/")
+@app.route("/ID1/")
 def contents():
     # Proxy to ID1 url
     req = requests.get("https://podcasts.c.woodburn.au/ID1/")
@@ -27,7 +27,7 @@ def contents():
     )
 
 
-@podcast_bp.route("/ID1/<path:path>")
+@app.route("/ID1/<path:path>")
 def path(path):
     # Proxy to ID1 url
     req = requests.get("https://podcasts.c.woodburn.au/ID1/" + path)
@@ -38,7 +38,7 @@ def path(path):
     )
 
 
-@podcast_bp.route("/ID1.xml")
+@app.route("/ID1.xml")
 def xml():
     # Proxy to ID1 url
     req = requests.get("https://podcasts.c.woodburn.au/ID1.xml")
@@ -49,7 +49,7 @@ def xml():
     )
 
 
-@podcast_bp.route("/podsync.opml")
+@app.route("/podsync.opml")
 def podsync():
     req = requests.get("https://podcasts.c.woodburn.au/podsync.opml")
     if req.status_code != 200:

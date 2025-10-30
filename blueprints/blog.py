@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import re
 from tools import isCLI, getClientIP, getHandshakeScript
 
-blog_bp = Blueprint('blog', __name__)
+app = Blueprint('blog', __name__, url_prefix='/blog')
 
 
 def list_page_files():
@@ -108,7 +108,7 @@ def render_home(handshake_scripts: str | None = None):
     )
 
 
-@blog_bp.route("/")
+@app.route("/")
 def index():
     if not isCLI(request):
         return render_home(handshake_scripts=getHandshakeScript(request.host))
@@ -129,7 +129,7 @@ def index():
     }), 200
 
 
-@blog_bp.route("/<path:path>")
+@app.route("/<path:path>")
 def path(path):
     if not isCLI(request):
         return render_page(path, handshake_scripts=getHandshakeScript(request.host))
@@ -152,7 +152,7 @@ def path(path):
     }), 200
 
 
-@blog_bp.route("/<path:path>.md")
+@app.route("/<path:path>.md")
 def path_md(path):
     if not os.path.exists(f"data/blog/{path}.md"):
         return render_template("404.html"), 404

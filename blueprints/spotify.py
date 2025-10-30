@@ -5,7 +5,7 @@ import requests
 import time
 import base64
 
-spotify_bp = Blueprint('spotify', __name__)
+app = Blueprint('spotify', __name__, url_prefix='/spotify')
 
 CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
 CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
@@ -48,7 +48,7 @@ def refresh_access_token():
     TOKEN_EXPIRES = time.time() + token_info.get("expires_in", 3600)
     return ACCESS_TOKEN
 
-@spotify_bp.route("/login")
+@app.route("/login")
 def login():
     auth_query = (
         f"{SPOTIFY_AUTH_URL}?response_type=code&client_id={CLIENT_ID}"
@@ -56,7 +56,7 @@ def login():
     )
     return redirect(auth_query)
 
-@spotify_bp.route("/callback")
+@app.route("/callback")
 def callback():
     code = request.args.get("code")
     if not code:
@@ -89,8 +89,8 @@ def callback():
     print("Refresh Token:", REFRESH_TOKEN)
     return redirect(url_for("spotify.currently_playing"))
 
-@spotify_bp.route("/")
-@spotify_bp.route("/currently-playing")
+@app.route("/")
+@app.route("/playing")
 def currently_playing():
     """Public endpoint showing your current track."""
     track = get_spotify_track()

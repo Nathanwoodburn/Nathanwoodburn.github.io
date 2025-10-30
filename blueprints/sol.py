@@ -9,7 +9,7 @@ import binascii
 import base64
 import os
 
-sol_bp = Blueprint('sol', __name__)
+app = Blueprint('sol', __name__)
 
 SOLANA_HEADERS = {
     "Content-Type": "application/json",
@@ -55,7 +55,7 @@ def get_solana_address() -> str:
         raise ValueError("SOLANA_ADDRESS is not set. Please ensure the .well-known/wallets/SOL file exists and contains a valid address.")
     return str(SOLANA_ADDRESS) 
 
-@sol_bp.route("/donate", methods=["GET", "OPTIONS"])
+@app.route("/donate", methods=["GET", "OPTIONS"])
 def sol_donate():
     data = {
         "icon": "https://nathan.woodburn.au/assets/img/profile.png",
@@ -90,7 +90,7 @@ def sol_donate():
     return response
 
 
-@sol_bp.route("/donate/<amount>")
+@app.route("/donate/<amount>")
 def sol_donate_amount(amount):
     data = {
         "icon": "https://nathan.woodburn.au/assets/img/profile.png",
@@ -101,7 +101,7 @@ def sol_donate_amount(amount):
     return jsonify(data), 200, SOLANA_HEADERS
 
 
-@sol_bp.route("/donate/<amount>", methods=["POST"])
+@app.route("/donate/<amount>", methods=["POST"])
 def sol_donate_post(amount):
 
     if not request.json:

@@ -19,13 +19,7 @@ from qrcode.constants import ERROR_CORRECT_L, ERROR_CORRECT_H
 from ansi2html import Ansi2HTMLConverter
 from PIL import Image
 # Import blueprints
-from blueprints.now import now_bp
-from blueprints.blog import blog_bp
-from blueprints.wellknown import wk_bp
-from blueprints.api import api_bp
-from blueprints.podcast import podcast_bp
-from blueprints.acme import acme_bp
-from blueprints.spotify import spotify_bp
+from blueprints import now, blog, wellknown, api, podcast, acme, spotify
 from tools import isCLI, isCrawler, getAddress, getFilePath, error_response, getClientIP, json_response, getHandshakeScript, get_tools_data
 from curl import curl_response
 
@@ -33,13 +27,9 @@ app = Flask(__name__)
 CORS(app)
 
 # Register blueprints
-app.register_blueprint(now_bp, url_prefix='/now')
-app.register_blueprint(blog_bp, url_prefix='/blog')
-app.register_blueprint(wk_bp, url_prefix='/.well-known')
-app.register_blueprint(api_bp, url_prefix='/api/v1')
-app.register_blueprint(podcast_bp)
-app.register_blueprint(acme_bp)
-app.register_blueprint(spotify_bp, url_prefix='/spotify')
+for module in [now, blog, wellknown, api, podcast, acme, spotify]:
+        app.register_blueprint(module.app)
+
 
 dotenv.load_dotenv()
 
@@ -54,7 +44,8 @@ RATE_LIMIT_WINDOW = 3600  # 1 hour in seconds
 
 RESTRICTED_ROUTES = ["ascii"]
 REDIRECT_ROUTES = {
-    "contact": "/#contact"
+    "contact": "/#contact",
+    "old": "/now/old"
 }
 DOWNLOAD_ROUTES = {
     "pgp": "data/nathanwoodburn.asc"
