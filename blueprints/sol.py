@@ -123,9 +123,3 @@ def sol_donate_post(amount):
 
     transaction = create_transaction(sender, amount)
     return jsonify({"message": "Success", "transaction": transaction}), 200, SOLANA_HEADERS
-
-@app.route("/actions.json")
-def sol_actions():
-    return jsonify(
-        {"rules": [{"pathPattern": "/donate**", "apiPath": "/api/v1/donate**"}]}
-    )

@@ -28,7 +28,7 @@ CORS(app)
 
 # Register blueprints
 for module in [now, blog, wellknown, api, podcast, acme, spotify]:
-        app.register_blueprint(module.app)
+    app.register_blueprint(module.app)
 
 
 dotenv.load_dotenv()
@@ -45,7 +45,10 @@ RATE_LIMIT_WINDOW = 3600  # 1 hour in seconds
 RESTRICTED_ROUTES = ["ascii"]
 REDIRECT_ROUTES = {
     "contact": "/#contact",
-    "old": "/now/old"
+    "old": "/now/old",
+    "/meet": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
+    "/meeting": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
+    "/appointment": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
 }
 DOWNLOAD_ROUTES = {
     "pgp": "data/nathanwoodburn.asc"
@@ -178,20 +181,15 @@ def serviceWorker():
 
 
 # region Misc routes
-
-@app.route("/meet")
-@app.route("/meeting")
-@app.route("/appointment")
-def meetingLink():
-    return redirect(
-        "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr", code=302
-    )
-
-
 @app.route("/links")
 def links():
     return render_template("link.html")
 
+@app.route("/actions.json")
+def sol_actions():
+    return jsonify(
+        {"rules": [{"pathPattern": "/donate**", "apiPath": "/api/v1/donate**"}]}
+    )
 
 @app.route("/api/<path:function>")
 def api_legacy(function):
@@ -245,7 +243,8 @@ def index():
     try:
         git = requests.get(
             "https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1",
-            headers={"Authorization": os.getenv("GIT_AUTH") if os.getenv("GIT_AUTH") else os.getenv("git_token")},
+            headers={"Authorization": os.getenv("GIT_AUTH") if os.getenv(
+                "GIT_AUTH") else os.getenv("git_token")},
         )
         git = git.json()
         git = git[0]
@@ -320,7 +319,7 @@ def index():
         repo_name = "Nathan.Woodburn/"
 
     html_url = git["repo"]["html_url"]
-    repo = '<a href="' + html_url + '" target="_blank">' + repo_name + "</a>"        
+    repo = '<a href="' + html_url + '" target="_blank">' + repo_name + "</a>"
 
     # Get time
     timezone_offset = datetime.timedelta(hours=NC_CONFIG["time-zone"])
@@ -368,7 +367,7 @@ def index():
             sites=SITES,
             projects=PROJECTS,
             time=time,
-            message=NC_CONFIG.get("message",""),
+            message=NC_CONFIG.get("message", ""),
         ),
         200,
         {"Content-Type": "text/html"},
@@ -378,6 +377,8 @@ def index():
     return resp
 
 # region Donate
+
+
 @app.route("/donate")
 def donate():
     if isCLI(request):
@@ -543,6 +544,7 @@ def qrcodee(data):
 
 # endregion
 
+
 @app.route("/supersecretpath")
 def supersecretpath():
     ascii_art = ""
@@ -668,6 +670,7 @@ def resume_pdf():
         return send_file("data/resume.pdf")
     return error_response(request, message="Resume not found")
 
+
 @app.route("/tools")
 def tools():
     if isCLI(request):
@@ -682,7 +685,7 @@ def tools():
 
 @app.route("/<path:path>")
 def catch_all(path: str):
-    
+
     if path.lower().replace(".html", "") in RESTRICTED_ROUTES:
         return error_response(request, message="Restricted route", code=403)
 
