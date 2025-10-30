@@ -77,15 +77,17 @@ def render_curl(date=None):
 
     # Find divs matching your pattern
     divs = soup.find_all("div", style=re.compile(r"max-width:\s*700px", re.IGNORECASE))
+    if not divs:
+        return error_response(request, message="No content found for CLI rendering.")
 
     for div in divs:
         # header could be h1/h2/h3 inside the div
-        header_tag = div.find(["h1", "h2", "h3"])
+        header_tag = div.find(["h1", "h2", "h3"]) # type: ignore
         # content is usually one or more <p> tags inside the div
-        p_tags = div.find_all("p")
+        p_tags = div.find_all("p") # type: ignore
 
         if header_tag and p_tags:
-            header_text = header_tag.get_text(strip=True)
+            header_text = header_tag.get_text(strip=True) # type: ignore
             content_lines = []
 
             for p in p_tags:
@@ -93,9 +95,9 @@ def render_curl(date=None):
                 text = p.get_text(strip=False)
 
                 # Extract any <a> links in the paragraph
-                links = [a.get("href") for a in p.find_all("a", href=True)]
+                links = [a.get("href") for a in p.find_all("a", href=True)] # type: ignore
                 if links:
-                    text += "\nLinks: " + ", ".join(links)
+                    text += "\nLinks: " + ", ".join(links) # type: ignore
 
                 content_lines.append(text)
 
@@ -111,7 +113,7 @@ def render_curl(date=None):
 
 
 
-@app.route("/")
+@app.route("/", strict_slashes=False)
 def index():
     if isCLI(request):
         return render_curl()
@@ -126,8 +128,7 @@ def path(path):
     return render(path, handshake_scripts=getHandshakeScript(request.host))
 
 
-@app.route("/old")
-@app.route("/old/")
+@app.route("/old", strict_slashes=False)
 def old():
     now_dates = list_dates()[1:]
     if isCLI(request):
