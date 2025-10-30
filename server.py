@@ -243,8 +243,7 @@ def index():
     try:
         git = requests.get(
             "https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1",
-            headers={"Authorization": os.getenv("GIT_AUTH") if os.getenv(
-                "GIT_AUTH") else os.getenv("git_token")},
+            headers={"Authorization": os.getenv("GIT_AUTH")},
         )
         git = git.json()
         git = git[0]
@@ -681,8 +680,6 @@ def tools():
 # region Error Catching
 
 # Catch all for GET requests
-
-
 @app.route("/<path:path>")
 def catch_all(path: str):
 
