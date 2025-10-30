@@ -30,7 +30,8 @@ CRAWLERS = [
 CLI_AGENTS = [
     "curl",
     "hurl",
-    "xh"
+    "xh",
+    "Posting"
 ]
 
 
