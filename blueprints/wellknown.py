@@ -1,15 +1,16 @@
-from flask import Blueprint, render_template, make_response, request, jsonify, send_from_directory, redirect
+from flask import Blueprint, make_response, request, jsonify, send_from_directory, redirect
+from tools import error_response
 import os
 
-wk_bp = Blueprint('well-known', __name__)
+app = Blueprint('well-known', __name__, url_prefix='/.well-known')
 
 
-@wk_bp.route("/<path:path>")
+@app.route("/<path:path>")
 def index(path):
     return send_from_directory(".well-known", path)
 
 
-@wk_bp.route("/wallets/<path:path>")
+@app.route("/wallets/<path:path>")
 def wallets(path):
     if path[0] == "." and 'proof' not in path:
         return send_from_directory(
@@ -25,10 +26,10 @@ def wallets(path):
     if os.path.isfile(".well-known/wallets/" + path.upper()):
         return redirect("/.well-known/wallets/" + path.upper(), code=302)
 
-    return render_template("404.html"), 404
+    return error_response(request)
 
 
-@wk_bp.route("/nostr.json")
+@app.route("/nostr.json")
 def nostr():
     # Get name parameter
     name = request.args.get("name")
@@ -50,7 +51,7 @@ def nostr():
     )
 
 
-@wk_bp.route("/xrp-ledger.toml")
+@app.route("/xrp-ledger.toml")
 def xrp():
     # Create a response with the xrp-ledger.toml file
     with open(".well-known/xrp-ledger.toml") as file:

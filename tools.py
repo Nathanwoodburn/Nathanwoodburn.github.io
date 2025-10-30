@@ -210,7 +210,6 @@ def json_response(request: Request, message: Union[str, Dict] = "404 Not Found",
         "ip": getClientIP(request),
     }), code
 
-
 def error_response(
     request: Request,
     message: str = "404 Not Found",

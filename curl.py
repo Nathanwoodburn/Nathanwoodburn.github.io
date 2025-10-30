@@ -6,6 +6,8 @@ import requests
 from blueprints.spotify import get_spotify_track
 
 
+MAX_WIDTH = 80
+
 def clean_path(path:str):
     path = path.strip("/ ").lower()
     # Strip any .html extension
@@ -114,7 +116,6 @@ def curl_response(request):
     if path == "tools":
         tools = get_tools_data()
         return render_template("tools.ascii",header=get_header(),tools=tools), 200, {'Content-Type': 'text/plain; charset=utf-8'}
-
 
     if os.path.exists(f"templates/{path}.ascii"):
         return render_template(f"{path}.ascii",header=get_header()), 200, {'Content-Type': 'text/plain; charset=utf-8'}

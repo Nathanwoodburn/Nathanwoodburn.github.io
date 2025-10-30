@@ -35,6 +35,7 @@
     <link rel="stylesheet" href="/assets/css/brand-reveal.min.css">
     <link rel="stylesheet" href="/assets/css/profile.min.css">
     <link rel="stylesheet" href="/assets/css/Social-Icons.min.css">
+    <link rel="stylesheet" href="/assets/css/tools.min.css">
 <link rel="me" href="https://mastodon.woodburn.au/@nathanwoodburn" />
 <script async src="https://umami.woodburn.au/script.js" data-website-id="6a55028e-aad3-481c-9a37-3e096ff75589"></script>
 </head>
@@ -76,11 +77,15 @@
 <div class="row">
     {% for tool in tools_in_type %}
     <div class="col-md-6 col-lg-4 mb-4">
-        <div class="card h-100 shadow-sm transition-all" style="transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 0.5rem 1rem rgba(0,0,0,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='';">
+        <div class="card h-100 shadow-sm transition-all" style="transition: transform 0.2s, box-shadow 0.2s;">
             <div class="card-body d-flex flex-column">
                 <h4 class="card-title">{{tool.name}}</h4>
                 <p class="card-text">{{ tool.description }}</p>
-                <div class="btn-group gap-3 mt-auto" role="group">{% if tool.demo %}<button class="btn btn-primary" type="button" data-bs-target="#modal-{{tool.name}}" data-bs-toggle="modal" style="transition: transform 0.2s, background-color 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">View Demo</button>{% endif %}<a class="btn btn-primary" role="button" href="{{tool.url}}" target="_blank" style="transition: transform 0.2s, background-color 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">{{tool.name}} Website</a></div>
+                <div class="btn-group gap-3 mt-auto" role="group">{% if tool.demo %}<button class="btn btn-primary"
+                        type="button" data-bs-target="#modal-{{tool.name}}" data-bs-toggle="modal"
+                        style="transition: transform 0.2s, background-color 0.2s;">View Demo</button>{% endif %}<a
+                        class="btn btn-primary" role="button" href="{{tool.url}}" target="_blank"
+                        style="transition: transform 0.2s, background-color 0.2s;">{{tool.name}} Website</a></div>
             </div>
         </div>
     </div>
@@ -89,49 +94,110 @@
 <!-- Modals for this type -->
 {% for tool in tools_in_type %}
 {% if tool.demo %}
-<div id="modal-{{tool.name}}" class="modal fade" role="dialog" tabindex="-1" style="z-index: 1055;">
+<div id="modal-{{tool.name}}" class="modal fade" role="dialog" tabindex="-1" style="z-index: 1055;"
+    data-demo-url="{{ tool.demo | e }}">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">{{tool.name}}</h4><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal"></button>
+                <h4 class="modal-title">{{tool.name}}</h4><button class="btn-close" type="button" aria-label="Close"
+                    data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                {{ tool.demo | safe }}
-            </div>
-            <div class="modal-footer"><button class="btn btn-light" type="button" data-bs-dismiss="modal">Close</button></div>
+            
+            <div class="modal-body" data-demo-loaded="false"></div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-light" type="button" data-bs-dismiss="modal">Close</button>
         </div>
     </div>
+</div>
 </div>
 {% endif %}
 {% endfor %}
 {% endfor %}
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const navbar = document.getElementById('mainNav');
-    const headers = document.querySelectorAll('.section-header');
-    
-    if (navbar) {
-        const navbarHeight = navbar.offsetHeight;
-        headers.forEach(header => {
-            header.style.top = navbarHeight + 'px';
-            header.style.zIndex = '100';
-            header.style.scrollMarginTop = navbarHeight + 'px';
-        });
-        
-        // Handle hash navigation on page load
-        if (window.location.hash) {
-            setTimeout(() => {
-                const target = document.querySelector(window.location.hash);
-                if (target) {
-                    window.scrollTo({
-                        top: target.offsetTop - navbarHeight,
-                        behavior: 'smooth'
-                    });
-                }
-            }, 0);
+    document.addEventListener('DOMContentLoaded', function () {
+        const navbar = document.getElementById('mainNav');
+        const headers = document.querySelectorAll('.section-header');
+
+        if (navbar) {
+            const navbarHeight = navbar.offsetHeight;
+            headers.forEach(header => {
+                header.style.top = navbarHeight + 'px';
+                header.style.zIndex = '100';
+                header.style.scrollMarginTop = navbarHeight + 'px';
+            });
+
+            // Handle hash navigation on page load
+            if (window.location.hash) {
+                setTimeout(() => {
+                    const target = document.querySelector(window.location.hash);
+                    if (target) {
+                        window.scrollTo({
+                            top: target.offsetTop - navbarHeight,
+                            behavior: 'smooth'
+                        });
+                    }
+                }, 0);
+            }
         }
-    }
+
+       // Load demo in modal
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('show.bs.modal', () => {
+            const body = modal.querySelector('.modal-body');
+            if (body.dataset.demoLoaded === 'false') {
+                const demoUrl = modal.dataset.demoUrl;
+                const iframeId = 'iframe-' + modal.id;
+
+                // Add a div on top of all content to show loading message
+                const loadingDiv = document.createElement('div');
+                loadingDiv.style.position = 'absolute';
+                loadingDiv.style.top = '0';
+                loadingDiv.style.left = '0';
+                loadingDiv.style.width = '100%';
+                loadingDiv.style.height = '100%';
+                loadingDiv.style.backgroundColor = 'rgb(0, 0, 0)';
+                loadingDiv.style.display = 'flex';
+                loadingDiv.style.justifyContent = 'center';
+                loadingDiv.style.alignItems = 'center';
+                loadingDiv.style.zIndex = '10';
+                const loadingMsg = document.createElement('p');
+                loadingMsg.className = 'text-center';
+                loadingMsg.textContent = 'Loading demo...';
+                loadingDiv.appendChild(loadingMsg);
+                body.style.position = 'relative';
+                body.appendChild(loadingDiv);
+
+                // Create iframe
+                const iframe = document.createElement('iframe');
+                iframe.src = demoUrl + '/iframe';
+                iframe.id = iframeId;
+                iframe.style.width = '100%';
+                iframe.style.height = '400px'; // temporary height
+                iframe.style.border = '0';
+                iframe.setAttribute('scrolling', 'no');
+                iframe.setAttribute('allowfullscreen', 'true');
+
+                body.appendChild(iframe);
+                body.dataset.demoLoaded = 'true';
+
+                // Listen for bodySize message from asciinema iframe
+                const origin = new URL(demoUrl).origin;
+                function onMessage(event) {
+                    if (event.origin !== origin || event.source !== iframe.contentWindow) return;
+                    if (event.data.type === 'bodySize' && event.data.payload.height) {
+                        iframe.style.height = event.data.payload.height + 'px';
+                        // Remove loading message
+                        body.removeChild(loadingDiv);
+                        // Optional: limit modal max height
+                        modal.querySelector('.modal-dialog').style.maxHeight = '90vh';
+                    }
+                }
+
+                window.addEventListener('message', onMessage, false);
+            }
+        });
+    });
 });
 </script></div>
     </section>

@@ -11,7 +11,7 @@ Here are some of the tools I use regularly — most of them are open source! �
 [1;33m{{tool.name}}[0m
 {{tool.description}}
 Website: {{tool.url}}
-{% if tool.demo_url %}Demo: {{tool.demo_url}}{% endif %}
+{% if tool.demo %}Demo: {{tool.demo}}{% endif %}
 {% endfor %}
 
 [1;36m───────────────────────────────────────────────[0m

@@ -19,13 +19,7 @@ from qrcode.constants import ERROR_CORRECT_L, ERROR_CORRECT_H
 from ansi2html import Ansi2HTMLConverter
 from PIL import Image
 # Import blueprints
-from blueprints.now import now_bp
-from blueprints.blog import blog_bp
-from blueprints.wellknown import wk_bp
-from blueprints.api import api_bp
-from blueprints.podcast import podcast_bp
-from blueprints.acme import acme_bp
-from blueprints.spotify import spotify_bp
+from blueprints import now, blog, wellknown, api, podcast, acme, spotify
 from tools import isCLI, isCrawler, getAddress, getFilePath, error_response, getClientIP, json_response, getHandshakeScript, get_tools_data
 from curl import curl_response
 
@@ -33,13 +27,9 @@ app = Flask(__name__)
 CORS(app)
 
 # Register blueprints
-app.register_blueprint(now_bp, url_prefix='/now')
-app.register_blueprint(blog_bp, url_prefix='/blog')
-app.register_blueprint(wk_bp, url_prefix='/.well-known')
-app.register_blueprint(api_bp, url_prefix='/api/v1')
-app.register_blueprint(podcast_bp)
-app.register_blueprint(acme_bp)
-app.register_blueprint(spotify_bp, url_prefix='/spotify')
+for module in [now, blog, wellknown, api, podcast, acme, spotify]:
+    app.register_blueprint(module.app)
+
 
 dotenv.load_dotenv()
 
@@ -54,7 +44,11 @@ RATE_LIMIT_WINDOW = 3600  # 1 hour in seconds
 
 RESTRICTED_ROUTES = ["ascii"]
 REDIRECT_ROUTES = {
-    "contact": "/#contact"
+    "contact": "/#contact",
+    "old": "/now/old",
+    "/meet": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
+    "/meeting": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
+    "/appointment": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
 }
 DOWNLOAD_ROUTES = {
     "pgp": "data/nathanwoodburn.asc"
@@ -187,21 +181,15 @@ def serviceWorker():
 
 
 # region Misc routes
-
-
-@app.route("/meet")
-@app.route("/meeting")
-@app.route("/appointment")
-def meetingLink():
-    return redirect(
-        "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr", code=302
-    )
-
-
 @app.route("/links")
 def links():
     return render_template("link.html")
 
+@app.route("/actions.json")
+def sol_actions():
+    return jsonify(
+        {"rules": [{"pathPattern": "/donate**", "apiPath": "/api/v1/donate**"}]}
+    )
 
 @app.route("/api/<path:function>")
 def api_legacy(function):
@@ -211,13 +199,6 @@ def api_legacy(function):
         if rule.rule == f"/api/v1/{function}":
             return redirect(f"/api/v1/{function}", code=301)
     return error_response(request, message="404 Not Found", code=404)
-
-
-@app.route("/actions.json")
-def sol_actions():
-    return jsonify(
-        {"rules": [{"pathPattern": "/donate**", "apiPath": "/api/v1/donate**"}]}
-    )
 
 # endregion
 
@@ -262,7 +243,7 @@ def index():
     try:
         git = requests.get(
             "https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1",
-            headers={"Authorization": os.getenv("GIT_AUTH") if os.getenv("GIT_AUTH") else os.getenv("git_token")},
+            headers={"Authorization": os.getenv("GIT_AUTH")},
         )
         git = git.json()
         git = git[0]
@@ -337,7 +318,7 @@ def index():
         repo_name = "Nathan.Woodburn/"
 
     html_url = git["repo"]["html_url"]
-    repo = '<a href="' + html_url + '" target="_blank">' + repo_name + "</a>"        
+    repo = '<a href="' + html_url + '" target="_blank">' + repo_name + "</a>"
 
     # Get time
     timezone_offset = datetime.timedelta(hours=NC_CONFIG["time-zone"])
@@ -385,7 +366,7 @@ def index():
             sites=SITES,
             projects=PROJECTS,
             time=time,
-            message=NC_CONFIG.get("message",""),
+            message=NC_CONFIG.get("message", ""),
         ),
         200,
         {"Content-Type": "text/html"},
@@ -395,6 +376,8 @@ def index():
     return resp
 
 # region Donate
+
+
 @app.route("/donate")
 def donate():
     if isCLI(request):
@@ -560,6 +543,7 @@ def qrcodee(data):
 
 # endregion
 
+
 @app.route("/supersecretpath")
 def supersecretpath():
     ascii_art = ""
@@ -685,6 +669,7 @@ def resume_pdf():
         return send_file("data/resume.pdf")
     return error_response(request, message="Resume not found")
 
+
 @app.route("/tools")
 def tools():
     if isCLI(request):
@@ -695,11 +680,9 @@ def tools():
 # region Error Catching
 
 # Catch all for GET requests
-
-
 @app.route("/<path:path>")
 def catch_all(path: str):
-    
+
     if path.lower().replace(".html", "") in RESTRICTED_ROUTES:
         return error_response(request, message="Restricted route", code=403)
 

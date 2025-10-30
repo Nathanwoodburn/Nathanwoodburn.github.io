@@ -5,7 +5,7 @@ import requests
 import re
 from mail import sendEmail
 from tools import getClientIP, getGitCommit, json_response, parse_date, get_tools_data
-from blueprints.sol import sol_bp
+from blueprints import sol
 from dateutil import parser as date_parser
 from blueprints.spotify import get_spotify_track
 
@@ -17,9 +17,9 @@ HTTP_NOT_FOUND = 404
 HTTP_UNSUPPORTED_MEDIA = 415
 HTTP_SERVER_ERROR = 500
 
-api_bp = Blueprint('api', __name__)
+app = Blueprint('api', __name__, url_prefix='/api/v1')
 # Register solana blueprint
-api_bp.register_blueprint(sol_bp)
+app.register_blueprint(sol.app)
 
 # Load configuration
 NC_CONFIG = requests.get(
@@ -30,8 +30,8 @@ if 'time-zone' not in NC_CONFIG:
     NC_CONFIG['time-zone'] = 10
 
 
-@api_bp.route("/")
-@api_bp.route("/help")
+@app.route("/", strict_slashes=False)
+@app.route("/help")
 def help():
     """Provide API documentation and help."""
     return jsonify({
@@ -57,18 +57,18 @@ def help():
         "status": HTTP_OK
     })
 
-@api_bp.route("/status")
-@api_bp.route("/ping")
+@app.route("/status")
+@app.route("/ping")
 def status():
     return json_response(request, "200 OK", HTTP_OK)
 
-@api_bp.route("/version")
+@app.route("/version")
 def version():
     """Get the current version of the website."""
     return jsonify({"version": getGitCommit()})
 
 
-@api_bp.route("/time")
+@app.route("/time")
 def time():
     """Get the current time in the configured timezone."""
     timezone_offset = datetime.timedelta(hours=NC_CONFIG["time-zone"])
@@ -84,7 +84,7 @@ def time():
     })
 
 
-@api_bp.route("/timezone")
+@app.route("/timezone")
 def timezone():
     """Get the current timezone setting."""
     return jsonify({
@@ -94,7 +94,7 @@ def timezone():
     })
 
 
-@api_bp.route("/message")
+@app.route("/message")
 def message():
     """Get the message from the configuration."""
     return jsonify({
@@ -104,7 +104,7 @@ def message():
     })
 
 
-@api_bp.route("/ip")
+@app.route("/ip")
 def ip():
     """Get the client's IP address."""
     return jsonify({
@@ -113,7 +113,7 @@ def ip():
     })
 
 
-@api_bp.route("/email", methods=["POST"])
+@app.route("/email", methods=["POST"])
 def email_post():
     """Send an email via the API (requires API key)."""
     # Verify json
@@ -135,7 +135,7 @@ def email_post():
     return sendEmail(data)
 
 
-@api_bp.route("/project")
+@app.route("/project")
 def project():
     """Get information about the current git project."""
     gitinfo = {
@@ -168,7 +168,7 @@ def project():
         "status": HTTP_OK
     })
 
-@api_bp.route("/tools")
+@app.route("/tools")
 def tools():
     """Get a list of tools used by Nathan Woodburn."""
     try:
@@ -176,15 +176,10 @@ def tools():
     except Exception as e:
         print(f"Error getting tools data: {e}")
         return json_response(request, "500 Internal Server Error", HTTP_SERVER_ERROR)
-
-    # Remove demo and move demo_url to demo
-    for tool in tools:
-        if "demo_url" in tool:
-            tool["demo"] = tool.pop("demo_url")
         
     return json_response(request, {"tools": tools}, HTTP_OK)
 
-@api_bp.route("/playing")
+@app.route("/playing")
 def playing():
     """Get the currently playing Spotify track."""
     track_info = get_spotify_track()
@@ -193,7 +188,7 @@ def playing():
     return json_response(request, {"spotify": track_info}, HTTP_OK)
 
 
-@api_bp.route("/headers")
+@app.route("/headers")
 def headers():
     """Get the request headers."""
     headers = dict(request.headers)
@@ -216,7 +211,7 @@ def headers():
         "status": HTTP_OK
     })
 
-@api_bp.route("/page_date")
+@app.route("/page_date")
 def page_date():
     url = request.args.get("url")
     if not url:

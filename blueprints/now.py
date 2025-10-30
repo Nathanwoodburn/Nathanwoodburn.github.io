@@ -1,10 +1,13 @@
 from flask import Blueprint, render_template, make_response, request, jsonify
 import datetime
 import os
-from tools import getHandshakeScript
+from tools import getHandshakeScript, error_response, isCLI
+from curl import get_header, MAX_WIDTH
+from bs4 import BeautifulSoup
+import re
 
 # Create blueprint
-now_bp = Blueprint('now', __name__)
+app = Blueprint('now', __name__, url_prefix='/now')
 
 
 def list_page_files():
@@ -44,27 +47,115 @@ def render(date, handshake_scripts=None):
     date = date.removesuffix(".html")
 
     if date not in list_dates():
-        return render_template("404.html"), 404
+        return error_response(request)
 
     date_formatted = datetime.datetime.strptime(date, "%y_%m_%d")
     date_formatted = date_formatted.strftime("%A, %B %d, %Y")
     return render_template(f"now/{date}.html", DATE=date_formatted, handshake_scripts=handshake_scripts)
 
+def render_curl(date=None):
+    # If the date is not available, render the latest page
+    if date is None:
+        date = get_latest_date()
 
-@now_bp.route("/")
+    # Remove .html if present
+    date = date.removesuffix(".html")
+
+    if date not in list_dates():
+        return error_response(request)
+
+    # Format the date nicely
+    date_formatted = datetime.datetime.strptime(date, "%y_%m_%d")
+    date_formatted = date_formatted.strftime("%A, %B %d, %Y")
+    
+    # Load HTML
+    with open(f"templates/now/{date}.html", "r", encoding="utf-8") as f:
+        raw_html = f.read().replace("{{ date }}", date_formatted)
+    soup = BeautifulSoup(raw_html, 'html.parser')
+    
+    posts = []
+
+    # Find divs matching your pattern
+    divs = soup.find_all("div", style=re.compile(r"max-width:\s*700px", re.IGNORECASE))
+    if not divs:
+        return error_response(request, message="No content found for CLI rendering.")
+
+    for div in divs:
+        # header could be h1/h2/h3 inside the div
+        header_tag = div.find(["h1", "h2", "h3"]) # type: ignore
+        # content is usually one or more <p> tags inside the div
+        p_tags = div.find_all("p") # type: ignore
+
+        if header_tag and p_tags:
+            header_text = header_tag.get_text(strip=True) # type: ignore
+            content_lines = []
+
+            for p in p_tags:
+                # Extract text
+                text = p.get_text(strip=False)
+
+                # Extract any <a> links in the paragraph
+                links = [a.get("href") for a in p.find_all("a", href=True)] # type: ignore
+                # Set max width for text wrapping
+                
+                # Wrap text manually
+                wrapped_lines = []
+                for line in text.splitlines():
+                    while len(line) > MAX_WIDTH:
+                        # Find last space within max_width
+                        split_at = line.rfind(' ', 0, MAX_WIDTH)
+                        if split_at == -1:
+                            split_at = MAX_WIDTH
+                        wrapped_lines.append(line[:split_at].rstrip())
+                        line = line[split_at:].lstrip()
+                    wrapped_lines.append(line)
+                text = "\n".join(wrapped_lines)
+
+                if links:
+                    text += "\nLinks: " + ", ".join(links) # type: ignore
+
+                content_lines.append(text)
+
+            content_text = "\n\n".join(content_lines)
+            posts.append({"header": header_text, "content": content_text})
+
+    # Build final response
+    response = ""
+    for post in posts:
+        response += f"[1m{post['header']}[0m\n\n{post['content']}\n\n"
+
+    return render_template("now.ascii", date=date_formatted, content=response, header=get_header())
+
+
+
+@app.route("/", strict_slashes=False)
 def index():
+    if isCLI(request):
+        return render_curl()
     return render_latest(handshake_scripts=getHandshakeScript(request.host))
 
 
-@now_bp.route("/<path:path>")
+@app.route("/<path:path>")
 def path(path):
+    if isCLI(request):
+        return render_curl(path)
+
     return render(path, handshake_scripts=getHandshakeScript(request.host))
 
 
-@now_bp.route("/old")
-@now_bp.route("/old/")
+@app.route("/old", strict_slashes=False)
 def old():
     now_dates = list_dates()[1:]
+    if isCLI(request):
+        response = ""
+        for date in now_dates:
+            link = date
+            date_fmt = datetime.datetime.strptime(date, "%y_%m_%d")
+            date_fmt = date_fmt.strftime("%A, %B %d, %Y")
+            response += f"{date_fmt} - /now/{link}\n"
+        return render_template("now.ascii", date="Old Now Pages", content=response, header=get_header())
+
+
     html = '<ul class="list-group">'
     html += f'<a style="text-decoration:none;" href="/now"><li class="list-group-item" style="background-color:#000000;color:#ffffff;">{get_latest_date(True)}</li></a>'
 
@@ -80,9 +171,9 @@ def old():
     )
 
 
-@now_bp.route("/now.rss")
-@now_bp.route("/now.xml")
-@now_bp.route("/rss.xml")
+@app.route("/now.rss")
+@app.route("/now.xml")
+@app.route("/rss.xml")
 def rss():
     host = "https://" + request.host
     if ":" in request.host:
@@ -99,7 +190,7 @@ def rss():
     return make_response(rss, 200, {"Content-Type": "application/rss+xml"})
 
 
-@now_bp.route("/now.json")
+@app.route("/now.json")
 def json():
     now_pages = list_page_files()
     host = "https://" + request.host
