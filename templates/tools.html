@@ -95,7 +95,7 @@
 {% for tool in tools_in_type %}
 {% if tool.demo %}
 <div id="modal-{{tool.name}}" class="modal fade" role="dialog" tabindex="-1" style="z-index: 1055;"
-    data-demo-url="{{ tool.demo_url | e }}">
+    data-demo-url="{{ tool.demo | e }}">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">

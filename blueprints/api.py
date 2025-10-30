@@ -176,11 +176,6 @@ def tools():
     except Exception as e:
         print(f"Error getting tools data: {e}")
         return json_response(request, "500 Internal Server Error", HTTP_SERVER_ERROR)
-
-    # Remove demo and move demo_url to demo
-    for tool in tools:
-        if "demo_url" in tool:
-            tool["demo"] = tool.pop("demo_url")
         
     return json_response(request, {"tools": tools}, HTTP_OK)
 
