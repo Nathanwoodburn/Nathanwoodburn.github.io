@@ -197,6 +197,19 @@ def playing():
 def headers():
     """Get the request headers."""
     headers = dict(request.headers)
+
+    # For each header, convert list-like headers to lists
+    toremove = []
+    for key, _ in headers.items():
+        # If header is like X- something
+        if key.startswith("X-"):
+            # Remove from headers
+            toremove.append(key)
+        
+
+    for key in toremove:
+        headers.pop(key)
+
     return jsonify({
         "headers": headers,
         "ip": getClientIP(request),
