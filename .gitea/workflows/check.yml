@@ -6,13 +6,11 @@ on:
 jobs:
   RuffCheck:
     runs-on: [ubuntu-latest, amd]
+    container:
+      image: python:3.13-slim-bookworm
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
       - name: Install Ruff
         run: pip install ruff
       - name: Run Ruff
