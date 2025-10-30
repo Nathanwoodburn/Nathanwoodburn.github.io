@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, make_response, request, jsonify
 import datetime
 import os
 from tools import getHandshakeScript, error_response, isCLI
-from curl import get_header
+from curl import get_header, MAX_WIDTH
 from bs4 import BeautifulSoup
 import re
 
@@ -96,6 +96,21 @@ def render_curl(date=None):
 
                 # Extract any <a> links in the paragraph
                 links = [a.get("href") for a in p.find_all("a", href=True)] # type: ignore
+                # Set max width for text wrapping
+                
+                # Wrap text manually
+                wrapped_lines = []
+                for line in text.splitlines():
+                    while len(line) > MAX_WIDTH:
+                        # Find last space within max_width
+                        split_at = line.rfind(' ', 0, MAX_WIDTH)
+                        if split_at == -1:
+                            split_at = MAX_WIDTH
+                        wrapped_lines.append(line[:split_at].rstrip())
+                        line = line[split_at:].lstrip()
+                    wrapped_lines.append(line)
+                text = "\n".join(wrapped_lines)
+
                 if links:
                     text += "\nLinks: " + ", ".join(links) # type: ignore
 

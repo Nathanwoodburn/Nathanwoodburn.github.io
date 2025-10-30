@@ -6,6 +6,8 @@ import requests
 from blueprints.spotify import get_spotify_track
 
 
+MAX_WIDTH = 80
+
 def clean_path(path:str):
     path = path.strip("/ ").lower()
     # Strip any .html extension
