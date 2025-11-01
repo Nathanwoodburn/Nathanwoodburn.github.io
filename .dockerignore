@@ -1,0 +1,19 @@
+
+__pycache__/
+
+.env
+.vs/
+.venv/
+*.tmp
+testing/
+tests/
+.vscode/
+.ruff_check/
+.gitea/
+
+
+# Random files
+README.md
+LICENSE.txt
+NathanWoodburn.bsdesign
+Dockerfile
