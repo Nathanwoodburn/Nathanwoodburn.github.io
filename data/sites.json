@@ -10,7 +10,8 @@
         "url": "https://domains.hns.au",
         "img": "/assets/img/external/HNSAU.webp",
         "name": "HNSAU Registry",
-        "description": "An easy to use DNS provider and domain reselling platform"
+        "description": "An easy to use DNS provider and domain reselling platform",
+        "enabled": false
     },
     {
         "url": "https://hns.au",
@@ -22,7 +23,8 @@
         "url": "https://hnshosting.au",
         "img": "/favicon.png",
         "name": "HNS Hosting",
-        "description": "Simple Wordpress hosting for Handshake domains with builtin SSL using DANE"
+        "description": "Simple Wordpress hosting for Handshake domains with builtin SSL using DANE",
+        "enabled": false
     },
     {
         "url": "https://firewallet.au",
@@ -34,7 +36,8 @@
         "url": "https://shakecities.com",
         "img": "/assets/img/external/HNSW.png",
         "name": "ShakeCities",
-        "description": "A single page website creator where each user's page on their free HNS domain"
+        "description": "A single page website creator where each user's page on their free HNS domain",
+        "enabled": false
     },
     {
         "url": "https://git.woodburn.au",
@@ -66,5 +69,17 @@
         "img": "https://ipfs.hnsproxy.au/fireportal.png",
         "name": "FirePortal",
         "description": "A Handshake domain IPFS gateway that allows you to access IPFS content using Handshake domains"
+    },
+    {
+        "url": "https://hsd.hns.au/",
+        "img": "/favicon.png",
+        "name": "Fire HSD",
+        "description": "A free public API for Handshake (HSD)"
+    },
+    {
+        "url": "https://time.c.woodburn.au/",
+        "img": "/favicon.png",
+        "name": "Timezone Converter",
+        "description": "A simple site and API for converting timezones"
     }
 ]
