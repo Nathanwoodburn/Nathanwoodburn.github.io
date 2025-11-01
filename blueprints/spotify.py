@@ -25,6 +25,10 @@ def refresh_access_token():
     """Refresh Spotify access token when expired."""
     global ACCESS_TOKEN, TOKEN_EXPIRES
 
+    # If no refresh token, cannot proceed
+    if not REFRESH_TOKEN:
+        return None
+
     # If still valid, reuse it
     if ACCESS_TOKEN and time.time() < TOKEN_EXPIRES - 60:
         return ACCESS_TOKEN
@@ -100,7 +104,7 @@ def get_spotify_track():
     """Internal function to get current playing track without HTTP context."""
     token = refresh_access_token()
     if not token:
-        return json_response(request, {"error": "Failed to refresh access token"}, 500)
+        return {"error": "Failed to refresh access token"}
 
     headers = {"Authorization": f"Bearer {token}"}
     response = requests.get(SPOTIFY_CURRENTLY_PLAYING_URL, headers=headers)
