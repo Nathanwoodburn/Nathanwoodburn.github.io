@@ -40,6 +40,8 @@ RUN addgroup -g 1001 appgroup && \
     adduser -D -u 1001 -G appgroup -h /app appuser
 
 WORKDIR /app
+RUN apk add --no-cache curl
+
 
 # Copy only what’s needed for runtime
 COPY --from=build --chown=appuser:appgroup /app/.venv /app/.venv
@@ -58,34 +60,3 @@ USER appuser
 EXPOSE 5000
 
 ENTRYPOINT ["python3", "main.py"]
-
-
-
-
-# FROM --platform=$BUILDPLATFORM python:3.13-alpine
-# COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
-
-# # Install curl for healthcheck
-# RUN apk add --no-cache curl
-
-# # Set working directory
-# WORKDIR /app
-
-# # Install dependencies
-# RUN --mount=type=cache,target=/root/.cache/uv \
-#     --mount=type=bind,source=uv.lock,target=uv.lock \
-#     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-#     uv sync --locked --no-install-project
-
-# # Copy the project into the image
-# ADD . /app
-
-# # Sync the project
-# RUN --mount=type=cache,target=/root/.cache/uv \
-#     uv sync --locked
-
-# # Add mount point for data volume
-# # VOLUME /data
-
-# ENTRYPOINT ["uv", "run"]
-# CMD ["main.py"]
