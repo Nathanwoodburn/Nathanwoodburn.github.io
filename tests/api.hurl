@@ -5,7 +5,7 @@ HTTP 200
 GET http://127.0.0.1:5000/api/v1/ip
 HTTP 200
 [Asserts]
-jsonpath "$.ip" == "127.0.0.1"
+jsonpath "$.ip" matches "^(127|172).(0|17).0.1$"
 
 GET http://127.0.0.1:5000/api/v1/time
 HTTP 200

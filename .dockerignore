@@ -1,19 +1,33 @@
-
+# Bytecode and virtualenvs
 __pycache__/
-
-.env
-.vs/
+*.pyc
+*.pyo
 .venv/
-*.tmp
+.vscode/
+.vs/
+.ruff_check/
+.env
+
+# Pycache in subdirectories
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+
+# Git and CI
+.git/
+.gitea/
 testing/
 tests/
-.vscode/
-.ruff_check/
-.gitea/
 
-
-# Random files
-README.md
-LICENSE.txt
-NathanWoodburn.bsdesign
+# Build and docs
 Dockerfile
+NathanWoodburn.bsdesign
+LICENSE.txt
+README.md
+
+
+# Development caches
+*.tmp
+*.log
+
+
