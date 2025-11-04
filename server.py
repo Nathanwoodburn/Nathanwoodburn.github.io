@@ -661,13 +661,20 @@ def hosting_post():
         return json_response(request, "Failed to send enquiry", 500)
     return json_response(request, "Enquiry sent", 200)
 
+@app.route("/resume")
+def resume():
+    # Check if arg for support is passed
+    support = request.args.get("support")
+    return render_template(
+        "resume.html", support=support)
 
 @app.route("/resume.pdf")
 def resume_pdf():
-    # Check if file exists
-    if os.path.isfile("data/resume.pdf"):
-        return send_file("data/resume.pdf")
-    return error_response(request, message="Resume not found")
+    # Check if arg for support is passed
+    support = request.args.get("support")
+    if support:
+        return send_file("data/resume_support.pdf")
+    return send_file("data/resume.pdf")
 
 
 @app.route("/tools")
