@@ -32,7 +32,8 @@ CLI_AGENTS = [
     "hurl",
     "xh",
     "Posting",
-    "HTTPie"
+    "HTTPie",
+    "nushell"
 ]
 
 
