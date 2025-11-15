@@ -18,9 +18,20 @@ import qrcode
 from qrcode.constants import ERROR_CORRECT_L, ERROR_CORRECT_H
 from ansi2html import Ansi2HTMLConverter
 from PIL import Image
+
 # Import blueprints
 from blueprints import now, blog, wellknown, api, podcast, acme, spotify
-from tools import isCLI, isCrawler, getAddress, getFilePath, error_response, getClientIP, json_response, getHandshakeScript, get_tools_data
+from tools import (
+    isCLI,
+    isCrawler,
+    getAddress,
+    getFilePath,
+    error_response,
+    getClientIP,
+    json_response,
+    getHandshakeScript,
+    get_tools_data,
+)
 from curl import curl_response
 
 app = Flask(__name__)
@@ -37,9 +48,9 @@ dotenv.load_dotenv()
 
 # Rate limiting for hosting enquiries
 EMAIL_REQUEST_COUNT = {}  # Track requests by email
-IP_REQUEST_COUNT = {}     # Track requests by IP
-EMAIL_RATE_LIMIT = 3      # Max 3 requests per email per hour
-IP_RATE_LIMIT = 5         # Max 5 requests per IP per hour
+IP_REQUEST_COUNT = {}  # Track requests by IP
+EMAIL_RATE_LIMIT = 3  # Max 3 requests per email per hour
+IP_RATE_LIMIT = 5  # Max 5 requests per IP per hour
 RATE_LIMIT_WINDOW = 3600  # 1 hour in seconds
 
 RESTRICTED_ROUTES = ["ascii"]
@@ -50,18 +61,14 @@ REDIRECT_ROUTES = {
     "/meeting": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
     "/appointment": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
 }
-DOWNLOAD_ROUTES = {
-    "pgp": "data/nathanwoodburn.asc"
-}
+DOWNLOAD_ROUTES = {"pgp": "data/nathanwoodburn.asc"}
 
 SITES = []
 if os.path.isfile("data/sites.json"):
     with open("data/sites.json") as file:
         SITES = json.load(file)
         # Remove any sites that are not enabled
-        SITES = [
-            site for site in SITES if "enabled" not in site or site["enabled"]
-        ]
+        SITES = [site for site in SITES if "enabled" not in site or site["enabled"]]
 
 PROJECTS = []
 PROJECTS_UPDATED = 0
@@ -114,6 +121,13 @@ def asset(path):
     return error_response(request)
 
 
+@app.route("/fonts/<path:path>")
+def fonts(path):
+    if os.path.isfile("templates/assets/fonts/" + path):
+        return send_from_directory("templates/assets/fonts", path)
+    return error_response(request)
+
+
 @app.route("/sitemap")
 @app.route("/sitemap.xml")
 def sitemap():
@@ -153,6 +167,7 @@ def download(path):
 
     return error_response(request, message="File not found")
 
+
 # endregion
 # region PWA routes
 
@@ -177,6 +192,7 @@ def manifest():
 def serviceWorker():
     return send_from_directory("pwa", "sw.js")
 
+
 # endregion
 
 
@@ -185,11 +201,13 @@ def serviceWorker():
 def links():
     return render_template("link.html")
 
+
 @app.route("/actions.json")
 def sol_actions():
     return jsonify(
         {"rules": [{"pathPattern": "/donate**", "apiPath": "/api/v1/donate**"}]}
     )
+
 
 @app.route("/api/<path:function>")
 def api_legacy(function):
@@ -199,6 +217,7 @@ def api_legacy(function):
         if rule.rule == f"/api/v1/{function}":
             return redirect(f"/api/v1/{function}", code=301)
     return error_response(request, message="404 Not Found", code=404)
+
 
 # endregion
 
@@ -263,9 +282,11 @@ def index():
         print(f"Error getting git data: {e}")
 
     # Get only repo names for the newest updates
-    if PROJECTS == [] or PROJECTS_UPDATED < (datetime.datetime.now() - datetime.timedelta(
-        hours=2
-    )).timestamp():
+    if (
+        PROJECTS == []
+        or PROJECTS_UPDATED
+        < (datetime.datetime.now() - datetime.timedelta(hours=2)).timestamp()
+    ):
         projectsreq = requests.get(
             "https://git.woodburn.au/api/v1/users/nathanwoodburn/repos"
         )
@@ -288,11 +309,9 @@ def index():
                 or project["avatar_url"] == ""
             ):
                 project["avatar_url"] = "/favicon.png"
-            project["name"] = project["name"].replace(
-                "_", " ").replace("-", " ")
+            project["name"] = project["name"].replace("_", " ").replace("-", " ")
         # Sort by last updated
-        projectsList = sorted(
-            PROJECTS, key=lambda x: x["updated_at"], reverse=True)
+        projectsList = sorted(PROJECTS, key=lambda x: x["updated_at"], reverse=True)
         PROJECTS = []
         projectNames = []
         projectNum = 0
@@ -305,8 +324,7 @@ def index():
 
     custom = ""
     # Check for downtime
-    uptime = requests.get(
-        "https://uptime.woodburn.au/api/status-page/main/badge")
+    uptime = requests.get("https://uptime.woodburn.au/api/status-page/main/badge")
     uptime = uptime.content.count(b"Up") > 1
 
     if uptime:
@@ -374,6 +392,7 @@ def index():
     resp.set_cookie("loaded", "true", max_age=604800)
 
     return resp
+
 
 # region Donate
 
@@ -451,7 +470,7 @@ def donate():
             if not token:
                 cryptoHTML += f"<br>Donate with {coinNames[crypto] if crypto in coinNames else crypto}:"
             else:
-                cryptoHTML += f'<br>Donate with {token["name"]} {"("+token["symbol"]+") " if token["symbol"] != token["name"] else ""}on {crypto}:'
+                cryptoHTML += f"<br>Donate with {token['name']} {'(' + token['symbol'] + ') ' if token['symbol'] != token['name'] else ''}on {crypto}:"
             cryptoHTML += f'<br><code data-bs-toggle="tooltip" data-bss-tooltip="" id="crypto-address" class="address" style="color: rgb(242,90,5);display: inline-block;" data-bs-original-title="Click to copy">{address}</code>'
 
             if proof:
@@ -459,12 +478,12 @@ def donate():
     elif token:
         if "address" in token:
             address = token["address"]
-            cryptoHTML += f'<br>Donate with {token["name"]} {"("+token["symbol"]+")" if token["symbol"] != token["name"] else ""}{" on "+crypto if crypto != "NULL" else ""}:'
+            cryptoHTML += f"<br>Donate with {token['name']} {'(' + token['symbol'] + ')' if token['symbol'] != token['name'] else ''}{' on ' + crypto if crypto != 'NULL' else ''}:"
             cryptoHTML += f'<br><code data-bs-toggle="tooltip" data-bss-tooltip="" id="crypto-address" class="address" style="color: rgb(242,90,5);display: inline-block;" data-bs-original-title="Click to copy">{address}</code>'
             if proof:
                 cryptoHTML += proof
         else:
-            cryptoHTML += f'<br>Invalid offchain token: {token["symbol"]}<br>'
+            cryptoHTML += f"<br>Invalid offchain token: {token['symbol']}<br>"
     else:
         cryptoHTML += f"<br>Invalid chain: {crypto}<br>"
 
@@ -520,26 +539,29 @@ def qraddress(address):
 @app.route("/qrcode/<path:data>")
 @app.route("/qr/<path:data>")
 def qrcodee(data):
-    qr = qrcode.QRCode(
-        error_correction=ERROR_CORRECT_H, box_size=10, border=2)
+    qr = qrcode.QRCode(error_correction=ERROR_CORRECT_H, box_size=10, border=2)
     qr.add_data(data)
     qr.make()
 
     qr_image: Image.Image = qr.make_image(
-        fill_color="black", back_color="white").convert('RGB')  # type: ignore
+        fill_color="black", back_color="white"
+    ).convert("RGB")  # type: ignore
 
     # Add logo
     logo = Image.open("templates/assets/img/favicon/logo.png")
-    basewidth = qr_image.size[0]//3
-    wpercent = (basewidth / float(logo.size[0]))
+    basewidth = qr_image.size[0] // 3
+    wpercent = basewidth / float(logo.size[0])
     hsize = int((float(logo.size[1]) * float(wpercent)))
     logo = logo.resize((basewidth, hsize), Image.Resampling.LANCZOS)
-    pos = ((qr_image.size[0] - logo.size[0]) // 2,
-           (qr_image.size[1] - logo.size[1]) // 2)
+    pos = (
+        (qr_image.size[0] - logo.size[0]) // 2,
+        (qr_image.size[1] - logo.size[1]) // 2,
+    )
     qr_image.paste(logo, pos, mask=logo)
 
     qr_image.save("/tmp/qr_code.png")
     return send_file("/tmp/qr_code.png", mimetype="image/png")
+
 
 # endregion
 
@@ -580,15 +602,18 @@ def hosting_post():
 
     # Check email rate limit
     if email in EMAIL_REQUEST_COUNT:
-        if (current_time - EMAIL_REQUEST_COUNT[email]["last_reset"]) > RATE_LIMIT_WINDOW:
+        if (
+            current_time - EMAIL_REQUEST_COUNT[email]["last_reset"]
+        ) > RATE_LIMIT_WINDOW:
             # Reset counter if the time window has passed
-            EMAIL_REQUEST_COUNT[email] = {
-                "count": 1, "last_reset": current_time}
+            EMAIL_REQUEST_COUNT[email] = {"count": 1, "last_reset": current_time}
         else:
             # Increment counter
             EMAIL_REQUEST_COUNT[email]["count"] += 1
             if EMAIL_REQUEST_COUNT[email]["count"] > EMAIL_RATE_LIMIT:
-                return json_response(request, "Rate limit exceeded. Please try again later.", 429)
+                return json_response(
+                    request, "Rate limit exceeded. Please try again later.", 429
+                )
     else:
         # First request for this email
         EMAIL_REQUEST_COUNT[email] = {"count": 1, "last_reset": current_time}
@@ -602,7 +627,9 @@ def hosting_post():
             # Increment counter
             IP_REQUEST_COUNT[ip]["count"] += 1
             if IP_REQUEST_COUNT[ip]["count"] > IP_RATE_LIMIT:
-                return json_response(request, "Rate limit exceeded. Please try again later.", 429)
+                return json_response(
+                    request, "Rate limit exceeded. Please try again later.", 429
+                )
     else:
         # First request for this IP
         IP_REQUEST_COUNT[ip] = {"count": 1, "last_reset": current_time}
@@ -661,12 +688,13 @@ def hosting_post():
         return json_response(request, "Failed to send enquiry", 500)
     return json_response(request, "Enquiry sent", 200)
 
+
 @app.route("/resume")
 def resume():
     # Check if arg for support is passed
     support = request.args.get("support")
-    return render_template(
-        "resume.html", support=support)
+    return render_template("resume.html", support=support)
+
 
 @app.route("/resume.pdf")
 def resume_pdf():
@@ -683,13 +711,14 @@ def tools():
         return curl_response(request)
     return render_template("tools.html", tools=get_tools_data())
 
+
 # endregion
 # region Error Catching
+
 
 # Catch all for GET requests
 @app.route("/<path:path>")
 def catch_all(path: str):
-
     if path.lower().replace(".html", "") in RESTRICTED_ROUTES:
         return error_response(request, message="Restricted route", code=403)
 
@@ -702,17 +731,23 @@ def catch_all(path: str):
 
     # If file exists, load it
     if os.path.isfile("templates/" + path):
-        return render_template(path, handshake_scripts=getHandshakeScript(request.host), sites=SITES)
+        return render_template(
+            path, handshake_scripts=getHandshakeScript(request.host), sites=SITES
+        )
 
     # Try with .html
     if os.path.isfile("templates/" + path + ".html"):
         return render_template(
-            path + ".html", handshake_scripts=getHandshakeScript(request.host), sites=SITES
+            path + ".html",
+            handshake_scripts=getHandshakeScript(request.host),
+            sites=SITES,
         )
 
     if os.path.isfile("templates/" + path.strip("/") + ".html"):
         return render_template(
-            path.strip("/") + ".html", handshake_scripts=getHandshakeScript(request.host), sites=SITES
+            path.strip("/") + ".html",
+            handshake_scripts=getHandshakeScript(request.host),
+            sites=SITES,
         )
 
     # Try to find a file matching
@@ -728,6 +763,7 @@ def catch_all(path: str):
 @app.errorhandler(404)
 def not_found(e):
     return error_response(request)
+
 
 # endregion
 
