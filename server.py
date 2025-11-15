@@ -325,7 +325,10 @@ def index():
     custom = ""
     # Check for downtime
     uptime = requests.get("https://uptime.woodburn.au/api/status-page/main/badge")
-    uptime = uptime.content.count(b"Up") > 1
+    if "maintenance" in uptime.content.decode("utf-8").lower():
+        uptime = True
+    else:
+        uptime = uptime.content.count(b"Up") > 1
 
     if uptime:
         custom += "<style>#downtime{display:none !important;}</style>"
