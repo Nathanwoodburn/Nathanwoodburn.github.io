@@ -20,7 +20,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 # Copy only app source files
 COPY blueprints blueprints
-COPY main.py server.py curl.py tools.py mail.py ./
+COPY main.py server.py curl.py tools.py mail.py cache_helper.py ./
 COPY templates templates
 COPY data data
 COPY pwa pwa
@@ -55,6 +55,7 @@ COPY --from=build --chown=appuser:appgroup /app/server.py /app/
 COPY --from=build --chown=appuser:appgroup /app/curl.py /app/
 COPY --from=build --chown=appuser:appgroup /app/tools.py /app/
 COPY --from=build --chown=appuser:appgroup /app/mail.py /app/
+COPY --from=build --chown=appuser:appgroup /app/cache_helper.py /app/
 
 USER appuser
 EXPOSE 5000
