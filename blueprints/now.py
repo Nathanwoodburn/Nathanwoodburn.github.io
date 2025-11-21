@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, make_response, request, jsonify
 import datetime
 import os
+from functools import lru_cache
 from tools import getHandshakeScript, error_response, isCLI
 from curl import get_header, MAX_WIDTH
 from bs4 import BeautifulSoup
@@ -10,6 +11,7 @@ import re
 app = Blueprint('now', __name__, url_prefix='/now')
 
 
+@lru_cache(maxsize=16)
 def list_page_files():
     now_pages = os.listdir("templates/now")
     now_pages = [
@@ -19,12 +21,14 @@ def list_page_files():
     return now_pages
 
 
+@lru_cache(maxsize=16)
 def list_dates():
     now_pages = list_page_files()
     now_dates = [page.split(".")[0] for page in now_pages]
     return now_dates
 
 
+@lru_cache(maxsize=8)
 def get_latest_date(formatted=False):
     if formatted:
         date = list_dates()[0]

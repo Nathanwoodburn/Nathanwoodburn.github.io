@@ -3,11 +3,13 @@ from flask import Blueprint, render_template, request, jsonify
 import markdown
 from bs4 import BeautifulSoup
 import re
+from functools import lru_cache
 from tools import isCLI, getClientIP, getHandshakeScript
 
 app = Blueprint('blog', __name__, url_prefix='/blog')
 
 
+@lru_cache(maxsize=32)
 def list_page_files():
     blog_pages = os.listdir("data/blog")
     # Sort pages by modified time, newest first
@@ -21,28 +23,43 @@ def list_page_files():
     return blog_pages
 
 
-def render_page(date, handshake_scripts=None):
-    # Convert md to html
+@lru_cache(maxsize=64)
+def get_blog_content(date):
+    """Get and cache blog content."""
     if not os.path.exists(f"data/blog/{date}.md"):
-        return render_template("404.html"), 404
-
+        return None
+    
     with open(f"data/blog/{date}.md", "r") as f:
-        content = f.read()
-    # Get the title from the file name
-    title = date.removesuffix(".md").replace("_", " ")
-    # Convert the md to html
-    content = markdown.markdown(
+        return f.read()
+
+
+@lru_cache(maxsize=64)
+def render_markdown_to_html(content):
+    """Convert markdown to HTML with caching."""
+    html = markdown.markdown(
         content, extensions=['sane_lists', 'codehilite', 'fenced_code'])
     # Add target="_blank" to all links
-    content = content.replace('<a href="', '<a target="_blank" href="')
+    html = html.replace('<a href="', '<a target="_blank" href="')
+    html = html.replace("<h4", "<h4 style='margin-bottom:0px;'")
+    html = fix_numbered_lists(html)
+    return html
 
-    content = content.replace("<h4", "<h4 style='margin-bottom:0px;'")
-    content = fix_numbered_lists(content)
+
+def render_page(date, handshake_scripts=None):
+    # Get cached content
+    content = get_blog_content(date)
+    if content is None:
+        return render_template("404.html"), 404
+
+    # Get the title from the file name
+    title = date.removesuffix(".md").replace("_", " ")
+    # Convert the md to html (cached)
+    html_content = render_markdown_to_html(content)
 
     return render_template(
         "blog/template.html",
         title=title,
-        content=content,
+        content=html_content,
         handshake_scripts=handshake_scripts,
     )
 
@@ -134,12 +151,11 @@ def path(path):
     if not isCLI(request):
         return render_page(path, handshake_scripts=getHandshakeScript(request.host))
 
-    # Convert md to html
-    if not os.path.exists(f"data/blog/{path}.md"):
+    # Get cached content
+    content = get_blog_content(path)
+    if content is None:
         return render_template("404.html"), 404
 
-    with open(f"data/blog/{path}.md", "r") as f:
-        content = f.read()
     # Get the title from the file name
     title = path.replace("_", " ")
     return jsonify({
@@ -154,11 +170,9 @@ def path(path):
 
 @app.route("/<path:path>.md")
 def path_md(path):
-    if not os.path.exists(f"data/blog/{path}.md"):
+    content = get_blog_content(path)
+    if content is None:
         return render_template("404.html"), 404
-
-    with open(f"data/blog/{path}.md", "r") as f:
-        content = f.read()
 
     # Return the raw markdown file
     return content, 200, {'Content-Type': 'text/plain; charset=utf-8'}
