@@ -33,6 +33,15 @@ from tools import (
     get_tools_data,
 )
 from curl import curl_response
+from cache_helper import (
+    get_nc_config,
+    get_git_latest_activity,
+    get_projects,
+    get_uptime_status,
+    get_wallet_tokens,
+    get_coin_names,
+    get_wallet_domains,
+)
 
 app = Flask(__name__)
 CORS(app)
@@ -69,13 +78,6 @@ if os.path.isfile("data/sites.json"):
         SITES = json.load(file)
         # Remove any sites that are not enabled
         SITES = [site for site in SITES if "enabled" not in site or site["enabled"]]
-
-PROJECTS = []
-PROJECTS_UPDATED = 0
-
-NC_CONFIG = requests.get(
-    "https://cloud.woodburn.au/s/4ToXgFe3TnnFcN7/download/website-conf.json"
-).json()
 
 # endregion
 
@@ -226,9 +228,6 @@ def api_legacy(function):
 
 @app.route("/")
 def index():
-    global PROJECTS
-    global PROJECTS_UPDATED
-
     # Check if host if podcast.woodburn.au
     if "podcast.woodburn.au" in request.host:
         return render_template("podcast.html")
@@ -259,81 +258,22 @@ def index():
         resp.set_cookie("loaded", "true", max_age=604800)
         return resp
 
-    try:
-        git = requests.get(
-            "https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1",
-            headers={"Authorization": os.getenv("GIT_AUTH")},
-        )
-        git = git.json()
-        git = git[0]
-        repo_name = git["repo"]["name"]
-        repo_name = repo_name.lower()
-        repo_description = git["repo"]["description"]
-    except Exception as e:
-        repo_name = "nathanwoodburn.github.io"
-        repo_description = "Personal website"
-        git = {
-            "repo": {
-                "html_url": "https://nathan.woodburn.au",
-                "name": "nathanwoodburn.github.io",
-                "description": "Personal website",
-            }
-        }
-        print(f"Error getting git data: {e}")
+    # Use cached git data
+    git = get_git_latest_activity()
+    repo_name = git["repo"]["name"].lower()
+    repo_description = git["repo"]["description"]
 
-    # Get only repo names for the newest updates
-    if (
-        PROJECTS == []
-        or PROJECTS_UPDATED
-        < (datetime.datetime.now() - datetime.timedelta(hours=2)).timestamp()
-    ):
-        projectsreq = requests.get(
-            "https://git.woodburn.au/api/v1/users/nathanwoodburn/repos"
-        )
+    # Use cached projects data
+    projects = get_projects(limit=3)
 
-        PROJECTS = projectsreq.json()
-
-        # Check for next page
-        pageNum = 1
-        while 'rel="next"' in projectsreq.headers["link"]:
-            projectsreq = requests.get(
-                "https://git.woodburn.au/api/v1/users/nathanwoodburn/repos?page="
-                + str(pageNum)
-            )
-            PROJECTS += projectsreq.json()
-            pageNum += 1
-
-        for project in PROJECTS:
-            if (
-                project["avatar_url"] == "https://git.woodburn.au/"
-                or project["avatar_url"] == ""
-            ):
-                project["avatar_url"] = "/favicon.png"
-            project["name"] = project["name"].replace("_", " ").replace("-", " ")
-        # Sort by last updated
-        projectsList = sorted(PROJECTS, key=lambda x: x["updated_at"], reverse=True)
-        PROJECTS = []
-        projectNames = []
-        projectNum = 0
-        while len(PROJECTS) < 3:
-            if projectsList[projectNum]["name"] not in projectNames:
-                PROJECTS.append(projectsList[projectNum])
-                projectNames.append(projectsList[projectNum]["name"])
-            projectNum += 1
-        PROJECTS_UPDATED = datetime.datetime.now().timestamp()
-
+    # Use cached uptime status
+    uptime = get_uptime_status()
     custom = ""
-    # Check for downtime
-    uptime = requests.get("https://uptime.woodburn.au/api/status-page/main/badge")
-    if "maintenance" in uptime.content.decode("utf-8").lower():
-        uptime = True
-    else:
-        uptime = uptime.content.count(b"Up") > 1
-
     if uptime:
         custom += "<style>#downtime{display:none !important;}</style>"
     else:
         custom += "<style>#downtime{opacity:1;}</style>"
+    
     # Special names
     if repo_name == "nathanwoodburn.github.io":
         repo_name = "Nathan.Woodburn/"
@@ -341,8 +281,9 @@ def index():
     html_url = git["repo"]["html_url"]
     repo = '<a href="' + html_url + '" target="_blank">' + repo_name + "</a>"
 
-    # Get time
-    timezone_offset = datetime.timedelta(hours=NC_CONFIG["time-zone"])
+    # Get time using cached config
+    nc_config = get_nc_config()
+    timezone_offset = datetime.timedelta(hours=nc_config["time-zone"])
     timezone = datetime.timezone(offset=timezone_offset)
     time = datetime.datetime.now(tz=timezone)
 
@@ -365,7 +306,7 @@ def index():
     setInterval(updateClock, 1000);
 }
 """
-    time += f"startClock({NC_CONFIG['time-zone']});"
+    time += f"startClock({nc_config['time-zone']});"
     time += "</script>"
 
     HNSaddress = getAddress("HNS")
@@ -385,9 +326,9 @@ def index():
             repo_description=repo_description,
             custom=custom,
             sites=SITES,
-            projects=PROJECTS,
+            projects=projects,
             time=time,
-            message=NC_CONFIG.get("message", ""),
+            message=nc_config.get("message", ""),
         ),
         200,
         {"Content-Type": "text/html"},
@@ -409,31 +350,21 @@ def donate():
     coinList = [file for file in coinList if file[0] != "."]
     coinList.sort()
 
-    tokenList = []
-
-    with open(".well-known/wallets/.tokens") as file:
-        tokenList = file.read()
-        tokenList = json.loads(tokenList)
-
-    coinNames = {}
-    with open(".well-known/wallets/.coins") as file:
-        coinNames = file.read()
-        coinNames = json.loads(coinNames)
+    tokenList = get_wallet_tokens()
+    coinNames = get_coin_names()
 
     coins = ""
     default_coins = ["btc", "eth", "hns", "sol", "xrp", "ada", "dot"]
 
     for file in coinList:
-        if file in coinNames:
-            coins += f'<a class="dropdown-item" style="{"display:none;" if file.lower() not in default_coins else ""}" href="?c={file.lower()}">{coinNames[file]}</a>'
-        else:
-            coins += f'<a class="dropdown-item" style="{"display:none;" if file.lower() not in default_coins else ""}" href="?c={file.lower()}">{file}</a>'
+        coin_name = coinNames.get(file, file)
+        display_style = "" if file.lower() in default_coins else "display:none;"
+        coins += f'<a class="dropdown-item" style="{display_style}" href="?c={file.lower()}">{coin_name}</a>'
 
     for token in tokenList:
-        if token["chain"] != "null":
-            coins += f'<a class="dropdown-item" style="display:none;" href="?t={token["symbol"].lower()}&c={token["chain"].lower()}">{token["name"]} ({token["symbol"] + " on " if token["symbol"] != token["name"] else ""}{token["chain"]})</a>'
-        else:
-            coins += f'<a class="dropdown-item" style="display:none;" href="?t={token["symbol"].lower()}&c={token["chain"].lower()}">{token["name"]} ({token["symbol"] if token["symbol"] != token["name"] else ""})</a>'
+        chain_display = f" on {token['chain']}" if token["chain"] != "null" else ""
+        symbol_display = f" ({token['symbol']}{chain_display})" if token["symbol"] != token["name"] else chain_display
+        coins += f'<a class="dropdown-item" style="display:none;" href="?t={token["symbol"].lower()}&c={token["chain"].lower()}">{token["name"]}{symbol_display}</a>'
 
     crypto = request.args.get("c")
     if not crypto:
@@ -460,7 +391,6 @@ def donate():
             token = {"name": "Unknown token", "symbol": token, "chain": crypto}
 
     address = ""
-    domain = ""
     cryptoHTML = ""
 
     proof = ""
@@ -470,10 +400,12 @@ def donate():
     if os.path.isfile(f".well-known/wallets/{crypto}"):
         with open(f".well-known/wallets/{crypto}") as file:
             address = file.read()
+            coin_display = coinNames.get(crypto, crypto)
             if not token:
-                cryptoHTML += f"<br>Donate with {coinNames[crypto] if crypto in coinNames else crypto}:"
+                cryptoHTML += f"<br>Donate with {coin_display}:"
             else:
-                cryptoHTML += f"<br>Donate with {token['name']} {'(' + token['symbol'] + ') ' if token['symbol'] != token['name'] else ''}on {crypto}:"
+                token_symbol = f" ({token['symbol']})" if token['symbol'] != token['name'] else ""
+                cryptoHTML += f"<br>Donate with {token['name']}{token_symbol} on {crypto}:"
             cryptoHTML += f'<br><code data-bs-toggle="tooltip" data-bss-tooltip="" id="crypto-address" class="address" style="color: rgb(242,90,5);display: inline-block;" data-bs-original-title="Click to copy">{address}</code>'
 
             if proof:
@@ -481,7 +413,9 @@ def donate():
     elif token:
         if "address" in token:
             address = token["address"]
-            cryptoHTML += f"<br>Donate with {token['name']} {'(' + token['symbol'] + ')' if token['symbol'] != token['name'] else ''}{' on ' + crypto if crypto != 'NULL' else ''}:"
+            token_symbol = f" ({token['symbol']})" if token['symbol'] != token['name'] else ""
+            chain_display = f" on {crypto}" if crypto != 'NULL' else ""
+            cryptoHTML += f"<br>Donate with {token['name']}{token_symbol}{chain_display}:"
             cryptoHTML += f'<br><code data-bs-toggle="tooltip" data-bss-tooltip="" id="crypto-address" class="address" style="color: rgb(242,90,5);display: inline-block;" data-bs-original-title="Click to copy">{address}</code>'
             if proof:
                 cryptoHTML += proof
@@ -490,16 +424,12 @@ def donate():
     else:
         cryptoHTML += f"<br>Invalid chain: {crypto}<br>"
 
-    if os.path.isfile(".well-known/wallets/.domains"):
-        # Get json of all domains
-        with open(".well-known/wallets/.domains") as file:
-            domains = file.read()
-            domains = json.loads(domains)
-
-        if crypto in domains:
-            domain = domains[crypto]
-            cryptoHTML += "<br>Or send to this domain on compatible wallets:<br>"
-            cryptoHTML += f'<code data-bs-toggle="tooltip" data-bss-tooltip="" id="crypto-domain" class="address" style="color: rgb(242,90,5);display: block;" data-bs-original-title="Click to copy">{domain}</code>'
+    domains = get_wallet_domains()
+    if crypto in domains:
+        domain = domains[crypto]
+        cryptoHTML += "<br>Or send to this domain on compatible wallets:<br>"
+        cryptoHTML += f'<code data-bs-toggle="tooltip" data-bss-tooltip="" id="crypto-domain" class="address" style="color: rgb(242,90,5);display: block;" data-bs-original-title="Click to copy">{domain}</code>'
+    
     if address:
         cryptoHTML += (
             '<br><img src="/address/'

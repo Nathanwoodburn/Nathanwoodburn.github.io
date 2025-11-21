@@ -2,8 +2,8 @@ from flask import render_template
 from tools import getAddress, get_tools_data, getClientIP
 import os
 from functools import lru_cache
-import requests
 from blueprints.spotify import get_spotify_track
+from cache_helper import get_git_latest_activity, get_projects as get_projects_cached
 
 
 MAX_WIDTH = 80
@@ -24,61 +24,26 @@ def get_header():
     with open("templates/header.ascii", "r") as f:
         return f.read()
 
-@lru_cache(maxsize=1)
+@lru_cache(maxsize=16)
 def get_current_project():
-    git = requests.get(
-        "https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1",
-        headers={"Authorization": os.getenv("GIT_AUTH") if os.getenv("GIT_AUTH") else os.getenv("git_token")},
-    )
-    git = git.json()
-    git = git[0]
-    repo_name = git["repo"]["name"]
-    repo_name = repo_name.lower()
+    git = get_git_latest_activity()
+    repo_name = git["repo"]["name"].lower()
     repo_description = git["repo"]["description"]    
     if not repo_description:
-        return f"[1;36m{repo_name}[0m"
-    return f"[1;36m{repo_name}[0m - [1m{repo_description}[0m"
+        return f"[1;36m{repo_name}[0m"
+    return f"[1;36m{repo_name}[0m - [1m{repo_description}[0m"
 
 
-@lru_cache(maxsize=1)
+@lru_cache(maxsize=16)
 def get_projects():
-    projectsreq = requests.get(
-            "https://git.woodburn.au/api/v1/users/nathanwoodburn/repos"
-        )
-
-    projects = projectsreq.json()
-
-    # Check for next page
-    pageNum = 1
-    while 'rel="next"' in projectsreq.headers["link"]:
-        projectsreq = requests.get(
-            "https://git.woodburn.au/api/v1/users/nathanwoodburn/repos?page="
-            + str(pageNum)
-        )
-        projects += projectsreq.json()
-        pageNum += 1
-
-    # Sort by last updated
-    projectsList = sorted(
-        projects, key=lambda x: x["updated_at"], reverse=True)
+    projects_data = get_projects_cached(limit=5)
     projects = ""
-    projectNum = 0
-    includedNames = []
-    while len(includedNames) < 5 and projectNum < len(projectsList):
-        # Avoid duplicates
-        if projectsList[projectNum]["name"] in includedNames:
-            projectNum += 1
-            continue
-        includedNames.append(projectsList[projectNum]["name"])
-        project = projectsList[projectNum]
-        projects += f"""[1m{project['name']}[0m - {project['description'] if project['description'] else 'No description'}
+    for project in projects_data:
+        projects += f"""[1m{project['name']}[0m - {project['description'] if project['description'] else 'No description'}
 {project['html_url']}
 
 """
-        projectNum += 1
-        
     return projects
-
 def curl_response(request):
     # Check if <path>.ascii exists
     path = clean_path(request.path)

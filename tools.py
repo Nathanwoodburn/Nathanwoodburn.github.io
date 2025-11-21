@@ -1,6 +1,6 @@
 from flask import Request, render_template, jsonify, make_response
 import os
-from functools import lru_cache as cache
+from functools import lru_cache
 import datetime
 from typing import Optional, Dict, Union, Tuple
 import re
@@ -56,7 +56,7 @@ def getClientIP(request: Request) -> str:
         ip = "unknown"
     return ip
 
-@cache
+@lru_cache(maxsize=1)
 def getGitCommit() -> str:
     """
     Get the current git commit hash.
@@ -115,7 +115,7 @@ def isCrawler(request: Request) -> bool:
         return any(crawler in user_agent for crawler in CRAWLERS)
     return False
 
-@cache
+@lru_cache(maxsize=128)
 def isDev(host: str) -> bool:
     """
     Check if the host indicates a development environment.
@@ -135,7 +135,7 @@ def isDev(host: str) -> bool:
         return True
     return False
 
-@cache
+@lru_cache(maxsize=128)
 def getHandshakeScript(host: str) -> str:
     """
     Get the handshake script HTML snippet.
@@ -150,7 +150,7 @@ def getHandshakeScript(host: str) -> str:
         return ""
     return '<script src="https://nathan.woodburn/handshake.js" domain="nathan.woodburn" async></script><script src="https://nathan.woodburn/https.js" async></script>'
 
-@cache
+@lru_cache(maxsize=64)
 def getAddress(coin: str) -> str:
     """
     Get the wallet address for a cryptocurrency.
@@ -169,7 +169,7 @@ def getAddress(coin: str) -> str:
     return address
 
 
-@cache
+@lru_cache(maxsize=256)
 def getFilePath(name: str, path: str) -> Optional[str]:
     """
     Find a file in a directory tree.

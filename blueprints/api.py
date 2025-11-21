@@ -8,6 +8,7 @@ from tools import getClientIP, getGitCommit, json_response, parse_date, get_tool
 from blueprints import sol
 from dateutil import parser as date_parser
 from blueprints.spotify import get_spotify_track
+from cache_helper import get_nc_config, get_git_latest_activity
 
 # Constants
 HTTP_OK = 200
@@ -20,14 +21,6 @@ HTTP_SERVER_ERROR = 500
 app = Blueprint('api', __name__, url_prefix='/api/v1')
 # Register solana blueprint
 app.register_blueprint(sol.app)
-
-# Load configuration
-NC_CONFIG = requests.get(
-    "https://cloud.woodburn.au/s/4ToXgFe3TnnFcN7/download/website-conf.json"
-).json()
-
-if 'time-zone' not in NC_CONFIG:
-    NC_CONFIG['time-zone'] = 10
 
 
 @app.route("/", strict_slashes=False)
@@ -71,13 +64,14 @@ def version():
 @app.route("/time")
 def time():
     """Get the current time in the configured timezone."""
-    timezone_offset = datetime.timedelta(hours=NC_CONFIG["time-zone"])
+    nc_config = get_nc_config()
+    timezone_offset = datetime.timedelta(hours=nc_config["time-zone"])
     timezone = datetime.timezone(offset=timezone_offset)
     current_time = datetime.datetime.now(tz=timezone)
     return jsonify({
         "timestring": current_time.strftime("%A, %B %d, %Y %I:%M %p"),
         "timestamp": current_time.timestamp(),
-        "timezone": NC_CONFIG["time-zone"],
+        "timezone": nc_config["time-zone"],
         "timeISO": current_time.isoformat(),
         "ip": getClientIP(request),
         "status": HTTP_OK
@@ -87,8 +81,9 @@ def time():
 @app.route("/timezone")
 def timezone():
     """Get the current timezone setting."""
+    nc_config = get_nc_config()
     return jsonify({
-        "timezone": NC_CONFIG["time-zone"],
+        "timezone": nc_config["time-zone"],
         "ip": getClientIP(request),
         "status": HTTP_OK
     })
@@ -97,8 +92,9 @@ def timezone():
 @app.route("/message")
 def message():
     """Get the message from the configuration."""
+    nc_config = get_nc_config()
     return jsonify({
-        "message": NC_CONFIG["message"],
+        "message": nc_config["message"],
         "ip": getClientIP(request),
         "status": HTTP_OK
     })
@@ -138,27 +134,16 @@ def email_post():
 @app.route("/project")
 def project():
     """Get information about the current git project."""
+    git = get_git_latest_activity()
+    repo_name = git["repo"]["name"].lower()
+    repo_description = git["repo"]["description"]
+    
     gitinfo = {
-        "website": None,
+        "name": repo_name,
+        "description": repo_description,
+        "url": git["repo"]["html_url"],
+        "website": git["repo"].get("website"),
     }
-    try:
-        git = requests.get(
-            "https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1",
-            headers={"Authorization": os.getenv("git_token")},
-        )
-        git = git.json()        
-        git = git[0]
-        repo_name = git["repo"]["name"]
-        repo_name = repo_name.lower()
-        repo_description = git["repo"]["description"]
-        gitinfo["name"] = repo_name
-        gitinfo["description"] = repo_description
-        gitinfo["url"] = git["repo"]["html_url"]
-        if "website" in git["repo"]:
-            gitinfo["website"] = git["repo"]["website"]
-    except Exception as e:
-        print(f"Error getting git data: {e}")
-        return json_response(request, "500 Internal Server Error", HTTP_SERVER_ERROR)
 
     return jsonify({
         "repo_name": repo_name,
