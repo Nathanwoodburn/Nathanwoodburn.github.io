@@ -273,7 +273,7 @@ def index():
         custom += "<style>#downtime{display:none !important;}</style>"
     else:
         custom += "<style>#downtime{opacity:1;}</style>"
-    
+
     # Special names
     if repo_name == "nathanwoodburn.github.io":
         repo_name = "Nathan.Woodburn/"
@@ -429,7 +429,7 @@ def donate():
         domain = domains[crypto]
         cryptoHTML += "<br>Or send to this domain on compatible wallets:<br>"
         cryptoHTML += f'<code data-bs-toggle="tooltip" data-bss-tooltip="" id="crypto-domain" class="address" style="color: rgb(242,90,5);display: block;" data-bs-original-title="Click to copy">{domain}</code>'
-    
+
     if address:
         cryptoHTML += (
             '<br><img src="/address/'
