@@ -5,7 +5,7 @@ import requests
 import time
 import base64
 
-app = Blueprint('spotify', __name__, url_prefix='/spotify')
+app = Blueprint("spotify", __name__, url_prefix="/spotify")
 
 CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
 CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
@@ -20,6 +20,7 @@ SCOPE = "user-read-currently-playing user-read-playback-state"
 ACCESS_TOKEN = None
 REFRESH_TOKEN = os.getenv("SPOTIFY_REFRESH_TOKEN")
 TOKEN_EXPIRES = 0
+
 
 def refresh_access_token():
     """Refresh Spotify access token when expired."""
@@ -52,6 +53,7 @@ def refresh_access_token():
     TOKEN_EXPIRES = time.time() + token_info.get("expires_in", 3600)
     return ACCESS_TOKEN
 
+
 @app.route("/login")
 def login():
     auth_query = (
@@ -59,6 +61,7 @@ def login():
         f"&redirect_uri={url_for('spotify.callback', _external=True)}&scope={SCOPE}"
     )
     return redirect(auth_query)
+
 
 @app.route("/callback")
 def callback():
@@ -76,12 +79,14 @@ def callback():
     response = requests.post(SPOTIFY_TOKEN_URL, data=data)
     token_info = response.json()
     if "access_token" not in token_info:
-        return json_response(request, {"error": "Failed to obtain token", "details": token_info}, 400)
+        return json_response(
+            request, {"error": "Failed to obtain token", "details": token_info}, 400
+        )
 
     access_token = token_info["access_token"]
     me = requests.get(
         "https://api.spotify.com/v1/me",
-        headers={"Authorization": f"Bearer {access_token}"}
+        headers={"Authorization": f"Bearer {access_token}"},
     ).json()
 
     if me.get("id") != ALLOWED_SPOTIFY_USER_ID:
@@ -93,12 +98,14 @@ def callback():
     print("Refresh Token:", REFRESH_TOKEN)
     return redirect(url_for("spotify.currently_playing"))
 
+
 @app.route("/", strict_slashes=False)
 @app.route("/playing")
 def currently_playing():
     """Public endpoint showing your current track."""
     track = get_spotify_track()
-    return json_response(request, {"spotify":track}, 200)
+    return json_response(request, {"spotify": track}, 200)
+
 
 def get_spotify_track():
     """Internal function to get current playing track without HTTP context."""
@@ -124,7 +131,7 @@ def get_spotify_track():
         "album_name": data["item"]["album"]["name"],
         "album_art": data["item"]["album"]["images"][0]["url"],
         "is_playing": data["is_playing"],
-        "progress_ms": data.get("progress_ms",0),
-        "duration_ms": data["item"].get("duration_ms",1)
+        "progress_ms": data.get("progress_ms", 0),
+        "duration_ms": data["item"].get("duration_ms", 1),
     }
     return track

@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 import re
 
 # Create blueprint
-app = Blueprint('now', __name__, url_prefix='/now')
+app = Blueprint("now", __name__, url_prefix="/now")
 
 
 @lru_cache(maxsize=16)
@@ -55,7 +55,10 @@ def render(date, handshake_scripts=None):
 
     date_formatted = datetime.datetime.strptime(date, "%y_%m_%d")
     date_formatted = date_formatted.strftime("%A, %B %d, %Y")
-    return render_template(f"now/{date}.html", DATE=date_formatted, handshake_scripts=handshake_scripts)
+    return render_template(
+        f"now/{date}.html", DATE=date_formatted, handshake_scripts=handshake_scripts
+    )
+
 
 def render_curl(date=None):
     # If the date is not available, render the latest page
@@ -71,12 +74,12 @@ def render_curl(date=None):
     # Format the date nicely
     date_formatted = datetime.datetime.strptime(date, "%y_%m_%d")
     date_formatted = date_formatted.strftime("%A, %B %d, %Y")
-    
+
     # Load HTML
     with open(f"templates/now/{date}.html", "r", encoding="utf-8") as f:
         raw_html = f.read().replace("{{ date }}", date_formatted)
-    soup = BeautifulSoup(raw_html, 'html.parser')
-    
+    soup = BeautifulSoup(raw_html, "html.parser")
+
     posts = []
 
     # Find divs matching your pattern
@@ -86,12 +89,12 @@ def render_curl(date=None):
 
     for div in divs:
         # header could be h1/h2/h3 inside the div
-        header_tag = div.find(["h1", "h2", "h3"]) # type: ignore
+        header_tag = div.find(["h1", "h2", "h3"])  # type: ignore
         # content is usually one or more <p> tags inside the div
-        p_tags = div.find_all("p") # type: ignore
+        p_tags = div.find_all("p")  # type: ignore
 
         if header_tag and p_tags:
-            header_text = header_tag.get_text(strip=True) # type: ignore
+            header_text = header_tag.get_text(strip=True)  # type: ignore
             content_lines = []
 
             for p in p_tags:
@@ -99,15 +102,15 @@ def render_curl(date=None):
                 text = p.get_text(strip=False)
 
                 # Extract any <a> links in the paragraph
-                links = [a.get("href") for a in p.find_all("a", href=True)] # type: ignore
+                links = [a.get("href") for a in p.find_all("a", href=True)]  # type: ignore
                 # Set max width for text wrapping
-                
+
                 # Wrap text manually
                 wrapped_lines = []
                 for line in text.splitlines():
                     while len(line) > MAX_WIDTH:
                         # Find last space within max_width
-                        split_at = line.rfind(' ', 0, MAX_WIDTH)
+                        split_at = line.rfind(" ", 0, MAX_WIDTH)
                         if split_at == -1:
                             split_at = MAX_WIDTH
                         wrapped_lines.append(line[:split_at].rstrip())
@@ -116,7 +119,7 @@ def render_curl(date=None):
                 text = "\n".join(wrapped_lines)
 
                 if links:
-                    text += "\nLinks: " + ", ".join(links) # type: ignore
+                    text += "\nLinks: " + ", ".join(links)  # type: ignore
 
                 content_lines.append(text)
 
@@ -128,8 +131,9 @@ def render_curl(date=None):
     for post in posts:
         response += f"[1m{post['header']}[0m\n\n{post['content']}\n\n"
 
-    return render_template("now.ascii", date=date_formatted, content=response, header=get_header())
-
+    return render_template(
+        "now.ascii", date=date_formatted, content=response, header=get_header()
+    )
 
 
 @app.route("/", strict_slashes=False)
@@ -157,8 +161,9 @@ def old():
             date_fmt = datetime.datetime.strptime(date, "%y_%m_%d")
             date_fmt = date_fmt.strftime("%A, %B %d, %Y")
             response += f"{date_fmt} - /now/{link}\n"
-        return render_template("now.ascii", date="Old Now Pages", content=response, header=get_header())
-
+        return render_template(
+            "now.ascii", date="Old Now Pages", content=response, header=get_header()
+        )
 
     html = '<ul class="list-group">'
     html += f'<a style="text-decoration:none;" href="/now"><li class="list-group-item" style="background-color:#000000;color:#ffffff;">{get_latest_date(True)}</li></a>'
@@ -171,7 +176,9 @@ def old():
 
     html += "</ul>"
     return render_template(
-        "now/old.html", handshake_scripts=getHandshakeScript(request.host), now_pages=html
+        "now/old.html",
+        handshake_scripts=getHandshakeScript(request.host),
+        now_pages=html,
     )
 
 
@@ -189,7 +196,7 @@ def rss():
         link = page.strip(".html")
         date = datetime.datetime.strptime(link, "%y_%m_%d")
         date = date.strftime("%A, %B %d, %Y")
-        rss += f'<item><title>What\'s Happening {date}</title><link>{host}/now/{link}</link><description>Latest updates for {date}</description><guid>{host}/now/{link}</guid></item>'
+        rss += f"<item><title>What's Happening {date}</title><link>{host}/now/{link}</link><description>Latest updates for {date}</description><guid>{host}/now/{link}</guid></item>"
     rss += "</channel></rss>"
     return make_response(rss, 200, {"Content-Type": "application/rss+xml"})
 
@@ -200,6 +207,17 @@ def json():
     host = "https://" + request.host
     if ":" in request.host:
         host = "http://" + request.host
-    now_pages = [{"url": host+"/now/"+page.strip(".html"), "date": datetime.datetime.strptime(page.strip(".html"), "%y_%m_%d").strftime(
-        "%A, %B %d, %Y"), "title": "What's Happening "+datetime.datetime.strptime(page.strip(".html"), "%y_%m_%d").strftime("%A, %B %d, %Y")} for page in now_pages]
+    now_pages = [
+        {
+            "url": host + "/now/" + page.strip(".html"),
+            "date": datetime.datetime.strptime(
+                page.strip(".html"), "%y_%m_%d"
+            ).strftime("%A, %B %d, %Y"),
+            "title": "What's Happening "
+            + datetime.datetime.strptime(page.strip(".html"), "%y_%m_%d").strftime(
+                "%A, %B %d, %Y"
+            ),
+        }
+        for page in now_pages
+    ]
     return jsonify(now_pages)

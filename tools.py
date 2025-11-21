@@ -24,17 +24,10 @@ CRAWLERS = [
     "Exabot",
     "facebot",
     "ia_archiver",
-    "Twitterbot"
+    "Twitterbot",
 ]
 
-CLI_AGENTS = [
-    "curl",
-    "hurl",
-    "xh",
-    "Posting",
-    "HTTPie",
-    "nushell"
-]
+CLI_AGENTS = ["curl", "hurl", "xh", "Posting", "HTTPie", "nushell"]
 
 
 def getClientIP(request: Request) -> str:
@@ -55,6 +48,7 @@ def getClientIP(request: Request) -> str:
     if ip is None:
         ip = "unknown"
     return ip
+
 
 @lru_cache(maxsize=1)
 def getGitCommit() -> str:
@@ -115,6 +109,7 @@ def isCrawler(request: Request) -> bool:
         return any(crawler in user_agent for crawler in CRAWLERS)
     return False
 
+
 @lru_cache(maxsize=128)
 def isDev(host: str) -> bool:
     """
@@ -135,6 +130,7 @@ def isDev(host: str) -> bool:
         return True
     return False
 
+
 @lru_cache(maxsize=128)
 def getHandshakeScript(host: str) -> str:
     """
@@ -149,6 +145,7 @@ def getHandshakeScript(host: str) -> str:
     if isDev(host):
         return ""
     return '<script src="https://nathan.woodburn/handshake.js" domain="nathan.woodburn" async></script><script src="https://nathan.woodburn/https.js" async></script>'
+
 
 @lru_cache(maxsize=64)
 def getAddress(coin: str) -> str:
@@ -187,7 +184,9 @@ def getFilePath(name: str, path: str) -> Optional[str]:
     return None
 
 
-def json_response(request: Request, message: Union[str, Dict] = "404 Not Found", code: int = 404):
+def json_response(
+    request: Request, message: Union[str, Dict] = "404 Not Found", code: int = 404
+):
     """
     Create a JSON response with standard formatting.
 
@@ -205,17 +204,20 @@ def json_response(request: Request, message: Union[str, Dict] = "404 Not Found",
         message["ip"] = getClientIP(request)
         return jsonify(message), code
 
-    return jsonify({
-        "status": code,
-        "message": message,
-        "ip": getClientIP(request),
-    }), code
+    return jsonify(
+        {
+            "status": code,
+            "message": message,
+            "ip": getClientIP(request),
+        }
+    ), code
+
 
 def error_response(
     request: Request,
     message: str = "404 Not Found",
     code: int = 404,
-    force_json: bool = False
+    force_json: bool = False,
 ) -> Union[Tuple[Dict, int], object]:
     """
     Create an error response in JSON or HTML format.
@@ -233,10 +235,12 @@ def error_response(
         return json_response(request, message, code)
 
     # Check if <error code>.html exists in templates
-    template_name = f"{code}.html" if os.path.isfile(
-        f"templates/{code}.html") else "404.html"
-    response = make_response(render_template(
-        template_name, code=code, message=message), code)
+    template_name = (
+        f"{code}.html" if os.path.isfile(f"templates/{code}.html") else "404.html"
+    )
+    response = make_response(
+        render_template(template_name, code=code, message=message), code
+    )
 
     # Add message to response headers
     response.headers["X-Error-Message"] = message
@@ -260,8 +264,7 @@ def parse_date(date_groups: list[str]) -> str | None:
         date_str = " ".join(date_groups).strip()
 
         # Remove ordinal suffixes
-        date_str = re.sub(r'(\d+)(st|nd|rd|th)', r'\1',
-                          date_str, flags=re.IGNORECASE)
+        date_str = re.sub(r"(\d+)(st|nd|rd|th)", r"\1", date_str, flags=re.IGNORECASE)
 
         # Parse with dateutil, default day=1 if missing
         dt = parse(date_str, default=datetime.datetime(1900, 1, 1))
@@ -274,6 +277,7 @@ def parse_date(date_groups: list[str]) -> str | None:
 
     except (ValueError, TypeError):
         return None
+
 
 def get_tools_data():
     with open("data/tools.json", "r") as f:

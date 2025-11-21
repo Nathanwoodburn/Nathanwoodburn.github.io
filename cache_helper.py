@@ -2,6 +2,7 @@
 Cache helper module for expensive API calls and configuration.
 Provides centralized caching with TTL for external API calls.
 """
+
 import datetime
 import os
 import json
@@ -26,14 +27,17 @@ def get_nc_config():
     current_time = datetime.datetime.now().timestamp()
 
     # Check if cache is valid
-    if _nc_config_cache["data"] and (current_time - _nc_config_cache["timestamp"]) < _nc_config_ttl:
+    if (
+        _nc_config_cache["data"]
+        and (current_time - _nc_config_cache["timestamp"]) < _nc_config_ttl
+    ):
         return _nc_config_cache["data"]
 
     # Fetch new config
     try:
         config = requests.get(
             "https://cloud.woodburn.au/s/4ToXgFe3TnnFcN7/download/website-conf.json",
-            timeout=5
+            timeout=5,
         ).json()
         _nc_config_cache = {"data": config, "timestamp": current_time}
         return config
@@ -61,15 +65,20 @@ def get_git_latest_activity():
     current_time = datetime.datetime.now().timestamp()
 
     # Check if cache is valid
-    if _git_data_cache["data"] and (current_time - _git_data_cache["timestamp"]) < _git_data_ttl:
+    if (
+        _git_data_cache["data"]
+        and (current_time - _git_data_cache["timestamp"]) < _git_data_ttl
+    ):
         return _git_data_cache["data"]
 
     # Fetch new data
     try:
         git = requests.get(
             "https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1",
-            headers={"Authorization": os.getenv("GIT_AUTH") or os.getenv("git_token") or ""},
-            timeout=5
+            headers={
+                "Authorization": os.getenv("GIT_AUTH") or os.getenv("git_token") or ""
+            },
+            timeout=5,
         )
         git_data = git.json()
         if git_data and len(git_data) > 0:
@@ -111,15 +120,17 @@ def get_projects(limit=3):
     current_time = datetime.datetime.now().timestamp()
 
     # Check if cache is valid
-    if _projects_cache["data"] and (current_time - _projects_cache["timestamp"]) < _projects_ttl:
+    if (
+        _projects_cache["data"]
+        and (current_time - _projects_cache["timestamp"]) < _projects_ttl
+    ):
         return _projects_cache["data"][:limit]
 
     # Fetch new data
     try:
         projects = []
         projectsreq = requests.get(
-            "https://git.woodburn.au/api/v1/users/nathanwoodburn/repos",
-            timeout=5
+            "https://git.woodburn.au/api/v1/users/nathanwoodburn/repos", timeout=5
         )
         projects = projectsreq.json()
 
@@ -128,7 +139,7 @@ def get_projects(limit=3):
         while 'rel="next"' in projectsreq.headers.get("link", ""):
             projectsreq = requests.get(
                 f"https://git.woodburn.au/api/v1/users/nathanwoodburn/repos?page={pageNum}",
-                timeout=5
+                timeout=5,
             )
             projects += projectsreq.json()
             pageNum += 1
@@ -143,7 +154,9 @@ def get_projects(limit=3):
             project["name"] = project["name"].replace("_", " ").replace("-", " ")
 
         # Sort by last updated
-        projects_sorted = sorted(projects, key=lambda x: x.get("updated_at", ""), reverse=True)
+        projects_sorted = sorted(
+            projects, key=lambda x: x.get("updated_at", ""), reverse=True
+        )
 
         # Remove duplicates by name
         seen_names = set()
@@ -178,14 +191,16 @@ def get_uptime_status():
     current_time = datetime.datetime.now().timestamp()
 
     # Check if cache is valid
-    if _uptime_cache["data"] is not None and (current_time - _uptime_cache["timestamp"]) < _uptime_ttl:
+    if (
+        _uptime_cache["data"] is not None
+        and (current_time - _uptime_cache["timestamp"]) < _uptime_ttl
+    ):
         return _uptime_cache["data"]
 
     # Fetch new data
     try:
         uptime = requests.get(
-            "https://uptime.woodburn.au/api/status-page/main/badge",
-            timeout=5
+            "https://uptime.woodburn.au/api/status-page/main/badge", timeout=5
         )
         content = uptime.content.decode("utf-8").lower()
         status = "maintenance" in content or uptime.content.count(b"Up") > 1
@@ -247,4 +262,3 @@ def get_wallet_domains():
     except Exception as e:
         print(f"Error loading domains: {e}")
     return {}
-

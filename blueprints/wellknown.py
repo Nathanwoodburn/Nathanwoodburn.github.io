@@ -1,8 +1,15 @@
-from flask import Blueprint, make_response, request, jsonify, send_from_directory, redirect
+from flask import (
+    Blueprint,
+    make_response,
+    request,
+    jsonify,
+    send_from_directory,
+    redirect,
+)
 from tools import error_response
 import os
 
-app = Blueprint('well-known', __name__, url_prefix='/.well-known')
+app = Blueprint("well-known", __name__, url_prefix="/.well-known")
 
 
 @app.route("/<path:path>")
@@ -12,7 +19,7 @@ def index(path):
 
 @app.route("/wallets/<path:path>")
 def wallets(path):
-    if path[0] == "." and 'proof' not in path:
+    if path[0] == "." and "proof" not in path:
         return send_from_directory(
             ".well-known/wallets", path, mimetype="application/json"
         )

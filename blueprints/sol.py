@@ -9,12 +9,12 @@ import binascii
 import base64
 import os
 
-app = Blueprint('sol', __name__)
+app = Blueprint("sol", __name__)
 
 SOLANA_HEADERS = {
     "Content-Type": "application/json",
     "X-Action-Version": "2.4.2",
-    "X-Blockchain-Ids": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+    "X-Blockchain-Ids": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
 }
 
 SOLANA_ADDRESS = None
@@ -23,15 +23,19 @@ if os.path.isfile(".well-known/wallets/SOL"):
         address = file.read()
     SOLANA_ADDRESS = Pubkey.from_string(address.strip())
 
+
 def create_transaction(sender_address: str, amount: float) -> str:
     if SOLANA_ADDRESS is None:
-        raise ValueError("SOLANA_ADDRESS is not set. Please ensure the .well-known/wallets/SOL file exists and contains a valid address.")
+        raise ValueError(
+            "SOLANA_ADDRESS is not set. Please ensure the .well-known/wallets/SOL file exists and contains a valid address."
+        )
     # Create transaction
     sender = Pubkey.from_string(sender_address)
     transfer_ix = transfer(
         TransferParams(
-            from_pubkey=sender, to_pubkey=SOLANA_ADDRESS, lamports=int(
-                amount * 1000000000)
+            from_pubkey=sender,
+            to_pubkey=SOLANA_ADDRESS,
+            lamports=int(amount * 1000000000),
         )
     )
     solana_client = Client("https://api.mainnet-beta.solana.com")
@@ -50,10 +54,14 @@ def create_transaction(sender_address: str, amount: float) -> str:
     base64_string = base64.b64encode(raw_bytes).decode("utf-8")
     return base64_string
 
+
 def get_solana_address() -> str:
     if SOLANA_ADDRESS is None:
-        raise ValueError("SOLANA_ADDRESS is not set. Please ensure the .well-known/wallets/SOL file exists and contains a valid address.")
-    return str(SOLANA_ADDRESS) 
+        raise ValueError(
+            "SOLANA_ADDRESS is not set. Please ensure the .well-known/wallets/SOL file exists and contains a valid address."
+        )
+    return str(SOLANA_ADDRESS)
+
 
 @app.route("/donate", methods=["GET", "OPTIONS"])
 def sol_donate():
@@ -103,7 +111,6 @@ def sol_donate_amount(amount):
 
 @app.route("/donate/<amount>", methods=["POST"])
 def sol_donate_post(amount):
-
     if not request.json:
         return jsonify({"message": "Error: No JSON data provided"}), 400, SOLANA_HEADERS
 
@@ -122,4 +129,8 @@ def sol_donate_post(amount):
         return jsonify({"message": "Error: Amount too small"}), 400, SOLANA_HEADERS
 
     transaction = create_transaction(sender, amount)
-    return jsonify({"message": "Success", "transaction": transaction}), 200, SOLANA_HEADERS
+    return (
+        jsonify({"message": "Success", "transaction": transaction}),
+        200,
+        SOLANA_HEADERS,
+    )

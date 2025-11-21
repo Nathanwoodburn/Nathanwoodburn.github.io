@@ -2,7 +2,8 @@ from flask import Blueprint, make_response, request
 from tools import error_response
 import requests
 
-app = Blueprint('podcast', __name__)
+app = Blueprint("podcast", __name__)
+
 
 @app.route("/ID1")
 def index():

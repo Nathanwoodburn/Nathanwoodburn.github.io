@@ -11,15 +11,16 @@ class GunicornApp(BaseApplication):
 
     def load_config(self):
         for key, value in self.options.items():
-            if key in self.cfg.settings and value is not None: # type: ignore
-                self.cfg.set(key.lower(), value) # type: ignore
+            if key in self.cfg.settings and value is not None:  # type: ignore
+                self.cfg.set(key.lower(), value)  # type: ignore
 
     def load(self):
         return self.application
 
-if __name__ == '__main__':
-    workers = os.getenv('WORKERS')
-    threads = os.getenv('THREADS')
+
+if __name__ == "__main__":
+    workers = os.getenv("WORKERS")
+    threads = os.getenv("THREADS")
     if workers is None:
         workers = 1
     if threads is None:
@@ -27,10 +28,17 @@ if __name__ == '__main__':
     workers = int(workers)
     threads = int(threads)
     options = {
-        'bind': '0.0.0.0:5000',
-        'workers': workers,
-        'threads': threads,
+        "bind": "0.0.0.0:5000",
+        "workers": workers,
+        "threads": threads,
     }
     gunicorn_app = GunicornApp(app, options)
-    print('Starting server with ' + str(workers) + ' workers and ' + str(threads) + ' threads', flush=True)
+    print(
+        "Starting server with "
+        + str(workers)
+        + " workers and "
+        + str(threads)
+        + " threads",
+        flush=True,
+    )
     gunicorn_app.run()

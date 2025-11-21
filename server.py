@@ -363,7 +363,11 @@ def donate():
 
     for token in tokenList:
         chain_display = f" on {token['chain']}" if token["chain"] != "null" else ""
-        symbol_display = f" ({token['symbol']}{chain_display})" if token["symbol"] != token["name"] else chain_display
+        symbol_display = (
+            f" ({token['symbol']}{chain_display})"
+            if token["symbol"] != token["name"]
+            else chain_display
+        )
         coins += f'<a class="dropdown-item" style="display:none;" href="?t={token["symbol"].lower()}&c={token["chain"].lower()}">{token["name"]}{symbol_display}</a>'
 
     crypto = request.args.get("c")
@@ -404,8 +408,12 @@ def donate():
             if not token:
                 cryptoHTML += f"<br>Donate with {coin_display}:"
             else:
-                token_symbol = f" ({token['symbol']})" if token['symbol'] != token['name'] else ""
-                cryptoHTML += f"<br>Donate with {token['name']}{token_symbol} on {crypto}:"
+                token_symbol = (
+                    f" ({token['symbol']})" if token["symbol"] != token["name"] else ""
+                )
+                cryptoHTML += (
+                    f"<br>Donate with {token['name']}{token_symbol} on {crypto}:"
+                )
             cryptoHTML += f'<br><code data-bs-toggle="tooltip" data-bss-tooltip="" id="crypto-address" class="address" style="color: rgb(242,90,5);display: inline-block;" data-bs-original-title="Click to copy">{address}</code>'
 
             if proof:
@@ -413,9 +421,13 @@ def donate():
     elif token:
         if "address" in token:
             address = token["address"]
-            token_symbol = f" ({token['symbol']})" if token['symbol'] != token['name'] else ""
-            chain_display = f" on {crypto}" if crypto != 'NULL' else ""
-            cryptoHTML += f"<br>Donate with {token['name']}{token_symbol}{chain_display}:"
+            token_symbol = (
+                f" ({token['symbol']})" if token["symbol"] != token["name"] else ""
+            )
+            chain_display = f" on {crypto}" if crypto != "NULL" else ""
+            cryptoHTML += (
+                f"<br>Donate with {token['name']}{token_symbol}{chain_display}:"
+            )
             cryptoHTML += f'<br><code data-bs-toggle="tooltip" data-bss-tooltip="" id="crypto-address" class="address" style="color: rgb(242,90,5);display: inline-block;" data-bs-original-title="Click to copy">{address}</code>'
             if proof:
                 cryptoHTML += proof

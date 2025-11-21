@@ -3,7 +3,7 @@ import os
 from cloudflare import Cloudflare
 from tools import json_response
 
-app = Blueprint('acme', __name__)
+app = Blueprint("acme", __name__)
 
 
 @app.route("/hnsdoh-acme", methods=["POST"])
@@ -23,7 +23,9 @@ def post():
     zone = cf.zones.list(name="hnsdoh.com").to_dict()
     zone_id = zone["result"][0]["id"]  # type: ignore
     existing_records = cf.dns.records.list(
-        zone_id=zone_id, type="TXT", name="_acme-challenge.hnsdoh.com"  # type: ignore
+        zone_id=zone_id,
+        type="TXT",
+        name="_acme-challenge.hnsdoh.com",  # type: ignore
     ).to_dict()
     record_id = existing_records["result"][0]["id"]  # type: ignore
     cf.dns.records.delete(dns_record_id=record_id, zone_id=zone_id)
