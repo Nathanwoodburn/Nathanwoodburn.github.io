@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 import re
 
 # Create blueprint
-app = Blueprint("now", __name__, url_prefix="/now")
+app = Blueprint("now", __name__, url_prefix="/")
 
 
 @lru_cache(maxsize=16)
@@ -136,14 +136,14 @@ def render_curl(date=None):
     )
 
 
-@app.route("/", strict_slashes=False)
+@app.route("/now", strict_slashes=False)
 def index():
     if isCLI(request):
         return render_curl()
     return render_latest(handshake_scripts=getHandshakeScript(request.host))
 
 
-@app.route("/<path:path>")
+@app.route("/now/<path:path>")
 def path(path):
     if isCLI(request):
         return render_curl(path)
@@ -151,6 +151,7 @@ def path(path):
     return render(path, handshake_scripts=getHandshakeScript(request.host))
 
 
+@app.route("/now/old", strict_slashes=False)
 @app.route("/old", strict_slashes=False)
 def old():
     now_dates = list_dates()[1:]
@@ -187,11 +188,12 @@ def old():
 @app.route("/rss.xml")
 def rss():
     host = "https://" + request.host
+    path = request.path
     if ":" in request.host:
         host = "http://" + request.host
     # Generate RSS feed
     now_pages = list_page_files()
-    rss = f'<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Nathan.Woodburn/</title><link>{host}</link><description>See what I\'ve been up to</description><language>en-us</language><lastBuildDate>{datetime.datetime.now(tz=datetime.timezone.utc).strftime("%a, %d %b %Y %H:%M:%S %z")}</lastBuildDate><atom:link href="{host}/now.rss" rel="self" type="application/rss+xml" />'
+    rss = f'<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Nathan.Woodburn/</title><link>{host}</link><description>See what I\'ve been up to</description><language>en-us</language><lastBuildDate>{datetime.datetime.now(tz=datetime.timezone.utc).strftime("%a, %d %b %Y %H:%M:%S %z")}</lastBuildDate><atom:link href="{host}{path}" rel="self" type="application/rss+xml" />'
     for page in now_pages:
         link = page.strip(".html")
         date = datetime.datetime.strptime(link, "%y_%m_%d")

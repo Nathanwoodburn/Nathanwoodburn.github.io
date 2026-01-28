@@ -65,7 +65,6 @@ RATE_LIMIT_WINDOW = 3600  # 1 hour in seconds
 RESTRICTED_ROUTES = ["ascii"]
 REDIRECT_ROUTES = {
     "contact": "/#contact",
-    "old": "/now/old",
     "/meet": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
     "/meeting": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
     "/appointment": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
