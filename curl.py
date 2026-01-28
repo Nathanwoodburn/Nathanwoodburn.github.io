@@ -2,7 +2,7 @@ from flask import render_template
 from tools import getAddress, get_tools_data, getClientIP
 import os
 from functools import lru_cache
-from blueprints.spotify import get_spotify_track
+from blueprints.spotify import get_playing_spotify_track
 from cache_helper import get_git_latest_activity, get_projects as get_projects_cached
 
 
@@ -61,7 +61,7 @@ def curl_response(request):
                 "index.ascii",
                 repo=get_current_project(),
                 ip=getClientIP(request),
-                spotify=get_spotify_track(),
+                spotify=get_playing_spotify_track(),
             ),
             200,
             {"Content-Type": "text/plain; charset=utf-8"},

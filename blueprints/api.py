@@ -7,7 +7,7 @@ from mail import sendEmail
 from tools import getClientIP, getGitCommit, json_response, parse_date, get_tools_data
 from blueprints import sol
 from dateutil import parser as date_parser
-from blueprints.spotify import get_spotify_track
+from blueprints.spotify import get_playing_spotify_track
 from cache_helper import get_nc_config, get_git_latest_activity
 
 # Constants
@@ -176,7 +176,7 @@ def tools():
 @app.route("/playing")
 def playing():
     """Get the currently playing Spotify track."""
-    track_info = get_spotify_track()
+    track_info = get_playing_spotify_track()
     if "error" in track_info:
         return json_response(request, track_info, HTTP_OK)
     return json_response(request, {"spotify": track_info}, HTTP_OK)

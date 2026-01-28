@@ -15,7 +15,8 @@ SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize"
 SPOTIFY_TOKEN_URL = "https://accounts.spotify.com/api/token"
 SPOTIFY_CURRENTLY_PLAYING_URL = "https://api.spotify.com/v1/me/player/currently-playing"
 
-SCOPE = "user-read-currently-playing user-read-playback-state"
+
+SCOPE = "user-read-currently-playing user-read-playback-state user-read-recently-played"
 
 ACCESS_TOKEN = None
 REFRESH_TOKEN = os.getenv("SPOTIFY_REFRESH_TOKEN")
@@ -103,11 +104,11 @@ def callback():
 @app.route("/playing")
 def currently_playing():
     """Public endpoint showing your current track."""
-    track = get_spotify_track()
+    track = get_playing_spotify_track()
     return json_response(request, {"spotify": track}, 200)
 
 
-def get_spotify_track():
+def get_playing_spotify_track():
     """Internal function to get current playing track without HTTP context."""
     token = refresh_access_token()
     if not token:
@@ -115,9 +116,9 @@ def get_spotify_track():
 
     headers = {"Authorization": f"Bearer {token}"}
     response = requests.get(SPOTIFY_CURRENTLY_PLAYING_URL, headers=headers)
-
     if response.status_code == 204:
-        return {"error": "Nothing is currently playing."}
+        # return {"error": "Nothing is currently playing."}
+        return get_last_spotify_track()
     elif response.status_code != 200:
         return {"error": "Spotify API error", "status": response.status_code}
 
@@ -133,5 +134,32 @@ def get_spotify_track():
         "is_playing": data["is_playing"],
         "progress_ms": data.get("progress_ms", 0),
         "duration_ms": data["item"].get("duration_ms", 1),
+    }
+    return track
+
+
+def get_last_spotify_track():
+    """Internal function to get last played track without HTTP context."""
+    token = refresh_access_token()
+    if not token:
+        return {"error": "Failed to refresh access token"}
+
+    headers = {"Authorization": f"Bearer {token}"}
+    response = requests.get(
+        "https://api.spotify.com/v1/me/player/recently-played", headers=headers
+    )
+    if response.status_code != 200:
+        print("Spotify API error:", response.text)
+        return {"error": "Spotify API error", "status": response.status_code}
+    data = response.json()
+    if not data.get("items"):
+        return {"error": "No recently played tracks found."}
+    last_track_info = data["items"][0]["track"]
+    track = {
+        "song_name": last_track_info["name"],
+        "artist": ", ".join([artist["name"] for artist in last_track_info["artists"]]),
+        "album_name": last_track_info["album"]["name"],
+        "album_art": last_track_info["album"]["images"][0]["url"],
+        "played_at": data["items"][0]["played_at"],
     }
     return track
