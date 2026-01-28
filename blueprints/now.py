@@ -197,8 +197,17 @@ def rss():
     for page in now_pages:
         link = page.strip(".html")
         date = datetime.datetime.strptime(link, "%y_%m_%d")
+        pubdate = date.strftime("%a, %d %b %Y 00:00:00 +0000")
         date = date.strftime("%A, %B %d, %Y")
-        rss += f"<item><title>What's Happening {date}</title><link>{host}/now/{link}</link><description>Latest updates for {date}</description><guid>{host}/now/{link}</guid></item>"
+        rss += f"""
+        <item>
+          <title>What's Happening {date}</title>
+          <link>{host}/now/{link}</link>
+          <description>Latest updates for {date}</description>
+          <pubDate>{pubdate}</pubDate>
+          <guid isPermaLink="true">{host}/now/{link}</guid>
+        </item>
+        """
     rss += "</channel></rss>"
     return make_response(rss, 200, {"Content-Type": "application/rss+xml"})
 
