@@ -137,14 +137,15 @@ def getHandshakeScript(host: str) -> str:
     Get the handshake script HTML snippet.
 
     Args:
-        domain (str): The domain to use in the handshake script
+        host (str): The host string from the request
 
     Returns:
         str: The handshake script HTML snippet
     """
-    if isDev(host):
-        return ""
-    return '<script src="https://nathan.woodburn/handshake.js" domain="nathan.woodburn" async></script><script src="https://nathan.woodburn/https.js" async></script>'
+    return ""
+    # if isDev(host):
+    #     return ""
+    # return '<script src="https://nathan.woodburn/handshake.js" domain="nathan.woodburn" async></script><script src="https://nathan.woodburn/https.js" async></script>'
 
 
 @lru_cache(maxsize=64)
