@@ -8,7 +8,8 @@ from tools import getClientIP, getGitCommit, json_response, parse_date, get_tool
 from blueprints import sol
 from dateutil import parser as date_parser
 from blueprints.spotify import get_playing_spotify_track
-from cache_helper import get_nc_config, get_git_latest_activity
+from cache_helper import get_git_latest_activity
+from zoneinfo import ZoneInfo
 
 # Constants
 HTTP_OK = 200
@@ -22,6 +23,8 @@ app = Blueprint("api", __name__, url_prefix="/api/v1")
 # Register solana blueprint
 app.register_blueprint(sol.app)
 
+tz = ZoneInfo(os.getenv("TIMEZONE", "Australia/Sydney"))
+
 
 @app.route("/", strict_slashes=False)
 @app.route("/help")
@@ -33,7 +36,6 @@ def help():
             "endpoints": {
                 "/time": "Get the current time",
                 "/timezone": "Get the current timezone",
-                "/message": "Get the message from the config",
                 "/project": "Get the current project from git",
                 "/version": "Get the current version of the website",
                 "/page_date?url=URL&verbose=BOOL": "Get the last modified date of a webpage (verbose is optional, default false)",
@@ -68,15 +70,13 @@ def version():
 @app.route("/time")
 def time():
     """Get the current time in the configured timezone."""
-    nc_config = get_nc_config()
-    timezone_offset = datetime.timedelta(hours=nc_config["time-zone"])
-    timezone = datetime.timezone(offset=timezone_offset)
-    current_time = datetime.datetime.now(tz=timezone)
+
+    current_time = datetime.datetime.now(tz)
     return jsonify(
         {
             "timestring": current_time.strftime("%A, %B %d, %Y %I:%M %p"),
             "timestamp": current_time.timestamp(),
-            "timezone": nc_config["time-zone"],
+            "timezone": tz.tzname(current_time),
             "timeISO": current_time.isoformat(),
             "ip": getClientIP(request),
             "status": HTTP_OK,
@@ -87,12 +87,11 @@ def time():
 @app.route("/timezone")
 def timezone():
     """Get the current timezone setting."""
-    nc_config = get_nc_config()
+    current_time = datetime.datetime.now(tz)
     return jsonify(
         {
-            "timezone": nc_config["time-zone"],
-            "server_timezone_name": datetime.datetime.now(datetime.timezone.utc).astimezone().tzname(),
-            "server_timezone_offset": datetime.datetime.now(datetime.timezone.utc).astimezone().utcoffset().total_seconds() / 3600,
+            "timezone": tz.utcoffset(current_time).total_seconds() / 3600,
+            "timezone_name": tz.tzname(current_time),
             "ip": getClientIP(request),
             "status": HTTP_OK,
         }
@@ -101,10 +100,15 @@ def timezone():
 
 @app.route("/message")
 def message():
-    """Get the message from the configuration."""
-    nc_config = get_nc_config()
+    """Deprecated: Get the message from the config."""
     return jsonify(
-        {"message": nc_config["message"], "ip": getClientIP(request), "status": HTTP_OK}
+        {
+            "message": "",
+            "ip": getClientIP(request),
+            "status": HTTP_OK,
+            "deprecated": True,
+            "note": "The /message endpoint is deprecated and will be removed in a future version. It currently returns an empty message.",
+        }
     )
 
 

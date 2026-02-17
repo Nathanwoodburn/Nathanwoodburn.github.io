@@ -18,6 +18,7 @@ import qrcode
 from qrcode.constants import ERROR_CORRECT_L, ERROR_CORRECT_H
 from ansi2html import Ansi2HTMLConverter
 from PIL import Image
+from zoneinfo import ZoneInfo
 
 # Import blueprints
 from blueprints import now, blog, wellknown, api, podcast, acme, spotify
@@ -34,7 +35,6 @@ from tools import (
 )
 from curl import curl_response
 from cache_helper import (
-    get_nc_config,
     get_git_latest_activity,
     get_projects,
     get_uptime_status,
@@ -77,6 +77,8 @@ if os.path.isfile("data/sites.json"):
         SITES = json.load(file)
         # Remove any sites that are not enabled
         SITES = [site for site in SITES if "enabled" not in site or site["enabled"]]
+
+TZ = ZoneInfo(os.getenv("TIMEZONE", "Australia/Sydney"))
 
 # endregion
 
@@ -280,13 +282,8 @@ def index():
     html_url = git["repo"]["html_url"]
     repo = '<a href="' + html_url + '" target="_blank">' + repo_name + "</a>"
 
-    # Get time using cached config
-    nc_config = get_nc_config()
-    timezone_offset = datetime.timedelta(hours=nc_config["time-zone"])
-    timezone = datetime.timezone(offset=timezone_offset)
-    time = datetime.datetime.now(tz=timezone)
-
-    time = time.strftime("%B %d")
+    timezone_offset = TZ.utcoffset(datetime.datetime.now()).total_seconds() / 3600
+    time = datetime.datetime.now().strftime("%B %d")
     time += """
     <span id=\"time\"></span>
     <script>
@@ -305,7 +302,7 @@ def index():
     setInterval(updateClock, 1000);
 }
 """
-    time += f"startClock({nc_config['time-zone']});"
+    time += f"startClock({timezone_offset});"
     time += "</script>"
 
     HNSaddress = getAddress("HNS")
@@ -327,7 +324,7 @@ def index():
             sites=SITES,
             projects=projects,
             time=time,
-            message=nc_config.get("message", ""),
+            message="",
         ),
         200,
         {"Content-Type": "text/html"},

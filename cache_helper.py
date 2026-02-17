@@ -10,45 +10,6 @@ import requests
 from functools import lru_cache
 
 
-# Cache storage for NC_CONFIG with timestamp
-_nc_config_cache = {"data": None, "timestamp": 0}
-_nc_config_ttl = 3600  # 1 hour cache
-
-
-def get_nc_config():
-    """
-    Get NC_CONFIG with caching (1 hour TTL).
-    Falls back to default config on error.
-
-    Returns:
-        dict: Configuration dictionary
-    """
-    global _nc_config_cache
-    current_time = datetime.datetime.now().timestamp()
-
-    # Check if cache is valid
-    if (
-        _nc_config_cache["data"]
-        and (current_time - _nc_config_cache["timestamp"]) < _nc_config_ttl
-    ):
-        return _nc_config_cache["data"]
-
-    # Fetch new config
-    try:
-        config = requests.get(
-            "https://cloud.woodburn.au/s/4ToXgFe3TnnFcN7/download/website-conf.json",
-            timeout=5,
-        ).json()
-        _nc_config_cache = {"data": config, "timestamp": current_time}
-        return config
-    except Exception as e:
-        print(f"Error fetching NC_CONFIG: {e}")
-        # Return cached data if available, otherwise default
-        if _nc_config_cache["data"]:
-            return _nc_config_cache["data"]
-        return {"time-zone": 10, "message": ""}
-
-
 # Cache storage for git data
 _git_data_cache = {"data": None, "timestamp": 0}
 _git_data_ttl = 300  # 5 minutes cache
