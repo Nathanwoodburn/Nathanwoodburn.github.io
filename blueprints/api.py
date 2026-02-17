@@ -91,6 +91,8 @@ def timezone():
     return jsonify(
         {
             "timezone": nc_config["time-zone"],
+            "server_timezone_name": datetime.datetime.now(datetime.timezone.utc).astimezone().tzname(),
+            "server_timezone_offset": datetime.datetime.now(datetime.timezone.utc).astimezone().utcoffset().total_seconds() / 3600,
             "ip": getClientIP(request),
             "status": HTTP_OK,
         }
