@@ -24,7 +24,6 @@ from zoneinfo import ZoneInfo
 from blueprints import now, blog, wellknown, api, podcast, acme, spotify
 from tools import (
     isCLI,
-    isCrawler,
     getAddress,
     getFilePath,
     error_response,
@@ -233,31 +232,8 @@ def index():
     if "podcast.woodburn.au" in request.host:
         return render_template("podcast.html")
 
-    loaded = False
-    if request.referrer:
-        # Check if referrer includes nathan.woodburn.au
-        if "nathan.woodburn.au" in request.referrer:
-            loaded = True
-    if request.cookies.get("loaded"):
-        loaded = True
-
-    # Always load if load is in the query string
-    if request.args.get("load"):
-        loaded = False
     if isCLI(request):
         return curl_response(request)
-
-    if not loaded and not isCrawler(request):
-        # Set cookie
-        resp = make_response(
-            render_template("loading.html").replace(
-                "https://nathan.woodburn.au/loading", "https://nathan.woodburn.au/"
-            ),
-            200,
-            {"Content-Type": "text/html"},
-        )
-        resp.set_cookie("loaded", "true", max_age=604800)
-        return resp
 
     # Use cached git data
     git = get_git_latest_activity()
@@ -309,29 +285,21 @@ def index():
     SOLaddress = getAddress("SOL")
     BTCaddress = getAddress("BTC")
     ETHaddress = getAddress("ETH")
-    # Set cookie
-    resp = make_response(
-        render_template(
-            "index.html",
-            handshake_scripts=getHandshakeScript(request.host),
-            HNS=HNSaddress,
-            SOL=SOLaddress,
-            BTC=BTCaddress,
-            ETH=ETHaddress,
-            repo=repo,
-            repo_description=repo_description,
-            custom=custom,
-            sites=SITES,
-            projects=projects,
-            time=time,
-            message="",
-        ),
-        200,
-        {"Content-Type": "text/html"},
+    return render_template(
+        "index.html",
+        handshake_scripts=getHandshakeScript(request.host),
+        HNS=HNSaddress,
+        SOL=SOLaddress,
+        BTC=BTCaddress,
+        ETH=ETHaddress,
+        repo=repo,
+        repo_description=repo_description,
+        custom=custom,
+        sites=SITES,
+        projects=projects,
+        time=time,
+        message="",
     )
-    resp.set_cookie("loaded", "true", max_age=604800)
-
-    return resp
 
 
 # region Donate
