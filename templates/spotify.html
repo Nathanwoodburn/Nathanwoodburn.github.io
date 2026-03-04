@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="en-au">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Currently Listening | Nathan.Woodburn/</title>
+    <meta name="theme-color" content="#000000">
+    <link rel="canonical" href="https://nathan.woodburn.au/spotify">
+    <meta property="og:url" content="https://nathan.woodburn.au/spotify">
+    <meta name="fediverse:creator" content="@nathanwoodburn@mastodon.woodburn.au">
+    <meta name="twitter:image" content="https://nathan.woodburn.au/assets/img/profile.jpg">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://nathan.woodburn.au/assets/img/profile.jpg">
+    <meta name="twitter:description" content="See what I'm currently listening to">
+    <meta property="og:title" content="Currently Listening | Nathan.Woodburn/">
+    <meta name="description" content="See what I'm currently listening to">
+    <meta name="twitter:title" content="Currently Listening | Nathan.Woodburn/">
+    <meta name="twitter:card" content="summary">
+    <meta property="og:description" content="See what I'm currently listening to">
+    <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="/assets/img/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="180x180" href="/assets/img/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/img/favicon/android-chrome-512x512.png">
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Cabin:700&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Anonymous+Pro&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&amp;display=swap">
+    <link rel="stylesheet" href="/assets/fonts/font-awesome.min.css">
+    <link rel="stylesheet" href="/assets/css/styles.min.css">
+    <link rel="stylesheet" href="/assets/css/brand-reveal.min.css">
+    <link rel="stylesheet" href="/assets/css/profile.min.css">
+    <link rel="stylesheet" href="/assets/css/Social-Icons.min.css">
+<link rel="me" href="https://mastodon.woodburn.au/@nathanwoodburn" />
+<script async src="https://umami.woodburn.au/script.js" data-website-id="6a55028e-aad3-481c-9a37-3e096ff75589"></script>
+</head>
+
+<body id="page-top" data-bs-spy="scroll" data-bs-target="#mainNav" data-bs-offset="77">
+    <nav class="navbar navbar-expand-md fixed-top navbar-light" id="mainNav" style="background: var(--bs-navbar-hover-color);">
+        <div class="container-fluid"><a class="navbar-brand" href="/#">
+                <div style="padding-right: 1em;display: inline-flex;">
+                    <div class="slider"><span>/</span></div><span class="brand">Nathan.Woodburn</span>
+                </div>
+            </a><button class="navbar-toggler navbar-toggler-right" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" type="button" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation" value="Menu"><i class="fa fa-bars"></i></button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item nav-link"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item nav-link"><a class="nav-link" href="/hosting">Hosting</a></li>
+                    <li class="nav-item nav-link"><a class="nav-link" href="/tools">Tools</a></li>
+                    <li class="nav-item nav-link"><a class="nav-link" href="/blog">Blog</a></li>
+                    <li class="nav-item nav-link"><a class="nav-link" href="/now">Now</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <header class="masthead" style="background: url(&quot;/assets/img/bg/projects.webp&quot;) bottom / cover no-repeat;height: auto;padding-top: 20px;">
+        <div style="margin-top: 150px;margin-bottom: 100px;">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
+                        <h1 class="brand-heading">Spotify</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <section>
+        <div class="container" style="max-width: 500px;">
+            <div class="text-center" style="margin-top: 50px;margin-bottom: 50px;">
+                <div style="max-width: 500px;margin: auto;"><img class="img-fluid rounded-5 w-100 h-100" id="spotify-album-art" alt="Album Art" src="{{ track.album_art }}"></div>
+            </div>
+            <div style="position: relative;width: 100%;text-align: end;height: 0px;"><span id="join-btn" style="font-size: 4em;"><svg class="bi bi-play-circle-fill spotify-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" data-bs-toggle="tooltip" data-bss-tooltip="" id="spotify-icon-playing" style="display: none;" title="Open in spotify">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814l-3.5-2.5"></path>
+                    </svg><svg class="bi bi-pause-circle-fill spotify-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" data-bs-toggle="tooltip" data-bss-tooltip="" id="spotify-icon-paused" style="display: none;" title="Open in spotify">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.25 5C5.56 5 5 5.56 5 6.25v3.5a1.25 1.25 0 1 0 2.5 0v-3.5C7.5 5.56 6.94 5 6.25 5m3.5 0c-.69 0-1.25.56-1.25 1.25v3.5a1.25 1.25 0 1 0 2.5 0v-3.5C11 5.56 10.44 5 9.75 5"></path>
+                    </svg><svg class="bi bi-stop-circle-fill spotify-icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" data-bs-toggle="tooltip" data-bss-tooltip="" id="spotify-icon-stopped" title="Open in spotify">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M6.5 5A1.5 1.5 0 0 0 5 6.5v3A1.5 1.5 0 0 0 6.5 11h3A1.5 1.5 0 0 0 11 9.5v-3A1.5 1.5 0 0 0 9.5 5z"></path>
+                    </svg></span></div>
+            <h2 id="spotify-song" class="no-title" style="margin-bottom: 0px;">{{ track.song_name }}</h2>
+            <h3 id="spotify-artist" class="no-title" style="margin-bottom: 0px;"><strong>{{ track.artist }}</strong></h3>
+            <h4 id="spotify-album" class="no-title">{{ track.album_name }}</h4>
+            <div class="progress">
+                <div class="bg-primary progress-bar" id="spotify-progress" aria-valuenow="{{track.progress_ms}}" aria-valuemax="{{track.duration_ms}}" aria-valuemin="0" style="width: calc(({{ track.progress_ms }} / {{ track.duration_ms }}) * 100%);"></div>
+            </div>
+        </div>
+    </section>
+    <footer>
+        <div class="container text-center">
+            <p class="copyright">Copyright ©&nbsp;Nathan.Woodburn/ 2026</p>
+        </div>
+    </footer>
+    <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/assets/js/script.min.js"></script>
+    <script src="/assets/js/grayscale.min.js"></script>
+    <script src="/assets/js/hacker.min.js"></script>
+    <script src="/assets/js/spotify.min.js"></script>
+</body>
+
+</html>

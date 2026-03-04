@@ -1,5 +1,5 @@
-from flask import redirect, request, Blueprint, url_for
-from tools import json_response
+from flask import redirect, render_template, request, Blueprint, url_for
+from tools import json_response, isCLI
 import os
 import requests
 import time
@@ -105,7 +105,11 @@ def callback():
 def currently_playing():
     """Public endpoint showing your current track."""
     track = get_playing_spotify_track()
-    return json_response(request, {"spotify": track}, 200)
+    if isCLI(request):
+        return json_response(request, {"spotify": track}, 200)
+
+    # Render a simple HTML page for browsers
+    return render_template("spotify.html", track=track)
 
 
 def get_playing_spotify_track():
@@ -117,7 +121,6 @@ def get_playing_spotify_track():
     headers = {"Authorization": f"Bearer {token}"}
     response = requests.get(SPOTIFY_CURRENTLY_PLAYING_URL, headers=headers)
     if response.status_code == 204:
-        # return {"error": "Nothing is currently playing."}
         return get_last_spotify_track()
     elif response.status_code != 200:
         return {"error": "Spotify API error", "status": response.status_code}
@@ -125,7 +128,6 @@ def get_playing_spotify_track():
     data = response.json()
     if not data.get("item"):
         return {"error": "Nothing is currently playing."}
-
     track = {
         "song_name": data["item"]["name"],
         "artist": ", ".join([artist["name"] for artist in data["item"]["artists"]]),
@@ -134,6 +136,8 @@ def get_playing_spotify_track():
         "is_playing": data["is_playing"],
         "progress_ms": data.get("progress_ms", 0),
         "duration_ms": data["item"].get("duration_ms", 1),
+        "url": data["item"]["external_urls"]["spotify"],
+        "id": data["item"]["id"],
     }
     return track
 
@@ -160,6 +164,18 @@ def get_last_spotify_track():
         "artist": ", ".join([artist["name"] for artist in last_track_info["artists"]]),
         "album_name": last_track_info["album"]["name"],
         "album_art": last_track_info["album"]["images"][0]["url"],
+        "is_playing": False,
+        "progress_ms": 0,
+        "duration_ms": last_track_info.get("duration_ms", 1),
         "played_at": data["items"][0]["played_at"],
+        "url": last_track_info["external_urls"]["spotify"],
+        "id": last_track_info["id"],
     }
     return track
+
+
+@app.route("/last")
+def last_played():
+    """Public endpoint showing your last played track."""
+    track = get_last_spotify_track()
+    return json_response(request, {"spotify": track}, 200)
