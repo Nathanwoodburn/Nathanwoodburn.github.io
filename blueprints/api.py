@@ -90,7 +90,7 @@ def timezone():
     current_time = datetime.datetime.now(tz)
     return jsonify(
         {
-            "timezone": tz.utcoffset(current_time).total_seconds() / 3600,
+            "timezone": tz.utcoffset(current_time).total_seconds() / 3600,  # type: ignore
             "timezone_name": tz.tzname(current_time),
             "ip": getClientIP(request),
             "status": HTTP_OK,

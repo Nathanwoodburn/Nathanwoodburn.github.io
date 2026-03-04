@@ -258,7 +258,7 @@ def index():
     html_url = git["repo"]["html_url"]
     repo = '<a href="' + html_url + '" target="_blank">' + repo_name + "</a>"
 
-    timezone_offset = TZ.utcoffset(datetime.datetime.now()).total_seconds() / 3600
+    timezone_offset = TZ.utcoffset(datetime.datetime.now()).total_seconds() / 3600  # type: ignore
     time = datetime.datetime.now().strftime("%B %d")
     time += """
     <span id=\"time\"></span>
