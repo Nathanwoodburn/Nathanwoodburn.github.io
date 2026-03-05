@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import render_template, send_file
 from tools import getAddress, get_tools_data, getClientIP
 import os
 from functools import lru_cache
@@ -125,13 +125,15 @@ def curl_response(request):
             {"Content-Type": "text/plain; charset=utf-8"},
         )
 
+    if path == "pgp" or path == "gpg":
+        if os.path.exists("data/nathanwoodburn.asc"):
+            return send_file("data/nathanwoodburn.asc")
     if os.path.exists(f"templates/{path}.ascii"):
         return (
             render_template(f"{path}.ascii", header=get_header()),
             200,
             {"Content-Type": "text/plain; charset=utf-8"},
         )
-
     # Fallback to html if it exists
     if os.path.exists(f"templates/{path}.html"):
         return render_template(f"{path}.html")
