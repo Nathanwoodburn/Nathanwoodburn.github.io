@@ -1,5 +1,6 @@
 from flask import redirect, render_template, request, Blueprint, url_for
 from tools import json_response, isCLI
+from ascii_art import image_url_to_ascii
 import os
 import requests
 import time
@@ -106,7 +107,9 @@ def currently_playing():
     """Public endpoint showing your current track."""
     track = get_playing_spotify_track()
     if isCLI(request):
-        return json_response(request, {"spotify": track}, 200)
+        if "album_art" in track:
+            track["ascii_art"] = image_url_to_ascii(track["album_art"], new_width=40)
+        return render_template("spotify.ascii", track=track)
 
     # Render a simple HTML page for browsers
     return render_template("spotify.html", track=track)

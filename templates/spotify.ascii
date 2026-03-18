@@ -1,0 +1,21 @@
+{% include 'header.ascii' %}
+API      [/api/v1]
+
+[1;36m───────────────────────────────────────────────[0m
+[1;36m CURRENTLY PLAYING [0m
+[1;36m───────────────────[0m
+{% if track.error %}
+Error: {{ track.error }}
+{% else %}
+{% if track.ascii_art %}
+{{ track.ascii_art }}
+
+{% endif %}
+Song:     [1m{{ track.song_name }}[0m
+Artist:   {{ track.artist }}
+Album:    {{ track.album_name }}
+URL:      {{ track.url }}
+
+Progress: {{ track.progress_ms // 60000 }}:{{ '%02d' % ((track.progress_ms // 1000) % 60) }} / {{ track.duration_ms // 60000 }}:{{ '%02d' % ((track.duration_ms // 1000) % 60) }}
+Status:   {{ 'Playing' if track.is_playing else 'Paused' }}
+{% endif %}
