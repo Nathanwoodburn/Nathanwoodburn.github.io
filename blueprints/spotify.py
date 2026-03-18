@@ -106,9 +106,12 @@ def callback():
 def currently_playing():
     """Public endpoint showing your current track."""
     track = get_playing_spotify_track()
+    # Get terminal width for ASCII art scaling
+    width = request.args.get("width", default=40, type=int)
+
     if isCLI(request):
         if "album_art" in track:
-            track["ascii_art"] = image_url_to_ascii(track["album_art"], new_width=40)
+            track["ascii_art"] = image_url_to_ascii(track["album_art"], new_width=width)
         return render_template("spotify.ascii", track=track)
 
     # Render a simple HTML page for browsers

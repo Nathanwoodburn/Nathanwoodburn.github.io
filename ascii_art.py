@@ -48,8 +48,8 @@ def image_url_to_ascii(url, new_width=40):
     # Since we are using '██' (double width), we effectively make each "cell" square.
     # So we can just scale by aspect ratio directly without additional correction factor.
     new_height = int(aspect_ratio * new_width)
-    if new_height > 60:
-        new_height = 60
+    if new_height > height:
+        new_height = height
         new_width = int(new_height / aspect_ratio)
 
     # Resize and ensure RGB mode
