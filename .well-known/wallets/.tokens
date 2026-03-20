@@ -84,5 +84,21 @@
         "symbol": "stWDBRN",
         "name": "Woodburn Vault",
         "chain": "SOL"
+    },
+    {
+        "symbol": "AUDD",
+        "name": "Australian Digital Dollar",
+        "chain": "ETH"
+    },
+    {
+        "symbol": "AUDD",
+        "name": "Australian Digital Dollar",
+        "chain": "SOL"
+    },
+    {
+        "symbol": "AUDD",
+        "name": "Australian Digital Dollar",
+        "chain": "BASE",
+        "address": "0x6cB4B39bEc23a921C9a20D061Bf17d4640B0d39e"
     }
 ]
