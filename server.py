@@ -19,6 +19,7 @@ from qrcode.constants import ERROR_CORRECT_L, ERROR_CORRECT_H
 from ansi2html import Ansi2HTMLConverter
 from PIL import Image
 from zoneinfo import ZoneInfo
+import argparse
 
 # Import blueprints
 from blueprints import now, blog, wellknown, api, podcast, acme, spotify
@@ -678,4 +679,10 @@ def not_found(e):
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000, host="127.0.0.1")
+    # If --host argument is passed, use that as host, otherwise use 127.0.0.1
+    parser = argparse.ArgumentParser(description="Run the Flask server.")
+    parser.add_argument("--host", type=str, default="127.0.0.1")
+
+    args = parser.parse_args()
+
+    app.run(debug=True, port=5000, host=args.host)
