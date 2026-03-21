@@ -10,15 +10,15 @@ HTTP 200
 GET http://127.0.0.1:5000/now/24_02_18
 HTTP 200
 
-GET http://127.0.0.1:5000/now/now.json
+GET http://127.0.0.1:5000/now.json
 HTTP 200
 
-GET http://127.0.0.1:5000/now/now.xml
+GET http://127.0.0.1:5000/now.xml
 HTTP 200
 
-GET http://127.0.0.1:5000/now/now.rss
+GET http://127.0.0.1:5000/now.rss
 HTTP 200
 
-GET http://127.0.0.1:5000/now/rss.xml
+GET http://127.0.0.1:5000/rss.xml
 HTTP 200
 
