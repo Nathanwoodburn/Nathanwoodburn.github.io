@@ -4,6 +4,7 @@
 FROM python:3.13-alpine AS build
 
 # Install build dependencies for Pillow and other native wheels
+# Kept in case source builds are needed, though wheels are preferred
 RUN apk add --no-cache \
     build-base \
     jpeg-dev zlib-dev freetype-dev
@@ -12,51 +13,46 @@ RUN apk add --no-cache \
 COPY --from=ghcr.io/astral-sh/uv:0.8.21 /uv /uvx /bin/
 
 WORKDIR /app
+
+# Copy dependency files
 COPY pyproject.toml uv.lock ./
 
 # Install dependencies into a virtual environment
+# - --frozen: strict lockfile usage
+# - --no-dev: exclude development dependencies
+# - --no-install-project: avoid installing app as package
+# - --compile-bytecode: ensuring .pyc files for startup speed (optional, omit if size is critical but usually worth it)
+# We omit --compile-bytecode here to save space as requested
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --locked
-
-# Copy only app source files
-COPY blueprints blueprints
-COPY main.py server.py curl.py tools.py mail.py cache_helper.py ascii_art.py ./
-COPY templates templates
-COPY data data
-COPY pwa pwa
-COPY .well-known .well-known
-
-# Clean up caches and pycache
-RUN rm -rf /root/.cache/uv
-RUN find . -type d -name "__pycache__" -exec rm -rf {} +
-
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-dev --no-install-workspace
 
 ### Runtime stage ###
 FROM python:3.13-alpine AS runtime
+
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Create non-root user
+# Create non-root user and install curl for healthchecks
 RUN addgroup -g 1001 appgroup && \
-    adduser -D -u 1001 -G appgroup -h /app appuser
+    adduser -D -u 1001 -G appgroup -h /app appuser && \
+    apk add --no-cache curl
 
 WORKDIR /app
-RUN apk add --no-cache curl
 
-
-# Copy only what’s needed for runtime
+# Copy the virtual environment from build stage
 COPY --from=build --chown=appuser:appgroup /app/.venv /app/.venv
-COPY --from=build --chown=appuser:appgroup /app/blueprints /app/blueprints
-COPY --from=build --chown=appuser:appgroup /app/templates /app/templates
-COPY --from=build --chown=appuser:appgroup /app/data /app/data
-COPY --from=build --chown=appuser:appgroup /app/pwa /app/pwa
-COPY --from=build --chown=appuser:appgroup /app/.well-known /app/.well-known
-COPY --from=build --chown=appuser:appgroup /app/main.py /app/
-COPY --from=build --chown=appuser:appgroup /app/server.py /app/
-COPY --from=build --chown=appuser:appgroup /app/curl.py /app/
-COPY --from=build --chown=appuser:appgroup /app/tools.py /app/
-COPY --from=build --chown=appuser:appgroup /app/mail.py /app/
-COPY --from=build --chown=appuser:appgroup /app/cache_helper.py /app/
-COPY --from=build --chown=appuser:appgroup /app/ascii_art.py /app/
+
+# Copy all top-level Python files
+COPY --chown=appuser:appgroup *.py ./
+
+# Copy application directories
+COPY --chown=appuser:appgroup blueprints blueprints
+COPY --chown=appuser:appgroup templates templates
+COPY --chown=appuser:appgroup data data
+COPY --chown=appuser:appgroup pwa pwa
+COPY --chown=appuser:appgroup .well-known .well-known
+
 USER appuser
 EXPOSE 5000
 
