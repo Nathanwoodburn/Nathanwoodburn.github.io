@@ -69,10 +69,10 @@
       <div class="plan-card" onclick="selectPreset('standard')" style="border: 2px solid #ddd; border-radius: 8px; padding: 20px; cursor: pointer; flex: 1; min-width: 250px; background: white; transition: all 0.3s ease;">
         <input type="radio" name="preset" value="standard" onchange="handlePresetChange()" checked style="margin-bottom: 10px;">
         <h4 style="margin: 0 0 10px 0; color: #333;">Standard WordPress</h4>
-        <div style="font-size: 24px; font-weight: bold; color: #007bff; margin-bottom: 10px;">$6/month</div>
+        <div style="font-size: 24px; font-weight: bold; color: #007bff; margin-bottom: 10px;">$10/month</div>
         <ul style="list-style: none; padding: 0; margin: 0; color: #666;">
           <li style="margin-bottom: 5px;">✓ 1 CPU Core</li>
-          <li style="margin-bottom: 5px;">✓ 0.5GB RAM</li>
+          <li style="margin-bottom: 5px;">✓ 1GB RAM</li>
           <li style="margin-bottom: 5px;">✓ 10GB Storage</li>
           <li style="margin-bottom: 5px;">✓ Perfect for small sites</li>
         </ul>
@@ -81,10 +81,10 @@
       <div class="plan-card" onclick="selectPreset('premium')" style="border: 2px solid #ddd; border-radius: 8px; padding: 20px; cursor: pointer; flex: 1; min-width: 250px; background: white; transition: all 0.3s ease;">
         <input type="radio" name="preset" value="premium" onchange="handlePresetChange()" style="margin-bottom: 10px;">
         <h4 style="margin: 0 0 10px 0; color: #333;">Premium WordPress</h4>
-        <div style="font-size: 24px; font-weight: bold; color: #28a745; margin-bottom: 10px;">$10/month</div>
+        <div style="font-size: 24px; font-weight: bold; color: #28a745; margin-bottom: 10px;">$20/month</div>
         <ul style="list-style: none; padding: 0; margin: 0; color: #666;">
-          <li style="margin-bottom: 5px;">✓ 1 CPU Core</li>
-          <li style="margin-bottom: 5px;">✓ 1GB RAM</li>
+          <li style="margin-bottom: 5px;">✓ 2 CPU Core</li>
+          <li style="margin-bottom: 5px;">✓ 2GB RAM</li>
           <li style="margin-bottom: 5px;">✓ 50GB Storage</li>
           <li style="margin-bottom: 5px;">✓ Weekly Backups Included</li>
         </ul>
@@ -117,10 +117,10 @@
 
     <div>
       <label class="form-label" for="memory" style="padding: 10px;">Memory (GB): 
-        <span id="memoryValue" style="display:inline-block; min-width: 5ch; font-family: monospace;">0.5</span>
+        <span id="memoryValue" style="display:inline-block; min-width: 5ch; font-family: monospace;">1</span>
       </label>
       <input id="memory" name="memory" class="form-range" type="range" 
-             min="0" max="6" value="0" step="1" 
+             min="0" max="5" value="0" step="1" 
              style="max-width: 500px; padding-top: 10px;" 
              oninput="updateValue('memory')">
     </div>
@@ -157,13 +157,13 @@
 
 <script>
   // Rates
-  const cpuRate = 3;
+  const cpuRate = 4;
   const memoryRate = 5;
   const diskRate = 0.1;
-  const backupRate = 1;
+  const backupRate = 5;
 
   // Memory values mapping
-  const memoryValues = [0.5, 1, 2, 4, 8, 16, 24];
+  const memoryValues = [1, 2, 4, 8, 16, 24];
 
   // Initialize on load
   document.addEventListener('DOMContentLoaded', () => {
@@ -273,7 +273,7 @@
         document.getElementById('disk').value = 10;
         document.getElementById('backups').checked = false;
       } else if (selectedPreset === 'premium') {
-        document.getElementById('cpus').value = 1;
+        document.getElementById('cpus').value = 2;
         document.getElementById('memory').value = 1; // 1GB
         document.getElementById('disk').value = 50;
         document.getElementById('backups').checked = true;
@@ -293,10 +293,10 @@
     
     // For presets, use fixed pricing
     if (selectedPreset === 'standard') {
-      document.getElementById('monthlyCost').textContent = '6.00';
+      document.getElementById('monthlyCost').textContent = '10.00';
       return;
     } else if (selectedPreset === 'premium') {
-      document.getElementById('monthlyCost').textContent = '10.00';
+      document.getElementById('monthlyCost').textContent = '20.00';
       return;
     }
     
