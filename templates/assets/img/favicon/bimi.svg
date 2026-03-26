@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny-ps" xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 1000 1000" width="1000" height="1000">
+    <title>Nathan Woodburn Logo</title>
+    <defs>
+        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#d1d3d4" />
+            <stop offset="50%" stop-color="#7f8c8d" />
+            <stop offset="100%" stop-color="#2c3e50" />
+        </linearGradient>
+    </defs>
+    
+    <rect width="1000" height="1000" fill="#FFFFFF" />
+
+    <g fill="url(#grad1)" stroke="#34495e" stroke-width="2">
+        <path d="M50,40 L280,180 L280,680 L480,550 L480,850 L280,980 L50,850 Z" />
+        <path d="M520,550 L520,850 L720,980 L950,850 L950,40 L720,180 L720,680 Z" />
+    </g>
+</svg>
