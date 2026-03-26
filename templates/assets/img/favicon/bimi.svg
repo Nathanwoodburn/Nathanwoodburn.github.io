@@ -2,15 +2,15 @@
 <svg version="1.2" baseProfile="tiny-ps" viewBox="0 0 1000 1000" width="1000" height="1000" xmlns="http://www.w3.org/2000/svg">
   <title>Woodburn</title>
   <defs>
-    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#d1d3d4" />
-      <stop offset="50%" stop-color="#7f8c8d" />
-      <stop offset="100%" stop-color="#2c3e50" />
+    <linearGradient id="metalGrad" x1="0" y1="0" x2="1000" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#D1D3D4" />
+      <stop offset="45%" stop-color="#A7ACB0" />
+      <stop offset="100%" stop-color="#414F5A" />
     </linearGradient>
   </defs>
   <rect width="1000" height="1000" fill="#FFFFFF" />
-  <g fill="url(#grad1)" stroke="#34495e" stroke-width="2">
-    <path d="M50,40 L280,180 L280,680 L480,550 L480,850 L280,980 L50,850 Z" />
-    <path d="M520,550 L520,850 L720,980 L950,850 L950,40 L720,180 L720,680 Z" />
+  <g transform="translate(150, 100) scale(0.7, 0.8)">
+    <path fill="url(#metalGrad)" stroke="#2C3E50" stroke-width="2" d="M 0 50 L 320 250 L 320 650 L 480 520 L 480 850 L 320 980 L 0 800 Z" />
+    <path fill="url(#metalGrad)" stroke="#2C3E50" stroke-width="2" d="M 520 520 L 520 850 L 680 980 L 1000 800 L 1000 50 L 680 250 L 680 650 Z" />
   </g>
 </svg>
