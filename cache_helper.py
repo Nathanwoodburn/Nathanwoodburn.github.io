@@ -136,45 +136,6 @@ def get_projects(limit=3):
         return []
 
 
-# Cache storage for uptime status
-_uptime_cache = {"data": None, "timestamp": 0}
-_uptime_ttl = 300  # 5 minutes cache
-
-
-def get_uptime_status():
-    """
-    Get uptime status with caching (5 minute TTL).
-
-    Returns:
-        bool: True if services are up, False otherwise
-    """
-    global _uptime_cache
-    current_time = datetime.datetime.now().timestamp()
-
-    # Check if cache is valid
-    if (
-        _uptime_cache["data"] is not None
-        and (current_time - _uptime_cache["timestamp"]) < _uptime_ttl
-    ):
-        return _uptime_cache["data"]
-
-    # Fetch new data
-    try:
-        uptime = requests.get(
-            "https://uptime.woodburn.au/api/status-page/main/badge", timeout=5
-        )
-        content = uptime.content.decode("utf-8").lower()
-        status = "maintenance" in content or uptime.content.count(b"Up") > 1
-        _uptime_cache = {"data": status, "timestamp": current_time}
-        return status
-    except Exception as e:
-        print(f"Error fetching uptime: {e}")
-        # Return cached or default (assume up)
-        if _uptime_cache["data"] is not None:
-            return _uptime_cache["data"]
-        return True
-
-
 # Cached wallet data loaders
 @lru_cache(maxsize=1)
 def get_wallet_tokens():

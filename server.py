@@ -37,7 +37,6 @@ from curl import curl_response
 from cache_helper import (
     get_git_latest_activity,
     get_projects,
-    get_uptime_status,
     get_wallet_tokens,
     get_coin_names,
     get_wallet_domains,
@@ -200,11 +199,6 @@ def serviceWorker():
 
 
 # region Misc routes
-@app.route("/links")
-def links():
-    return render_template("link.html")
-
-
 @app.route("/actions.json")
 def sol_actions():
     return jsonify(
@@ -243,14 +237,6 @@ def index():
 
     # Use cached projects data
     projects = get_projects(limit=3)
-
-    # Use cached uptime status
-    uptime = get_uptime_status()
-    custom = ""
-    if uptime:
-        custom += "<style>#downtime{display:none !important;}</style>"
-    else:
-        custom += "<style>#downtime{opacity:1;}</style>"
 
     # Special names
     if repo_name == "nathanwoodburn.github.io":
@@ -295,7 +281,6 @@ def index():
         ETH=ETHaddress,
         repo=repo,
         repo_description=repo_description,
-        custom=custom,
         sites=SITES,
         projects=projects,
         time=time,
