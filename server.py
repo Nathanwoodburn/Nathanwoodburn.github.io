@@ -15,6 +15,7 @@ import dotenv
 import requests
 import datetime
 import qrcode
+import re
 from qrcode.constants import ERROR_CORRECT_L, ERROR_CORRECT_H
 from ansi2html import Ansi2HTMLConverter
 from PIL import Image
@@ -37,7 +38,6 @@ from curl import curl_response
 from cache_helper import (
     get_git_latest_activity,
     get_projects,
-    get_uptime_status,
     get_wallet_tokens,
     get_coin_names,
     get_wallet_domains,
@@ -45,6 +45,19 @@ from cache_helper import (
 
 app = Flask(__name__)
 CORS(app)
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 30 * (24 * 60 * 60)  # 30 days in seconds
+
+# Cache-busting and static file metadata cache
+_STATIC_VERSION_CACHE: dict[str, tuple[int, int, str]] = {}
+_HTML_URL_ATTR_RE = re.compile(
+    r'(?P<prefix>\b(?:src|href)=(["\']))(?P<url>/[^"\']+)(?P<suffix>\2)',
+    re.IGNORECASE,
+)
+_STYLESHEET_LINK_RE = re.compile(
+    r'<link\s+[^>]*rel=["\']stylesheet["\'][^>]*>',
+    re.IGNORECASE,
+)
+_HREF_ATTR_RE = re.compile(r'href=["\'](?P<href>[^"\']+)["\']', re.IGNORECASE)
 
 # Register blueprints
 for module in [now, blog, wellknown, api, podcast, acme, spotify]:
@@ -82,9 +95,199 @@ TZ = ZoneInfo(os.getenv("TIMEZONE", "Australia/Sydney"))
 
 # endregion
 
+
+# region request hooks
+def _resolve_static_file(url_path: str) -> str | None:
+    clean_path = url_path.split("?", 1)[0].split("#", 1)[0]
+
+    if clean_path.startswith("/assets/"):
+        relative_path = clean_path[len("/assets/") :]
+        resolved = os.path.join("templates/assets", relative_path)
+        return resolved if os.path.isfile(resolved) else None
+
+    if clean_path.startswith("/fonts/"):
+        relative_path = clean_path[len("/fonts/") :]
+        resolved = os.path.join("templates/assets/fonts", relative_path)
+        return resolved if os.path.isfile(resolved) else None
+
+    if clean_path == "/manifest.json":
+        return "pwa/manifest.json"
+
+    if clean_path == "/sw.js":
+        return "pwa/sw.js"
+
+    if clean_path in ("/favicon.png", "/favicon.svg", "/favicon.ico"):
+        ext = clean_path.rsplit(".", 1)[-1]
+        resolved = f"templates/assets/img/favicon/favicon.{ext}"
+        return resolved if os.path.isfile(resolved) else None
+
+    if clean_path.count("/") == 1 and clean_path.endswith(".js"):
+        filename = clean_path.split("/")[-1]
+        resolved = os.path.join("templates/assets/js", filename)
+        return resolved if os.path.isfile(resolved) else None
+
+    return None
+
+
+def _get_asset_version(url_path: str) -> str | None:
+    resolved = _resolve_static_file(url_path)
+    if not resolved:
+        return None
+
+    stat = os.stat(resolved)
+    mtime_ns = stat.st_mtime_ns
+    size = stat.st_size
+
+    cached = _STATIC_VERSION_CACHE.get(resolved)
+    if cached and cached[0] == mtime_ns and cached[1] == size:
+        return cached[2]
+
+    # Compact deterministic token derived from file metadata.
+    token = f"{mtime_ns:x}{size:x}"[-16:]
+    _STATIC_VERSION_CACHE[resolved] = (mtime_ns, size, token)
+    return token
+
+
+def _append_cache_busting_to_html(html: str) -> str:
+    def _replace(match: re.Match[str]) -> str:
+        original_url = match.group("url")
+        if original_url.startswith("//"):
+            return match.group(0)
+
+        version = _get_asset_version(original_url)
+        if not version:
+            return match.group(0)
+
+        separator = "&" if "?" in original_url else "?"
+        if "?v=" in original_url or "&v=" in original_url:
+            return match.group(0)
+
+        cache_busted = f"{original_url}{separator}v={version}"
+        return f"{match.group('prefix')}{cache_busted}{match.group('suffix')}"
+
+    return _HTML_URL_ATTR_RE.sub(_replace, html)
+
+
+def _is_non_blocking_stylesheet_target(href: str) -> bool:
+    normalized = href.lower().split("?", 1)[0]
+
+    # Keep the core layout CSS blocking.
+    if normalized.endswith("/assets/bootstrap/css/bootstrap.min.css"):
+        return False
+    if normalized.endswith("/assets/css/styles.min.css"):
+        return False
+
+    if "fonts.googleapis.com/css" in normalized:
+        return True
+    if normalized.startswith("/assets/fonts/"):
+        return True
+
+    return normalized in {
+        "/assets/css/brand-reveal.min.css",
+        "/assets/css/index.min.css",
+        "/assets/css/profile.min.css",
+        "/assets/css/social-icons.min.css",
+        "/assets/css/swiper.min.css",
+    }
+
+
+def _async_stylesheet_tag(href: str) -> str:
+    return (
+        f'<link rel="preload" as="style" href="{href}">'
+        f'<link rel="stylesheet" href="{href}" media="print" onload="this.media=\'all\'">'
+        f'<noscript><link rel="stylesheet" href="{href}"></noscript>'
+    )
+
+
+def _optimize_html_for_performance(html: str, path: str) -> str:
+    # Keep scope tight to avoid unexpected changes on unrelated pages.
+    if path != "/":
+        return html
+
+    if "fonts.googleapis.com/css" in html and "fonts.gstatic.com" not in html:
+        html = html.replace(
+            "</head>",
+            '<link rel="preconnect" href="https://fonts.googleapis.com">'
+            '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
+            "</head>",
+            1,
+        )
+
+    def _replace_stylesheet(match: re.Match[str]) -> str:
+        tag = match.group(0)
+        href_match = _HREF_ATTR_RE.search(tag)
+        if not href_match:
+            return tag
+
+        href = href_match.group("href")
+        if 'media="print"' in tag or "media='print'" in tag:
+            return tag
+
+        if not _is_non_blocking_stylesheet_target(href):
+            return tag
+
+        return _async_stylesheet_tag(href)
+
+    html = _STYLESHEET_LINK_RE.sub(_replace_stylesheet, html)
+
+    # Replace icon-font navbar toggler to avoid dependency on icon fonts for first paint.
+    html = html.replace(
+        '<i class="fa fa-bars"></i>', '<span class="navbar-toggler-icon"></span>'
+    )
+
+    return html
+
+
+def _is_static_request(path: str) -> bool:
+    return (
+        path.startswith("/assets/")
+        or path.startswith("/fonts/")
+        or path
+        in ("/manifest.json", "/sw.js", "/favicon.png", "/favicon.svg", "/favicon.ico")
+        or (path.count("/") == 1 and path.endswith(".js"))
+    )
+
+
+@app.after_request
+def add_header(response):
+    path = request.path
+
+    # HTML should be revalidated so clients can discover new cache-busted asset URLs quickly.
+    if response.status_code == 200 and response.mimetype == "text/html":
+        if not response.direct_passthrough:
+            html = response.get_data(as_text=True)
+            rewritten = _optimize_html_for_performance(html, path)
+            rewritten = _append_cache_busting_to_html(rewritten)
+            if rewritten != html:
+                response.set_data(rewritten)
+
+        response.headers["Cache-Control"] = "public, max-age=0, must-revalidate"
+        if request.method in ("GET", "HEAD"):
+            response.add_etag()
+            response.make_conditional(request)
+        return response
+
+    if _is_static_request(path):
+        if path == "/sw.js":
+            # Service workers should be revalidated frequently for update checks.
+            response.headers["Cache-Control"] = "public, max-age=0, must-revalidate"
+        elif request.args.get("v"):
+            response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        else:
+            response.headers["Cache-Control"] = (
+                "public, max-age=604800, stale-while-revalidate=86400"
+            )
+        return response
+
+    if "Cache-Control" not in response.headers:
+        response.headers["Cache-Control"] = "no-cache"
+    return response
+
+
+# endregion
+
+
 # region Assets routes
-
-
 @app.route("/assets/<path:path>")
 def asset(path):
     if path.endswith(".json"):
@@ -243,15 +446,6 @@ def index():
 
     # Use cached projects data
     projects = get_projects(limit=3)
-
-    # Use cached uptime status
-    uptime = get_uptime_status()
-    custom = ""
-    if uptime:
-        custom += "<style>#downtime{display:none !important;}</style>"
-    else:
-        custom += "<style>#downtime{opacity:1;}</style>"
-
     # Special names
     if repo_name == "nathanwoodburn.github.io":
         repo_name = "Nathan.Woodburn/"
@@ -295,7 +489,6 @@ def index():
         ETH=ETHaddress,
         repo=repo,
         repo_description=repo_description,
-        custom=custom,
         sites=SITES,
         projects=projects,
         time=time,
