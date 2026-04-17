@@ -21,8 +21,7 @@ I've been homeschooled through Year 12 and am now studying a
 [1mBachelor of Computer Science[0m.  
 
 I love building random projects, so this site is always evolving.  
-I'm also one of the founders of [1;36mHandshake AU[0m [https://hns.au],  
-working to grow Handshake adoption across Australia.
+I am currently working as a system administrator at [1mCSIRO[0m, Australia's national science agency.
 
 I'm currently working on: {{ repo | safe }}
 {% if not spotify.message %}Currently listening to: [1;36m{{ spotify.song_name }}[0m by [1;36m{{ spotify.artist }}[0m{% endif %}

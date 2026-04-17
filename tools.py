@@ -94,6 +94,22 @@ def isCLI(request: Request) -> bool:
     return False
 
 
+def isFinger(request: Request) -> bool:
+    """
+    Check if the request is a finger request.
+
+    Args:
+        request (Request): The Flask request object
+
+    Returns:
+        bool: True if the request is a finger request, False otherwise
+    """
+    if request.headers and request.headers.get("User-Agent"):
+        user_agent = request.headers.get("User-Agent", "")
+        return "finger" in user_agent.lower()
+    return False
+
+
 def isCrawler(request: Request) -> bool:
     """
     Check if the request is from a web crawler (e.g., Googlebot, Bingbot).

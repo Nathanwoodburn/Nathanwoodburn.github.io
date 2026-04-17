@@ -1,0 +1,35 @@
+-----------------------------------------------------
+  .  .    , .           .  .        ..             /
+  |\ | _.-+-|_  _.._    |  | _  _  _||_ . .._.._  /
+  | \|(_] | [ )(_][ ) * |/\|(_)(_)(_][_)(_|[  [ )/
+-----------------------------------------------------
+
+Welcome to my personal website! Wow I didn't expect to see anyone using the finger protocol in 2026!
+
+-----------------------------------------------
+ ABOUT ME
+----------
+
+Hi, I'm Nathan Woodburn from Canberra, Australia.
+I've been homeschooled through Year 12 and am now studying a
+Bachelor of Computer Science.
+
+I'm currently working on: {{ repo | safe }}
+{% if not spotify.message %}Currently listening to: {{ spotify.song_name }} by {{ spotify.artist }}{% endif %}
+
+-----------------------------------------------
+ SKILLS
+--------
+
+- Linux servers & CLI
+- DNS & DNSSEC
+- NGINX web servers
+- Programming:
+  - Python 3
+  - C#
+  - Java
+  - Bash
+
+
+Fetched from https://nathan.woodburn.au/
+-----------------------------------------------

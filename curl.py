@@ -148,3 +148,33 @@ def curl_response(request):
         404,
         {"Content-Type": "text/plain; charset=utf-8"},
     )
+
+
+def finger_response(request):
+    # Check if <path>.ascii exists
+    path = clean_path(request.path)
+
+    # Handle special cases
+    if path == "index":
+        # Get current project
+        return (
+            render_template(
+                "index.finger",
+                repo=get_current_project(),
+                spotify=get_playing_spotify_track(),
+            ),
+            200,
+            {"Content-Type": "text/plain; charset=utf-8"},
+        )
+    return (
+        render_template(
+            "error.ascii",
+            header=get_header(),
+            error={
+                "code": 400,
+                "message": "This server does not support finger requests.",
+            },
+        ),
+        400,
+        {"Content-Type": "text/plain; charset=utf-8"},
+    )

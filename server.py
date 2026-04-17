@@ -25,6 +25,7 @@ import argparse
 from blueprints import now, blog, wellknown, api, podcast, acme, spotify
 from tools import (
     isCLI,
+    isFinger,
     getAddress,
     getFilePath,
     error_response,
@@ -33,7 +34,7 @@ from tools import (
     getHandshakeScript,
     get_tools_data,
 )
-from curl import curl_response
+from curl import curl_response, finger_response
 from cache_helper import (
     get_git_latest_activity,
     get_projects,
@@ -229,6 +230,9 @@ def index():
 
     if isCLI(request):
         return curl_response(request)
+
+    if isFinger(request):
+        return finger_response(request)
 
     # Use cached git data
     git = get_git_latest_activity()
@@ -655,9 +659,19 @@ def catch_all(path: str):
     return error_response(request)
 
 
+@app.errorhandler(403)
+def forbidden(e):
+    return error_response(request, message="Forbidden", code=403)
+
+
 @app.errorhandler(404)
 def not_found(e):
     return error_response(request)
+
+
+@app.errorhandler(500)
+def server_error(e):
+    return error_response(request, message="Internal Server Error", code=500)
 
 
 # endregion
