@@ -1,6 +1,6 @@
 [project]
 name = "nathanwoodburn-github-io"
-version = "1.1.0"
+version = "1.1.1"
 description = "Nathan.Woodburn Personal Website"
 readme = "README.md"
 requires-python = ">=3.13"
