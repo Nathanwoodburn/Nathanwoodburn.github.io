@@ -27,8 +27,9 @@ def post():
         type="TXT",
         name="_acme-challenge.hnsdoh.com",  # type: ignore
     ).to_dict()
-    record_id = existing_records["result"][0]["id"]  # type: ignore
-    cf.dns.records.delete(dns_record_id=record_id, zone_id=zone_id)
+    if len(existing_records["result"]) > 0:
+        record_id = existing_records["result"][0]["id"]  # type: ignore
+        cf.dns.records.delete(dns_record_id=record_id, zone_id=zone_id)
     cf.dns.records.create(
         zone_id=zone_id,
         type="TXT",
