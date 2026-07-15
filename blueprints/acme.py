@@ -35,5 +35,6 @@ def post():
         type="TXT",
         name="_acme-challenge",
         content=txt,
+        ttl=60
     )
     return json_response(request, "Success", 200)
