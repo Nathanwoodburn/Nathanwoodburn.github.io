@@ -9,6 +9,7 @@ from flask import (
     send_from_directory,
     send_file,
 )
+from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_cors import CORS
 import os
 import dotenv
@@ -44,6 +45,7 @@ from cache_helper import (
 )
 
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 CORS(app)
 
 # Register blueprints
