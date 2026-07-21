@@ -97,7 +97,7 @@ def callback():
     global REFRESH_TOKEN
     REFRESH_TOKEN = token_info.get("refresh_token")
     print("Spotify authorization successful.")
-    print("Refresh Token:", REFRESH_TOKEN)
+    print("Refresh Token:", REFRESH_TOKEN, flush=True)
     return redirect(url_for("spotify.currently_playing"))
 
 
