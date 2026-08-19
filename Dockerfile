@@ -33,10 +33,10 @@ FROM python:3.13-alpine AS runtime
 
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Create non-root user and install curl for healthchecks
+# Create non-root user and install curl for healthchecks and chromium for PDF building
 RUN addgroup -g 1001 appgroup && \
     adduser -D -u 1001 -G appgroup -h /app appuser && \
-    apk add --no-cache curl
+    apk add --no-cache curl chromium font-noto
 
 WORKDIR /app
 
