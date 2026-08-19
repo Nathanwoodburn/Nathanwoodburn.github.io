@@ -1,13 +1,15 @@
+import os
+
 from flask import (
     Blueprint,
-    make_response,
-    request,
     jsonify,
-    send_from_directory,
+    make_response,
     redirect,
+    request,
+    send_from_directory,
 )
+
 from tools import error_response
-import os
 
 app = Blueprint("well-known", __name__, url_prefix="/.well-known")
 

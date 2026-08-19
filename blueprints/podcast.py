@@ -1,6 +1,7 @@
-from flask import Blueprint, make_response, request
-from tools import error_response
 import requests
+from flask import Blueprint, make_response, request
+
+from tools import error_response
 
 app = Blueprint("podcast", __name__)
 

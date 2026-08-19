@@ -1,10 +1,12 @@
-from flask import redirect, render_template, request, Blueprint, url_for
-from tools import json_response, isCLI
-from ascii_art import image_url_to_ascii
-import os
-import requests
-import time
 import base64
+import os
+import time
+
+import requests
+from flask import Blueprint, redirect, render_template, request, url_for
+
+from ascii_art import image_url_to_ascii
+from tools import isCLI, json_response
 
 app = Blueprint("spotify", __name__, url_prefix="/spotify")
 

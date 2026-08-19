@@ -4,11 +4,11 @@ Provides centralized caching with TTL for external API calls.
 """
 
 import datetime
-import os
 import json
-import requests
+import os
 from functools import lru_cache
 
+import requests
 
 # Cache storage for git data
 _git_data_cache = {"data": None, "timestamp": 0}
@@ -23,7 +23,7 @@ def get_git_latest_activity():
         dict: Git activity data or default values
     """
     global _git_data_cache
-    current_time = datetime.datetime.now().timestamp()
+    current_time = datetime.datetime.now(tz=datetime.UTC).timestamp()
 
     # Check if cache is valid
     if (
@@ -33,21 +33,18 @@ def get_git_latest_activity():
         return _git_data_cache["data"]
 
     # Fetch new data
-    try:
-        git = requests.get(
-            "https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1",
-            headers={
-                "Authorization": os.getenv("GIT_AUTH") or os.getenv("git_token") or ""
-            },
-            timeout=5,
-        )
-        git_data = git.json()
-        if git_data and len(git_data) > 0:
-            result = git_data[0]
-            _git_data_cache = {"data": result, "timestamp": current_time}
-            return result
-    except Exception as e:
-        print(f"Error fetching git data: {e}")
+    git = requests.get(
+        "https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1",
+        headers={
+            "Authorization": os.getenv("GIT_AUTH") or os.getenv("git_token") or ""
+        },
+        timeout=5,
+    )
+    git_data = git.json()
+    if git_data and len(git_data) > 0:
+        result = git_data[0]
+        _git_data_cache = {"data": result, "timestamp": current_time}
+        return result
 
     # Return cached or default
     if _git_data_cache["data"]:
@@ -78,7 +75,7 @@ def get_projects(limit=3):
         list: List of project dictionaries
     """
     global _projects_cache
-    current_time = datetime.datetime.now().timestamp()
+    current_time = datetime.datetime.now(tz=datetime.UTC).timestamp()
 
     # Check if cache is valid
     if (
@@ -88,52 +85,46 @@ def get_projects(limit=3):
         return _projects_cache["data"][:limit]
 
     # Fetch new data
-    try:
-        projects = []
+    projects = []
+    projectsreq = requests.get(
+        "https://git.woodburn.au/api/v1/users/nathanwoodburn/repos", timeout=5
+    )
+    projects = projectsreq.json()
+
+    # Check for pagination
+    pageNum = 2
+    while 'rel="next"' in projectsreq.headers.get("link", ""):
         projectsreq = requests.get(
-            "https://git.woodburn.au/api/v1/users/nathanwoodburn/repos", timeout=5
+            f"https://git.woodburn.au/api/v1/users/nathanwoodburn/repos?page={pageNum}",
+            timeout=5,
         )
-        projects = projectsreq.json()
+        projects += projectsreq.json()
+        pageNum += 1
+        # Safety limit
+        if pageNum > 10:
+            break
 
-        # Check for pagination
-        pageNum = 2
-        while 'rel="next"' in projectsreq.headers.get("link", ""):
-            projectsreq = requests.get(
-                f"https://git.woodburn.au/api/v1/users/nathanwoodburn/repos?page={pageNum}",
-                timeout=5,
-            )
-            projects += projectsreq.json()
-            pageNum += 1
-            # Safety limit
-            if pageNum > 10:
-                break
+    # Process projects
+    for project in projects:
+        if project.get("avatar_url") in ("https://git.woodburn.au/", ""):
+            project["avatar_url"] = "/favicon.png"
+        project["name"] = project["name"].replace("_", " ").replace("-", " ")
 
-        # Process projects
-        for project in projects:
-            if project.get("avatar_url") in ("https://git.woodburn.au/", ""):
-                project["avatar_url"] = "/favicon.png"
-            project["name"] = project["name"].replace("_", " ").replace("-", " ")
+    # Sort by last updated
+    projects_sorted = sorted(
+        projects, key=lambda x: x.get("updated_at", ""), reverse=True
+    )
 
-        # Sort by last updated
-        projects_sorted = sorted(
-            projects, key=lambda x: x.get("updated_at", ""), reverse=True
-        )
+    # Remove duplicates by name
+    seen_names = set()
+    unique_projects = []
+    for project in projects_sorted:
+        if project["name"] not in seen_names:
+            unique_projects.append(project)
+            seen_names.add(project["name"])
 
-        # Remove duplicates by name
-        seen_names = set()
-        unique_projects = []
-        for project in projects_sorted:
-            if project["name"] not in seen_names:
-                unique_projects.append(project)
-                seen_names.add(project["name"])
-
-        _projects_cache = {"data": unique_projects, "timestamp": current_time}
-        return unique_projects[:limit]
-    except Exception as e:
-        print(f"Error fetching projects: {e}")
-        if _projects_cache["data"]:
-            return _projects_cache["data"][:limit]
-        return []
+    _projects_cache = {"data": unique_projects, "timestamp": current_time}
+    return unique_projects[:limit]
 
 
 # Cached wallet data loaders
@@ -145,12 +136,8 @@ def get_wallet_tokens():
     Returns:
         list: List of token dictionaries
     """
-    try:
-        with open(".well-known/wallets/.tokens") as file:
-            return json.load(file)
-    except Exception as e:
-        print(f"Error loading tokens: {e}")
-        return []
+    with open(".well-known/wallets/.tokens") as file:
+        return json.load(file)
 
 
 @lru_cache(maxsize=1)
@@ -161,12 +148,8 @@ def get_coin_names():
     Returns:
         dict: Dictionary of coin names
     """
-    try:
-        with open(".well-known/wallets/.coins") as file:
-            return json.load(file)
-    except Exception as e:
-        print(f"Error loading coin names: {e}")
-        return {}
+    with open(".well-known/wallets/.coins") as file:
+        return json.load(file)
 
 
 @lru_cache(maxsize=1)
@@ -177,10 +160,6 @@ def get_wallet_domains():
     Returns:
         dict: Dictionary of wallet domains
     """
-    try:
-        if os.path.isfile(".well-known/wallets/.domains"):
-            with open(".well-known/wallets/.domains") as file:
-                return json.load(file)
-    except Exception as e:
-        print(f"Error loading domains: {e}")
-    return {}
+    if os.path.isfile(".well-known/wallets/.domains"):
+        with open(".well-known/wallets/.domains") as file:
+            return json.load(file)

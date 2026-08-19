@@ -1,11 +1,11 @@
-import smtplib
-import re
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.utils import formataddr
-from flask import jsonify
 import os
+import re
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.utils import formataddr
 
+from flask import jsonify
 
 # This is used to send emails via API
 # The process should be something like this
@@ -80,17 +80,14 @@ def sendEmail(data):
     msg.attach(MIMEText(body, "plain"))
 
     # Sending the email
-    try:
-        host = os.getenv("EMAIL_SMTP")
-        user = os.getenv("EMAIL_USER")
-        password = os.getenv("EMAIL_PASS")
-        if host is None or user is None or password is None:
-            return jsonify({"status": 500, "error": "Email server not configured"})
+    host = os.getenv("EMAIL_SMTP")
+    user = os.getenv("EMAIL_USER")
+    password = os.getenv("EMAIL_PASS")
+    if host is None or user is None or password is None:
+        return jsonify({"status": 500, "error": "Email server not configured"})
 
-        with smtplib.SMTP_SSL(host, 465) as server:
-            server.login(user, password)
-            server.sendmail(fromEmail, to, msg.as_string())
-        print("Email sent successfully.")
-        return jsonify({"status": 200, "message": "Send email successfully"})
-    except Exception as e:
-        return jsonify({"status": 500, "error": "Sending email failed", "exception": e})
+    with smtplib.SMTP_SSL(host, 465) as server:
+        server.login(user, password)
+        server.sendmail(fromEmail, to, msg.as_string())
+    print("Email sent successfully.")
+    return jsonify({"status": 200, "message": "Send email successfully"})

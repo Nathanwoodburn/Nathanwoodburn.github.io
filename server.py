@@ -1,47 +1,48 @@
+import argparse
+import datetime
 import json
+import os
+from zoneinfo import ZoneInfo
+
+import dotenv
+import qrcode
+import requests
+from ansi2html import Ansi2HTMLConverter
 from flask import (
     Flask,
+    jsonify,
     make_response,
     redirect,
-    request,
-    jsonify,
     render_template,
-    send_from_directory,
+    request,
     send_file,
+    send_from_directory,
 )
-from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_cors import CORS
-import os
-import dotenv
-import requests
-import datetime
-import qrcode
-from qrcode.constants import ERROR_CORRECT_L, ERROR_CORRECT_H
-from ansi2html import Ansi2HTMLConverter
 from PIL import Image
-from zoneinfo import ZoneInfo
-import argparse
+from qrcode.constants import ERROR_CORRECT_H, ERROR_CORRECT_L
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 # Import blueprints
-from blueprints import now, blog, wellknown, api, podcast, acme, spotify
-from tools import (
-    isCLI,
-    isFinger,
-    getAddress,
-    getFilePath,
-    error_response,
-    getClientIP,
-    json_response,
-    getHandshakeScript,
-    get_tools_data,
-)
-from curl import curl_response, finger_response
+from blueprints import acme, api, blog, now, podcast, spotify, wellknown
 from cache_helper import (
+    get_coin_names,
     get_git_latest_activity,
     get_projects,
-    get_wallet_tokens,
-    get_coin_names,
     get_wallet_domains,
+    get_wallet_tokens,
+)
+from curl import curl_response, finger_response
+from tools import (
+    error_response,
+    get_tools_data,
+    getAddress,
+    getClientIP,
+    getFilePath,
+    getHandshakeScript,
+    isCLI,
+    isFinger,
+    json_response,
 )
 
 app = Flask(__name__)
@@ -104,20 +105,15 @@ def asset(path):
         "img/hns": "img/external/HNS/black",
     }
 
-    for key in pathMap:
+    for key, value in pathMap:
         if path.startswith(key):
-            tmpPath = path.replace(key, pathMap[key])
+            tmpPath = path.replace(key, value)
             if os.path.isfile("templates/assets/" + tmpPath):
                 return send_from_directory("templates/assets", tmpPath)
 
     # Try looking in one of the directories
     filename: str = path.split("/")[-1]
-    if (
-        filename.endswith(".png")
-        or filename.endswith(".jpg")
-        or filename.endswith(".jpeg")
-        or filename.endswith(".svg")
-    ):
+    if filename.endswith((".png", ".jpg", ".jpeg", ".svg")):
         if os.path.isfile("templates/assets/img/" + filename):
             return send_from_directory("templates/assets/img", filename)
         if os.path.isfile("templates/assets/img/favicon/" + filename):
@@ -251,8 +247,9 @@ def index():
     html_url = git["repo"]["html_url"]
     repo = '<a href="' + html_url + '" target="_blank">' + repo_name + "</a>"
 
-    timezone_offset = TZ.utcoffset(datetime.datetime.now()).total_seconds() / 3600  # type: ignore
-    time = datetime.datetime.now().strftime("%B %d")
+    server_now = datetime.datetime.now().astimezone()
+    timezone_offset = TZ.utcoffset(server_now).total_seconds() / 3600  # type: ignore
+    time = server_now.strftime("%B %d")
     time += """
     <span id=\"time\"></span>
     <script>
@@ -452,7 +449,7 @@ def qrcodee(data):
     logo = Image.open("templates/assets/img/favicon/logo.png")
     basewidth = qr_image.size[0] // 3
     wpercent = basewidth / float(logo.size[0])
-    hsize = int((float(logo.size[1]) * float(wpercent)))
+    hsize = int(float(logo.size[1]) * float(wpercent))
     logo = logo.resize((basewidth, hsize), Image.Resampling.LANCZOS)
     pos = (
         (qr_image.size[0] - logo.size[0]) // 2,
@@ -481,9 +478,6 @@ def supersecretpath():
 
 @app.route("/hosting/send-enquiry", methods=["POST"])
 def hosting_post():
-    global EMAIL_REQUEST_COUNT
-    global IP_REQUEST_COUNT
-
     if not request.is_json or not request.json:
         return json_response(request, "No JSON data provided", 415)
 
@@ -499,7 +493,7 @@ def hosting_post():
     print(f"Hosting enquiry from {email} ({ip})")
 
     # Check rate limits
-    current_time = datetime.datetime.now().timestamp()
+    current_time = datetime.datetime.now(datetime.UTC).timestamp()
 
     # Check email rate limit
     if email in EMAIL_REQUEST_COUNT:

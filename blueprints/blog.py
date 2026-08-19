@@ -1,10 +1,12 @@
 import os
-from flask import Blueprint, render_template, request, jsonify
-import markdown
-from bs4 import BeautifulSoup
 import re
 from functools import lru_cache
-from tools import isCLI, getClientIP, getHandshakeScript
+
+import markdown
+from bs4 import BeautifulSoup
+from flask import Blueprint, jsonify, render_template, request
+
+from tools import getClientIP, getHandshakeScript, isCLI
 
 app = Blueprint("blog", __name__, url_prefix="/blog")
 

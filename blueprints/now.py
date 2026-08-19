@@ -1,11 +1,13 @@
-from flask import Blueprint, render_template, make_response, request, jsonify
 import datetime
 import os
-from functools import lru_cache
-from tools import getHandshakeScript, error_response, isCLI
-from curl import get_header, MAX_WIDTH
-from bs4 import BeautifulSoup
 import re
+from functools import lru_cache
+
+from bs4 import BeautifulSoup
+from flask import Blueprint, jsonify, make_response, render_template, request
+
+from curl import MAX_WIDTH, get_header
+from tools import error_response, getHandshakeScript, isCLI
 
 # Create blueprint
 app = Blueprint("now", __name__, url_prefix="/")
@@ -31,10 +33,11 @@ def list_dates():
 @lru_cache(maxsize=8)
 def get_latest_date(formatted=False):
     if formatted:
-        date = list_dates()[0]
-        date = datetime.datetime.strptime(date, "%y_%m_%d")
-        date = date.strftime("%A, %B %d, %Y")
-        return date
+        date_str = list_dates()[0]
+        dt = datetime.datetime.strptime(date_str, "%y_%m_%d").replace(
+            tzinfo=datetime.UTC
+        )
+        return dt.strftime("%A, %B %d, %Y")
     return list_dates()[0]
 
 
@@ -53,8 +56,12 @@ def render(date, handshake_scripts=None):
     if date not in list_dates():
         return error_response(request)
 
-    date_formatted = datetime.datetime.strptime(date, "%y_%m_%d")
-    date_formatted = date_formatted.strftime("%A, %B %d, %Y")
+    date_formatted = (
+        datetime.datetime.strptime(date, "%y_%m_%d")
+        .replace(tzinfo=datetime.UTC)
+        .strftime("%A, %B %d, %Y")
+    )
+
     return render_template(
         f"now/{date}.html", DATE=date_formatted, handshake_scripts=handshake_scripts
     )
@@ -72,9 +79,11 @@ def render_curl(date=None):
         return error_response(request)
 
     # Format the date nicely
-    date_formatted = datetime.datetime.strptime(date, "%y_%m_%d")
-    date_formatted = date_formatted.strftime("%A, %B %d, %Y")
-
+    date_formatted = (
+        datetime.datetime.strptime(date, "%y_%m_%d")
+        .replace(tzinfo=datetime.UTC)
+        .strftime("%A, %B %d, %Y")
+    )
     # Load HTML
     with open(f"templates/now/{date}.html", "r", encoding="utf-8") as f:
         raw_html = f.read().replace("{{ date }}", date_formatted)
@@ -129,7 +138,7 @@ def render_curl(date=None):
     # Build final response
     response = ""
     for post in posts:
-        response += f"[1m{post['header']}[0m\n\n{post['content']}\n\n"
+        response += f"\x1b[1m{post['header']}\x1b[0m\n\n{post['content']}\n\n"
 
     return render_template(
         "now.ascii", date=date_formatted, content=response, header=get_header()
@@ -159,9 +168,11 @@ def old():
         response = ""
         for date in now_dates:
             link = date
-            date_fmt = datetime.datetime.strptime(date, "%y_%m_%d")
-            date_fmt = date_fmt.strftime("%A, %B %d, %Y")
-            response += f"{date_fmt} - /now/{link}\n"
+            date_fmt = datetime.datetime.strptime(date, "%y_%m_%d").replace(
+                tzinfo=datetime.UTC
+            )
+            date_str = date_fmt.strftime("%A, %B %d, %Y")
+            response += f"{date_str} - /now/{link}\n"
         return render_template(
             "now.ascii", date="Old Now Pages", content=response, header=get_header()
         )
@@ -171,9 +182,11 @@ def old():
 
     for date in now_dates:
         link = date
-        date = datetime.datetime.strptime(date, "%y_%m_%d")
-        date = date.strftime("%A, %B %d, %Y")
-        html += f'<a style="text-decoration:none;" href="/now/{link}"><li class="list-group-item" style="background-color:#000000;color:#ffffff;">{date}</li></a>'
+        parsed_date = datetime.datetime.strptime(date, "%y_%m_%d").replace(
+            tzinfo=datetime.UTC
+        )
+        formatted_date = parsed_date.strftime("%A, %B %d, %Y")
+        html += f'<a style="text-decoration:none;" href="/now/{link}"><li class="list-group-item" style="background-color:#000000;color:#ffffff;">{formatted_date}</li></a>'
 
     html += "</ul>"
     return render_template(
@@ -191,23 +204,44 @@ def rss():
     path = request.path
     if ":" in request.host:
         host = "http://" + request.host
-    # Generate RSS feed
+
     now_pages = list_page_files()
-    rss = f'<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Nathan.Woodburn/</title><link>{host}</link><description>See what I\'ve been up to</description><language>en-us</language><lastBuildDate>{datetime.datetime.now(tz=datetime.timezone.utc).strftime("%a, %d %b %Y %H:%M:%S %z")}</lastBuildDate><atom:link href="{host}{path}" rel="self" type="application/rss+xml" />'
+
+    build_date = datetime.datetime.now(tz=datetime.UTC).strftime(
+        "%a, %d %b %Y %H:%M:%S %z"
+    )
+
+    rss = (
+        f'<?xml version="1.0" encoding="UTF-8"?>'
+        f'<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">'
+        f"<channel>"
+        f"<title>Nathan.Woodburn/</title>"
+        f"<link>{host}</link>"
+        f"<description>See what I've been up to</description>"
+        f"<language>en-us</language>"
+        f"<lastBuildDate>{build_date}</lastBuildDate>"
+        f'<atom:link href="{host}{path}" rel="self" type="application/rss+xml" />'
+    )
+
     for page in now_pages:
         link = page.strip(".html")
-        date = datetime.datetime.strptime(link, "%y_%m_%d")
-        pubdate = date.strftime("%a, %d %b %Y 00:00:00 +0000")
-        date = date.strftime("%A, %B %d, %Y")
+
+        # Attach UTC timezone to avoid naive datetime warning (DTZ007)
+        dt = datetime.datetime.strptime(link, "%y_%m_%d").replace(tzinfo=datetime.UTC)
+
+        pubdate = dt.strftime("%a, %d %b %Y 00:00:00 +0000")
+        formatted_date = dt.strftime("%A, %B %d, %Y")
+
         rss += f"""
         <item>
-          <title>What's Happening {date}</title>
+          <title>What's Happening {formatted_date}</title>
           <link>{host}/now/{link}</link>
-          <description>Latest updates for {date}</description>
+          <description>Latest updates for {formatted_date}</description>
           <pubDate>{pubdate}</pubDate>
           <guid isPermaLink="true">{host}/now/{link}</guid>
         </item>
         """
+
     rss += "</channel></rss>"
     return make_response(rss, 200, {"Content-Type": "application/rss+xml"})
 
@@ -218,17 +252,24 @@ def json():
     host = "https://" + request.host
     if ":" in request.host:
         host = "http://" + request.host
-    now_pages = [
-        {
-            "url": host + "/now/" + page.strip(".html"),
-            "date": datetime.datetime.strptime(
-                page.strip(".html"), "%y_%m_%d"
-            ).strftime("%A, %B %d, %Y"),
-            "title": "What's Happening "
-            + datetime.datetime.strptime(page.strip(".html"), "%y_%m_%d").strftime(
-                "%A, %B %d, %Y"
-            ),
-        }
-        for page in now_pages
-    ]
-    return jsonify(now_pages)
+
+    formatted_pages = []
+    for page in now_pages:
+        page_name = page.strip(".html")
+
+        # Parse string and explicitly attach timezone info to clear DTZ007
+        parsed_dt = datetime.datetime.strptime(page_name, "%y_%m_%d").replace(
+            tzinfo=datetime.UTC
+        )
+
+        formatted_date = parsed_dt.strftime("%A, %B %d, %Y")
+
+        formatted_pages.append(
+            {
+                "url": f"{host}/now/{page_name}",
+                "date": formatted_date,
+                "title": f"What's Happening {formatted_date}",
+            }
+        )
+
+    return jsonify(formatted_pages)

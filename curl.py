@@ -1,10 +1,12 @@
-from flask import render_template, send_file
-from tools import getAddress, get_tools_data, getClientIP
 import os
 from functools import lru_cache
-from blueprints.spotify import get_playing_spotify_track
-from cache_helper import get_git_latest_activity, get_projects as get_projects_cached
 
+from flask import render_template, send_file
+
+from blueprints.spotify import get_playing_spotify_track
+from cache_helper import get_git_latest_activity
+from cache_helper import get_projects as get_projects_cached
+from tools import get_tools_data, getAddress, getClientIP
 
 MAX_WIDTH = 80
 
@@ -12,8 +14,7 @@ MAX_WIDTH = 80
 def clean_path(path: str):
     path = path.strip("/ ").lower()
     # Strip any .html extension
-    if path.endswith(".html"):
-        path = path[:-5]
+    path = path.removesuffix(".html")
 
     # If the path is empty, set it to "index"
     if path == "":
@@ -33,8 +34,8 @@ def get_current_project():
     repo_name = git["repo"]["name"].lower()
     repo_description = git["repo"]["description"]
     if not repo_description:
-        return f"[1;36m{repo_name}[0m"
-    return f"[1;36m{repo_name}[0m - [1m{repo_description}[0m"
+        return f"\x1b[1;36m{repo_name}\x1b[0m"
+    return f"\x1b[1;36m{repo_name}\x1b[0m - \x1b[1m{repo_description}\x1b[0m"
 
 
 @lru_cache(maxsize=16)
@@ -42,7 +43,7 @@ def get_projects():
     projects_data = get_projects_cached(limit=5)
     projects = ""
     for project in projects_data:
-        projects += f"""[1m{project["name"]}[0m - {project["description"] if project["description"] else "No description"}
+        projects += f"""\x1b[1m{project["name"]}\x1b[0m - {project["description"] if project["description"] else "No description"}
 {project["html_url"]}
 
 """
@@ -126,8 +127,7 @@ def curl_response(request):
         )
 
     if path == "pgp" or path == "gpg":
-        if os.path.exists("data/nathanwoodburn.asc"):
-            return send_file("data/nathanwoodburn.asc")
+        return send_file("data/nathanwoodburn.asc")
     if os.path.exists(f"templates/{path}.ascii"):
         return (
             render_template(f"{path}.ascii", header=get_header()),

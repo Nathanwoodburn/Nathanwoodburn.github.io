@@ -1,15 +1,17 @@
-from flask import Blueprint, request, jsonify
-import os
 import datetime
-import requests
+import os
 import re
-from mail import sendEmail
-from tools import getClientIP, getGitCommit, json_response, parse_date, get_tools_data
-from blueprints import sol
+from zoneinfo import ZoneInfo
+
+import requests
 from dateutil import parser as date_parser
+from flask import Blueprint, jsonify, request
+
+from blueprints import sol
 from blueprints.spotify import get_playing_spotify_track
 from cache_helper import get_git_latest_activity
-from zoneinfo import ZoneInfo
+from mail import sendEmail
+from tools import get_tools_data, getClientIP, getGitCommit, json_response, parse_date
 
 # Constants
 HTTP_OK = 200

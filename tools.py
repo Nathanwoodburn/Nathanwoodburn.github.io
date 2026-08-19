@@ -1,11 +1,11 @@
-from flask import Request, render_template, jsonify, make_response
-import os
-from functools import lru_cache
 import datetime
-from typing import Optional, Dict, Union, Tuple
-import re
-from dateutil.parser import parse
 import json
+import os
+import re
+from functools import lru_cache
+
+from dateutil.parser import parse
+from flask import Request, jsonify, make_response, render_template
 
 # HTTP status codes
 HTTP_OK = 200
@@ -137,14 +137,12 @@ def isDev(host: str) -> bool:
     Returns:
         bool: True if in development environment, False otherwise
     """
-    if (
+    return (
         host == "localhost:5000"
         or host == "127.0.0.1:5000"
         or os.getenv("DEV") == "true"
         or host == "test.nathan.woodburn.au"
-    ):
-        return True
-    return False
+    )
 
 
 @lru_cache(maxsize=128)
@@ -184,7 +182,7 @@ def getAddress(coin: str) -> str:
 
 
 @lru_cache(maxsize=256)
-def getFilePath(name: str, path: str) -> Optional[str]:
+def getFilePath(name: str, path: str) -> str | None:
     """
     Find a file in a directory tree.
 
@@ -202,7 +200,7 @@ def getFilePath(name: str, path: str) -> Optional[str]:
 
 
 def json_response(
-    request: Request, message: Union[str, Dict] = "404 Not Found", code: int = 404
+    request: Request, message: str | dict = "404 Not Found", code: int = 404
 ):
     """
     Create a JSON response with standard formatting.
@@ -235,7 +233,7 @@ def error_response(
     message: str = "404 Not Found",
     code: int = 404,
     force_json: bool = False,
-) -> Union[Tuple[Dict, int], object]:
+) -> tuple[dict, int] | object:
     """
     Create an error response in JSON or HTML format.
 
@@ -284,7 +282,7 @@ def parse_date(date_groups: list[str]) -> str | None:
         date_str = re.sub(r"(\d+)(st|nd|rd|th)", r"\1", date_str, flags=re.IGNORECASE)
 
         # Parse with dateutil, default day=1 if missing
-        dt = parse(date_str, default=datetime.datetime(1900, 1, 1))
+        dt = parse(date_str, default=datetime.datetime(1900, 1, 1, tzinfo=datetime.UTC))
 
         # If year is missing, parse will fallback to 1900 → reject
         if dt.year == 1900:

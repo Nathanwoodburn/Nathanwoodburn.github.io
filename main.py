@@ -1,6 +1,8 @@
-from server import app
-from gunicorn.app.base import BaseApplication
 import os
+
+from gunicorn.app.base import BaseApplication
+
+from server import app
 
 
 class GunicornApp(BaseApplication):

@@ -1,5 +1,5 @@
-import os
 import json
+import os
 
 if not os.path.exists(".well-known/wallets"):
     os.makedirs(".well-known/wallets")

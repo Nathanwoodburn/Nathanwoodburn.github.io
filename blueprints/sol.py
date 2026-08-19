@@ -1,14 +1,15 @@
-from flask import Blueprint, request, jsonify, make_response
-from solders.pubkey import Pubkey
-from solders.hash import Hash
-from solders.system_program import TransferParams, transfer
-from solders.message import MessageV0
-from solders.transaction import VersionedTransaction
-from solders.null_signer import NullSigner
-import binascii
 import base64
+import binascii
 import os
+
 import requests
+from flask import Blueprint, jsonify, make_response, request
+from solders.hash import Hash
+from solders.message import MessageV0
+from solders.null_signer import NullSigner
+from solders.pubkey import Pubkey
+from solders.system_program import TransferParams, transfer
+from solders.transaction import VersionedTransaction
 
 app = Blueprint("sol", __name__)
 
@@ -45,7 +46,7 @@ def create_transaction(sender_address: str, amount: float) -> str:
         "jsonrpc": "2.0",
         "id": 1,
         "method": "getLatestBlockhash",
-        "params": [{"commitment": "confirmed"}]
+        "params": [{"commitment": "confirmed"}],
     }
     response = requests.post(rpc_url, json=payload)
     response.raise_for_status()

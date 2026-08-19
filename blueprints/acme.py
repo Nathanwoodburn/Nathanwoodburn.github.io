@@ -1,6 +1,8 @@
-from flask import Blueprint, request
 import os
+
 from cloudflare import Cloudflare
+from flask import Blueprint, request
+
 from tools import json_response
 
 app = Blueprint("acme", __name__)
@@ -31,10 +33,6 @@ def post():
         record_id = existing_records["result"][0]["id"]  # type: ignore
         cf.dns.records.delete(dns_record_id=record_id, zone_id=zone_id)
     cf.dns.records.create(
-        zone_id=zone_id,
-        type="TXT",
-        name="_acme-challenge",
-        content=txt,
-        ttl=60
+        zone_id=zone_id, type="TXT", name="_acme-challenge", content=txt, ttl=60
     )
     return json_response(request, "Success", 200)
