@@ -318,9 +318,30 @@ def find_chromium() -> str | None:
     return None
 
 
+def get_resume_data(support: bool = False) -> dict:
+    """Load and prepare resume data from data/resume.json."""
+    with open("data/resume.json", "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    title = data.get("titles", {}).get(
+        "support" if support else "default", data.get("title", "")
+    )
+    summary = data.get("summaries", {}).get(
+        "support" if support else "default", data.get("summary", "")
+    )
+
+    return {
+        **data,
+        "active_title": title,
+        "active_summary": summary,
+        "is_support": support,
+    }
+
+
 def get_resume_source_mtime() -> float:
-    """Get the latest modification timestamp of resume templates and styling assets."""
+    """Get the latest modification timestamp of resume templates, data, and styling assets."""
     source_files = [
+        "data/resume.json",
         "templates/resume.html",
         "templates/assets/css/resume-print.css",
         "templates/assets/css/resume-custom.css",
@@ -362,7 +383,8 @@ def build_resume_pdf(support: bool = False, output_path: str | None = None) -> s
             with open(css_rel, "r", encoding="utf-8") as cf:
                 css_parts.append(cf.read())
 
-    rendered = jinja2.Template(html).render(support=support)
+    resume_data = get_resume_data(support=support)
+    rendered = jinja2.Template(html).render(resume=resume_data, support=support)
     rendered = rendered.replace(
         "</head>",
         f"<style>\n{chr(10).join(css_parts)}\n</style>\n</head>",

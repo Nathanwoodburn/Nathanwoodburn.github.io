@@ -35,6 +35,7 @@ from cache_helper import (
 from curl import curl_response, finger_response
 from tools import (
     error_response,
+    get_resume_data,
     get_resume_pdf,
     get_tools_data,
     getAddress,
@@ -588,8 +589,9 @@ def hosting_post():
 @app.route("/resume")
 def resume():
     # Check if arg for support is passed
-    support = request.args.get("support")
-    return render_template("resume.html", support=support)
+    support = bool(request.args.get("support"))
+    resume_data = get_resume_data(support=support)
+    return render_template("resume.html", resume=resume_data, support=support)
 
 
 @app.route("/resume.pdf")

@@ -4,20 +4,20 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Nathan Woodburn - Resume</title>
+    <title>{{ resume.name }} - Resume</title>
     <meta name="theme-color" content="#6E0E9C">
     <link rel="canonical" href="https://nathan.woodburn.au/resume">
     <meta property="og:url" content="https://nathan.woodburn.au/resume">
     <meta name="fediverse:creator" content="@nathanwoodburn@mastodon.woodburn.au">
     <meta name="twitter:card" content="summary">
     <meta property="og:type" content="website">
-    <meta property="og:description" content="Cybersecurity-focused computing student with hands-on experience in DNS, Linux system administration, server infrastructure, and decentralized technologies. Skilled in providing technical support, resolving complex domain-related issues, and engaging in open-source blockchain communities. Experienced speaker and contributor at Handshake-related conferences. Passionate about building secure, resilient, and privacy-respecting systems from the ground up.">
-    <meta name="twitter:description" content="Cybersecurity-focused computing student with hands-on experience in DNS, Linux system administration, server infrastructure, and decentralized technologies. Skilled in providing technical support, resolving complex domain-related issues, and engaging in open-source blockchain communities. Experienced speaker and contributor at Handshake-related conferences. Passionate about building secure, resilient, and privacy-respecting systems from the ground up.">
-    <meta property="og:image" content="https://nathan.woodburn.au/assets/img/nathanwoodburn.jpeg">
-    <meta name="description" content="Cybersecurity-focused computing student with hands-on experience in DNS, Linux system administration, server infrastructure, and decentralized technologies. Skilled in providing technical support, resolving complex domain-related issues, and engaging in open-source blockchain communities. Experienced speaker and contributor at Handshake-related conferences. Passionate about building secure, resilient, and privacy-respecting systems from the ground up.">
-    <meta name="twitter:image" content="https://nathan.woodburn.au/assets/img/nathanwoodburn.jpeg">
-    <meta name="twitter:title" content="Nathan Woodburn - Resume">
-    <meta property="og:title" content="Nathan Woodburn - Resume">
+    <meta property="og:description" content="{{ resume.active_summary }}">
+    <meta name="twitter:description" content="{{ resume.active_summary }}">
+    <meta property="og:image" content="https://nathan.woodburn.au{{ resume.profile_image }}">
+    <meta name="description" content="{{ resume.active_summary }}">
+    <meta name="twitter:image" content="https://nathan.woodburn.au{{ resume.profile_image }}">
+    <meta name="twitter:title" content="{{ resume.name }} - Resume">
+    <meta property="og:title" content="{{ resume.name }} - Resume">
     <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="/assets/img/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon/favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon/favicon-32x32.png">
@@ -43,13 +43,13 @@
                 <aside class="col-12 col-md-4 resume-column resume-column-left">
                     <div class="resume-left-inner">
                         <div class="text-center profile-container">
-                            <img class="profile-side" src="/assets/img/nathanwoodburn.jpeg" alt="Nathan Woodburn">
+                            <img class="profile-side" src="{{ resume.profile_image }}" alt="{{ resume.name }}">
                         </div>
 
                         <!-- Mobile-only header (shows Name & Title at top on mobile) -->
                         <div class="mobile-header d-md-none text-center">
-                            <h1 class="mobile-title">Nathan Woodburn</h1>
-                            <h2 class="mobile-subtitle">{% if support %}Technical Support Specialist{% else %}Linux Systems Administrator{% endif %}</h2>
+                            <h1 class="mobile-title">{{ resume.name }}</h1>
+                            <h2 class="mobile-subtitle">{{ resume.active_title }}</h2>
                         </div>
 
                         <!-- Contact Section -->
@@ -57,55 +57,47 @@
                             <h2 class="l-heading1">Contact</h2>
                             <hr class="hr-l">
                             <div class="contact-grid">
+                                {% for item in resume.contact %}
                                 <div class="r-small">
-                                    <a class="print_text" href="tel:+61493129562" target="_blank" rel="noopener">
+                                    {% if item.url %}
+                                    <a class="print_text" href="{{ item.url }}" target="_blank" rel="noopener">
+                                    {% else %}
+                                    <span class="print_text">
+                                    {% endif %}
+                                        {% if item.icon == 'telephone' %}
                                         <svg class="bi bi-telephone-fill icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16">
                                             <path fill-rule="evenodd" d="M1.885.511a1.745 1.745 0 0 1 2.61.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.68.68 0 0 0 .178.643l2.457 2.457a.68.68 0 0 0 .644.178l2.189-.547a1.75 1.75 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.6 18.6 0 0 1-7.01-4.42 18.6 18.6 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877z"></path>
                                         </svg>
-                                        <span>+61 493 129 562</span>
-                                    </a>
-                                </div>
-                                <div class="r-small">
-                                    <a class="print_text" href="mailto:nathan@woodburn.au" target="_blank" rel="noopener">
+                                        {% elif item.icon == 'envelope' %}
                                         <svg class="bi bi-envelope-fill icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16">
                                             <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414zM0 4.697v7.104l5.803-3.558zM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586zm3.436-.586L16 11.801V4.697z"></path>
                                         </svg>
-                                        <span>nathan@woodburn.au</span>
-                                    </a>
-                                </div>
-                                <div class="r-small">
-                                    <span class="print_text">
+                                        {% elif item.icon == 'location' %}
                                         <svg class="bi bi-pin-angle-fill icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16">
                                             <path d="M9.828.722a.5.5 0 0 1 .354.146l4.95 4.95a.5.5 0 0 1 0 .707c-.48.48-1.072.588-1.503.588-.177 0-.335-.018-.46-.039l-3.134 3.134a6 6 0 0 1 .16 1.013c.046.702-.032 1.687-.72 2.375a.5.5 0 0 1-.707 0l-2.829-2.828-3.182 3.182c-.195.195-1.219.902-1.414.707s.512-1.22.707-1.414l3.182-3.182-2.828-2.829a.5.5 0 0 1 0-.707c.688-.688 1.673-.767 2.375-.72a6 6 0 0 1 1.013.16l3.134-3.133a3 3 0 0 1-.04-.461c0-.43.108-1.022.589-1.503a.5.5 0 0 1 .353-.146"></path>
                                         </svg>
-                                        <span>Canberra, ACT</span>
-                                    </span>
-                                </div>
-                                <div class="r-small">
-                                    <a class="print_text" href="https://nathan.woodburn.au" target="_blank" rel="noopener">
+                                        {% elif item.icon == 'website' %}
                                         <svg class="bi bi-link-45deg icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16">
                                             <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z"></path>
                                             <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z"></path>
                                         </svg>
-                                        <span>nathan.woodburn.au</span>
-                                    </a>
-                                </div>
-                                <div class="r-small">
-                                    <a class="print_text" href="https://github.com/nathanwoodburn" target="_blank" rel="noopener">
+                                        {% elif item.icon == 'github' %}
                                         <svg class="bi bi-github icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16">
                                             <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"></path>
                                         </svg>
-                                        <span>@nathanwoodburn</span>
-                                    </a>
-                                </div>
-                                <div class="r-small">
-                                    <a class="print_text" href="https://linkedin.com/in/nathanwoodburn" target="_blank" rel="noopener">
+                                        {% elif item.icon == 'linkedin' %}
                                         <svg class="bi bi-linkedin icon" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16">
                                             <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z"></path>
                                         </svg>
-                                        <span>@nathanwoodburn</span>
+                                        {% endif %}
+                                        <span>{{ item.label }}</span>
+                                    {% if item.url %}
                                     </a>
+                                    {% else %}
+                                    </span>
+                                    {% endif %}
                                 </div>
+                                {% endfor %}
                             </div>
                         </section>
 
@@ -113,20 +105,15 @@
                         <section class="sidebar-section side-column">
                             <h2 class="l-heading1">Education</h2>
                             <hr class="hr-l">
+                            {% for item in resume.education %}
                             <div class="noprintbreak mb-3">
-                                <h3 class="r-heading2">Bachelor of Computing</h3>
-                                <div class="r-heading3">Australian National University<br><span class="edu-date">2022 - 2026</span></div>
+                                <h3 class="r-heading2">{{ item.degree }}</h3>
+                                <div class="r-heading3">{{ item.institution }}{% if item.dates %}<br><span class="edu-date">{{ item.dates }}</span>{% endif %}</div>
+                                {% if item.description %}
+                                <p class="l-body">{{ item.description }}</p>
+                                {% endif %}
                             </div>
-                            <div class="noprintbreak mb-3">
-                                <h3 class="r-heading2">Discovering Engineering</h3>
-                                <div class="r-heading3">Australian National University<br><span class="edu-date">Years 11 - 12</span></div>
-                                <p class="l-body">Completed enrichment program in engineering disciplines, CAD modeling, and design thinking</p>
-                            </div>
-                            <div class="noprintbreak mb-3">
-                                <h3 class="r-heading2">Home Educated</h3>
-                                <div class="r-heading3">Self-Directed Learning</div>
-                                <p class="l-body">Developed passion for technology through independent exploration of programming, system administration, and server management.</p>
-                            </div>
+                            {% endfor %}
                         </section>
 
                         <!-- Skills Section -->
@@ -135,12 +122,9 @@
                             <hr class="hr-l">
                             <div class="noprintbreak">
                                 <ul class="r-body skills-list">
-                                    <li>Python 3</li>
-                                    <li>Git</li>
-                                    <li>Docker Containerization</li>
-                                    <li>DNS</li>
-                                    <li>Linux administration</li>
-                                    <li>Technical troubleshooting</li>
+                                    {% for skill in resume.skills %}
+                                    <li>{{ skill }}</li>
+                                    {% endfor %}
                                 </ul>
                             </div>
                         </section>
@@ -152,8 +136,8 @@
                     <div class="resume-right-inner">
                         <!-- Desktop Header -->
                         <header class="resume-header d-none d-md-block">
-                            <h1 class="title">Nathan Woodburn</h1>
-                            <h2 class="subtitle">{% if support %}Technical Support Specialist{% else %}Linux Systems Administrator{% endif %}</h2>
+                            <h1 class="title">{{ resume.name }}</h1>
+                            <h2 class="subtitle">{{ resume.active_title }}</h2>
                             <hr class="title-hr">
                         </header>
 
@@ -161,81 +145,54 @@
                         <section class="l-summary mb-4">
                             <h2 class="r-heading1">Summary</h2>
                             <hr class="hr-l-primary">
-                            <p class="r-body summary-text">{% if support %}Technical Support Specialist with expertise in Linux, DNS, and network troubleshooting. Experienced in resolving critical domain and network issues, supporting end-users, and collaborating with engineering teams to ensure stable and secure systems. Skilled in Python automation to streamline repetitive tasks and improve operational efficiency.{% else %}System Administrator specializing in Linux, Docker, and server deployments. Experienced in managing Proxmox, networks, and CI/CD pipelines. Implementing Python automations to optimize system operations. Ability to deploy and maintain server environments, self-hosted services, and web applications while ensuring reliability, scalability, and security.{% endif %}</p>
+                            <p class="r-body summary-text">{{ resume.active_summary }}</p>
                         </section>
 
                         <!-- Experience Section -->
                         <section class="mb-4">
                             <h2 class="r-heading1">Experience</h2>
                             <hr class="hr-l-primary">
+                            {% for item in resume.experience %}
                             <div class="noprintbreak timeline-item">
                                 <div class="d-flex justify-content-between align-items-baseline flex-wrap gap-1">
-                                    <h3 class="l-heading2">Web Hosting System Administrator</h3>
-                                    <span class="job-date">Dec 2025 - Present</span>
+                                    <h3 class="l-heading2">{{ item.role }}</h3>
+                                    {% if item.dates %}<span class="job-date">{{ item.dates }}</span>{% endif %}
                                 </div>
-                                <div class="l-heading3">CSIRO - Canberra</div>
+                                {% if item.company or item.location %}
+                                <div class="l-heading3">{% if item.company and item.location %}{{ item.company }} - {{ item.location }}{% elif item.company %}{{ item.company }}{% else %}{{ item.location }}{% endif %}</div>
+                                {% endif %}
+                                {% if item.bullets %}
                                 <ul class="r-body">
-                                    <li>Configure and manage web services</li>
-                                    <li>Managing Kubernetes services</li>
-                                    <li>Building tools to assist with internal processes</li>
+                                    {% for bullet in item.bullets %}
+                                    <li>{{ bullet }}</li>
+                                    {% endfor %}
                                 </ul>
+                                {% endif %}
                             </div>
-                            <div class="noprintbreak timeline-item">
-                                <div class="d-flex justify-content-between align-items-baseline flex-wrap gap-1">
-                                    <h3 class="l-heading2">Technical Support Specialist</h3>
-                                    <span class="job-date">Oct 2022 - Jun 2025</span>
-                                </div>
-                                <div class="l-heading3">Namebase - Remote</div>
-                                <ul class="r-body">
-                                    <li>Provided technical support for users, focusing on domain setup, configuration, and troubleshooting.</li>
-                                    <li>Worked with engineering teams to report bugs and suggest product improvements.</li>
-                                    <li>Diagnosed complex DNS issues including nameserver propagation and zone file errors.</li>
-                                    <li>Gained hands-on experience with recursive and authoritative DNS, DNSSEC, and decentralized naming.</li>
-                                    <li>Engaged with the community through social platforms and represented Namebase at conferences.</li>
-                                </ul>
-                            </div>
-                            <div class="noprintbreak timeline-item">
-                                <div class="d-flex justify-content-between align-items-baseline flex-wrap gap-1">
-                                    <h3 class="l-heading2">Small Business Owner</h3>
-                                    <span class="job-date">Feb 2020 - Dec 2023</span>
-                                </div>
-                                <div class="l-heading3">Nathan 3D Printing Service</div>
-                                <ul class="r-body">
-                                    <li>Operated a custom 3D printing and CAD design business independently.</li>
-                                    <li>Handled client communication, design iteration, and order fulfillment.</li>
-                                    <li>Built end-to-end project management and technical design skills.</li>
-                                </ul>
-                            </div>
+                            {% endfor %}
                         </section>
 
                         <!-- Projects Section -->
                         <section class="mb-3">
                             <h2 class="r-heading1">Projects</h2>
                             <hr class="hr-l-primary">
+                            {% for item in resume.projects %}
                             <div class="noprintbreak timeline-item">
                                 <div class="d-flex justify-content-between align-items-baseline flex-wrap gap-1">
-                                    <h3 class="l-heading2">Server Lab</h3>
+                                    <h3 class="l-heading2">{{ item.name }}</h3>
                                 </div>
-                                <div class="l-heading3">Proxmox, Networking, Linux, DNS</div>
+                                {% if item.technologies %}
+                                <div class="l-heading3">{{ item.technologies }}</div>
+                                {% endif %}
+                                {% if item.bullets %}
                                 <ul class="r-body">
-                                    <li>Maintain a personal physical server running Proxmox hypervisor.</li>
-                                    <li>Host multiple virtual machines across three VLANs with isolated firewalls for enhanced security.</li>
-                                    <li>Provide DNS and recursive resolver hosting services for external users.</li>
-                                    <li>Host a suite of self-hosted services such as Gitea, Authentik, Vaultwarden and Nextcloud.</li>
+                                    {% for bullet in item.bullets %}
+                                    <li>{{ bullet }}</li>
+                                    {% endfor %}
                                 </ul>
+                                {% endif %}
                             </div>
-                            <div class="noprintbreak timeline-item">
-                                <div class="d-flex justify-content-between align-items-baseline flex-wrap gap-1">
-                                    <h3 class="l-heading2">Personal Website</h3>
-                                </div>
-                                <div class="l-heading3">Python 3, Flask, Docker, CI/CD</div>
-                                <ul class="r-body">
-                                    <li>Designed modular web application architecture with Flask blueprints and reusable templates.</li>
-                                    <li>Managed containerized deployment using Docker on a dedicated server, ensuring consistency and scalability.</li>
-                                    <li>Implemented CI/CD pipelines for automated testing, building, and deployment from Git.</li>
-                                    <li>Integrated dynamic content and interactive features while maintaining secure and optimized server operations.</li>
-                                </ul>
-                            </div>
+                            {% endfor %}
                         </section>
                     </div>
                 </main>
