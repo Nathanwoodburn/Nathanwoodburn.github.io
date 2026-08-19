@@ -28,15 +28,33 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --frozen --no-dev --no-install-workspace
 
+### PDF Build stage (isolated so chromium is not in final image) ###
+FROM python:3.13-alpine AS pdf-builder
+
+# Install chromium and fonts only for PDF generation in this intermediate stage
+RUN apk add --no-cache chromium font-noto
+
+WORKDIR /app
+
+COPY --from=build /app/.venv /app/.venv
+ENV PATH="/app/.venv/bin:$PATH"
+
+COPY *.py ./
+COPY templates templates
+COPY data data
+
+# Generate the PDF files during build
+RUN python3 tools.py --build-resume
+
 ### Runtime stage ###
 FROM python:3.13-alpine AS runtime
 
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Create non-root user and install curl for healthchecks and chromium for PDF building
+# Create non-root user and install curl for healthchecks
 RUN addgroup -g 1001 appgroup && \
     adduser -D -u 1001 -G appgroup -h /app appuser && \
-    apk add --no-cache curl chromium font-noto
+    apk add --no-cache curl
 
 WORKDIR /app
 
@@ -46,10 +64,10 @@ COPY --from=build --chown=appuser:appgroup /app/.venv /app/.venv
 # Copy all top-level Python files
 COPY --chown=appuser:appgroup *.py ./
 
-# Copy application directories
+# Copy application directories (including pre-built PDFs in data from pdf-builder)
 COPY --chown=appuser:appgroup blueprints blueprints
 COPY --chown=appuser:appgroup templates templates
-COPY --chown=appuser:appgroup data data
+COPY --from=pdf-builder --chown=appuser:appgroup /app/data data
 COPY --chown=appuser:appgroup pwa pwa
 COPY --chown=appuser:appgroup .well-known .well-known
 

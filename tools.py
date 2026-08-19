@@ -419,3 +419,15 @@ def get_resume_pdf(support: bool = False, force: bool = False) -> str:
 
     return target_pdf
 
+
+if __name__ == "__main__":
+    import sys
+
+    if "--build-resume" in sys.argv or "-b" in sys.argv or len(sys.argv) == 1:
+        print("Building standard resume PDF...")
+        p1 = build_resume_pdf(support=False)
+        print(f"Built {p1} ({os.path.getsize(p1)} bytes)")
+        print("Building technical support resume PDF...")
+        p2 = build_resume_pdf(support=True)
+        print(f"Built {p2} ({os.path.getsize(p2)} bytes)")
+        print("Resume PDF build finished.")
