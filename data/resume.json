@@ -1,0 +1,137 @@
+{
+  "name": "Nathan Woodburn",
+  "profile_image": "/assets/img/nathanwoodburn.jpeg",
+  "titles": {
+    "default": "Linux Systems Administrator",
+    "support": "Technical Support Specialist"
+  },
+  "summaries": {
+    "default": "System Administrator specializing in Linux, Docker, and server deployments. Experienced in managing Proxmox, networks, and CI/CD pipelines. Implementing Python automations to optimize system operations. Ability to deploy and maintain server environments, self-hosted services, and web applications while ensuring reliability, scalability, and security.",
+    "support": "Technical Support Specialist with expertise in Linux, DNS, and network troubleshooting. Experienced in resolving critical domain and network issues, supporting end-users, and collaborating with engineering teams to ensure stable and secure systems. Skilled in Python automation to streamline repetitive tasks and improve operational efficiency."
+  },
+  "contact": [
+    {
+      "type": "phone",
+      "label": "+61 493 129 562",
+      "url": "tel:+61493129562",
+      "icon": "telephone"
+    },
+    {
+      "type": "email",
+      "label": "nathan@woodburn.au",
+      "url": "mailto:nathan@woodburn.au",
+      "icon": "envelope"
+    },
+    {
+      "type": "location",
+      "label": "Canberra, ACT",
+      "url": null,
+      "icon": "location"
+    },
+    {
+      "type": "website",
+      "label": "nathan.woodburn.au",
+      "url": "https://nathan.woodburn.au",
+      "icon": "website"
+    },
+    {
+      "type": "github",
+      "label": "@nathanwoodburn",
+      "url": "https://github.com/nathanwoodburn",
+      "icon": "github"
+    },
+    {
+      "type": "linkedin",
+      "label": "@nathanwoodburn",
+      "url": "https://linkedin.com/in/nathanwoodburn",
+      "icon": "linkedin"
+    }
+  ],
+  "education": [
+    {
+      "degree": "Bachelor of Computing",
+      "institution": "Australian National University",
+      "dates": "2022 - 2026",
+      "description": null
+    },
+    {
+      "degree": "Discovering Engineering",
+      "institution": "Australian National University",
+      "dates": "Years 11 - 12",
+      "description": "Completed enrichment program in engineering disciplines, CAD modeling, and design thinking"
+    },
+    {
+      "degree": "Home Educated",
+      "institution": "Self-Directed Learning",
+      "dates": null,
+      "description": "Developed passion for technology through independent exploration of programming, system administration, and server management."
+    }
+  ],
+  "skills": [
+    "Python 3",
+    "Git",
+    "Docker Containerization",
+    "DNS",
+    "Linux administration",
+    "Technical troubleshooting"
+  ],
+  "experience": [
+    {
+      "role": "Web Hosting System Administrator",
+      "company": "CSIRO",
+      "location": "Canberra",
+      "dates": "Dec 2025 - Present",
+      "bullets": [
+        "Configure and manage web services",
+        "Managing Kubernetes services",
+        "Building tools to assist with internal processes"
+      ]
+    },
+    {
+      "role": "Technical Support Specialist",
+      "company": "Namebase",
+      "location": "Remote",
+      "dates": "Oct 2022 - Jun 2025",
+      "bullets": [
+        "Provided technical support for users, focusing on domain setup, configuration, and troubleshooting.",
+        "Worked with engineering teams to report bugs and suggest product improvements.",
+        "Diagnosed complex DNS issues including nameserver propagation and zone file errors.",
+        "Gained hands-on experience with recursive and authoritative DNS, DNSSEC, and decentralized naming.",
+        "Engaged with the community through social platforms and represented Namebase at conferences."
+      ]
+    },
+    {
+      "role": "Small Business Owner",
+      "company": "Nathan 3D Printing Service",
+      "location": null,
+      "dates": "Feb 2020 - Dec 2023",
+      "bullets": [
+        "Operated a custom 3D printing and CAD design business independently.",
+        "Handled client communication, design iteration, and order fulfillment.",
+        "Built end-to-end project management and technical design skills."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "Server Lab",
+      "technologies": "Proxmox, Networking, Linux, DNS",
+      "bullets": [
+        "Maintain a personal physical server running Proxmox hypervisor.",
+        "Host multiple virtual machines across three VLANs with isolated firewalls for enhanced security.",
+        "Provide DNS and recursive resolver hosting services for external users.",
+        "Host a suite of self-hosted services such as Gitea, Authentik, Vaultwarden and Nextcloud."
+      ]
+    },
+    {
+      "name": "Personal Website",
+      "technologies": "Python 3, Flask, Docker, CI/CD",
+      "bullets": [
+        "Designed modular web application architecture with Flask blueprints and reusable templates.",
+        "Managed containerized deployment using Docker on a dedicated server, ensuring consistency and scalability.",
+        "Implemented CI/CD pipelines for automated testing, building, and deployment from Git.",
+        "Integrated dynamic content and interactive features while maintaining secure and optimized server operations."
+      ]
+    }
+  ]
+}

@@ -28,6 +28,24 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --frozen --no-dev --no-install-workspace
 
+### PDF Build stage (isolated so chromium is not in final image) ###
+FROM python:3.13-alpine AS pdf-builder
+
+# Install chromium and fonts only for PDF generation in this intermediate stage
+RUN apk add --no-cache chromium font-noto
+
+WORKDIR /app
+
+COPY --from=build /app/.venv /app/.venv
+ENV PATH="/app/.venv/bin:$PATH"
+
+COPY *.py ./
+COPY templates templates
+COPY data data
+
+# Generate the PDF files during build
+RUN python3 tools.py --build-resume
+
 ### Runtime stage ###
 FROM python:3.13-alpine AS runtime
 
@@ -46,10 +64,10 @@ COPY --from=build --chown=appuser:appgroup /app/.venv /app/.venv
 # Copy all top-level Python files
 COPY --chown=appuser:appgroup *.py ./
 
-# Copy application directories
+# Copy application directories (including pre-built PDFs in data from pdf-builder)
 COPY --chown=appuser:appgroup blueprints blueprints
 COPY --chown=appuser:appgroup templates templates
-COPY --chown=appuser:appgroup data data
+COPY --from=pdf-builder --chown=appuser:appgroup /app/data data
 COPY --chown=appuser:appgroup pwa pwa
 COPY --chown=appuser:appgroup .well-known .well-known
 
