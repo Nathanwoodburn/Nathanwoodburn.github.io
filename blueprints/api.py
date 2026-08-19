@@ -172,13 +172,7 @@ def project():
 @app.route("/tools")
 def tools():
     """Get a list of tools used by Nathan Woodburn."""
-    try:
-        tools = get_tools_data()
-    except Exception as e:
-        print(f"Error getting tools data: {e}")
-        return json_response(request, "500 Internal Server Error", HTTP_SERVER_ERROR)
-
-    return json_response(request, {"tools": tools}, HTTP_OK)
+    return json_response(request, {"tools": get_tools_data()}, HTTP_OK)
 
 
 @app.route("/playing")
@@ -197,7 +191,7 @@ def headers():
 
     # For each header, convert list-like headers to lists
     toremove = []
-    for key, _ in headers.items():
+    for key in headers:
         # If header is like X- something
         if key.startswith("X-"):
             # Remove from headers
@@ -276,7 +270,7 @@ def page_date():
     if not found_dates:
         return json_response(request, "Date not found on page", HTTP_BAD_REQUEST)
 
-    today = datetime.date.today()
+    today = datetime.datetime.now(tz=datetime.UTC).date()
     tolerance_date = today + datetime.timedelta(
         days=1
     )  # Allow for slight future dates (e.g., time zones)
@@ -286,14 +280,22 @@ def page_date():
         if pattern_format == -1:
             # Already formatted date
             try:
-                dt = datetime.datetime.strptime(date_groups[0], "%Y-%m-%d").date()
+                dt = (
+                    datetime.datetime.strptime(date_groups[0], "%Y-%m-%d")
+                    .replace(tzinfo=datetime.UTC)
+                    .date()
+                )
             except ValueError:
                 continue
         else:
             parsed_date = parse_date(date_groups)
             if not parsed_date:
                 continue
-            dt = datetime.datetime.strptime(parsed_date, "%Y-%m-%d").date()
+            dt = (
+                datetime.datetime.strptime(parsed_date, "%Y-%m-%d")
+                .replace(tzinfo=datetime.UTC)
+                .date()
+            )
 
         # Only keep dates in the past (with tolerance)
         if dt <= tolerance_date:

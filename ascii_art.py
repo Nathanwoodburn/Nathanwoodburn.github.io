@@ -1,7 +1,7 @@
 from io import BytesIO
 
 import requests
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 ASCII_CHARS = ["@", "#", "S", "%", "?", "*", "+", ";", ":", ",", "."]
 
@@ -38,7 +38,7 @@ def image_url_to_ascii(url, new_width=40):
     try:
         response = requests.get(url, timeout=5)
         image = Image.open(BytesIO(response.content))
-    except Exception:
+    except (requests.RequestException, UnidentifiedImageError, ValueError, OSError):
         return ""
 
     # Resize image
