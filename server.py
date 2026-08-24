@@ -92,12 +92,11 @@ TZ = ZoneInfo(os.getenv("TIMEZONE", "Australia/Sydney"))
 
 @app.route("/assets/<path:path>")
 def asset(path):
-    if path.endswith(".json"):
-        return send_from_directory(
-            "templates/assets", path, mimetype="application/json"
-        )
-
     if os.path.isfile("templates/assets/" + path):
+        if path.endswith(".json"):
+            return send_from_directory(
+                "templates/assets", path, mimetype="application/json"
+            )
         return send_from_directory("templates/assets", path)
 
     # Custom matching for images
@@ -113,13 +112,32 @@ def asset(path):
             if os.path.isfile("templates/assets/" + tmpPath):
                 return send_from_directory("templates/assets", tmpPath)
 
-    # Try looking in one of the directories
+    # Try looking in other directories first (excluding external), then fallback to external
     filename: str = path.split("/")[-1]
-    if filename.endswith((".png", ".jpg", ".jpeg", ".svg")):
-        if os.path.isfile("templates/assets/img/" + filename):
-            return send_from_directory("templates/assets/img", filename)
-        if os.path.isfile("templates/assets/img/favicon/" + filename):
-            return send_from_directory("templates/assets/img/favicon", filename)
+    if filename:
+        external_dir = os.path.abspath("templates/assets/img/external")
+
+        # 1. Search in non-external directories
+        for root, dirs, files in os.walk("templates/assets"):
+            root_abs = os.path.abspath(root)
+            if root_abs == external_dir or root_abs.startswith(external_dir + os.sep):
+                continue
+            if filename in files:
+                if filename.endswith(".json"):
+                    return send_from_directory(
+                        root, filename, mimetype="application/json"
+                    )
+                return send_from_directory(root, filename)
+
+        # 2. Fallback to external images section if not in any other directory
+        if os.path.isdir(external_dir):
+            for root, dirs, files in os.walk(external_dir):
+                if filename in files:
+                    if filename.endswith(".json"):
+                        return send_from_directory(
+                            root, filename, mimetype="application/json"
+                        )
+                    return send_from_directory(root, filename)
 
     return error_response(request)
 

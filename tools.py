@@ -187,7 +187,7 @@ def getAddress(coin: str) -> str:
 @lru_cache(maxsize=256)
 def getFilePath(name: str, path: str) -> str | None:
     """
-    Find a file in a directory tree.
+    Find a file in a directory tree, searching non-external directories first.
 
     Args:
         name (str): The filename to find
@@ -196,9 +196,22 @@ def getFilePath(name: str, path: str) -> str | None:
     Returns:
         Optional[str]: The full path to the file or None if not found
     """
+    external_dir = os.path.abspath(os.path.join(path, "assets", "img", "external"))
+
+    # 1. Search in non-external directories first
     for root, dirs, files in os.walk(path):
+        root_abs = os.path.abspath(root)
+        if root_abs == external_dir or root_abs.startswith(external_dir + os.sep):
+            continue
         if name in files:
             return os.path.join(root, name)
+
+    # 2. Search external directory if not found in any other directory
+    if os.path.isdir(external_dir):
+        for root, dirs, files in os.walk(external_dir):
+            if name in files:
+                return os.path.join(root, name)
+
     return None
 
 
