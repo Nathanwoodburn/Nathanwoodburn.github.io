@@ -107,7 +107,7 @@ def asset(path):
         "img/hns": "img/external/HNS/black",
     }
 
-    for key, value in pathMap:
+    for key, value in pathMap.items():
         if path.startswith(key):
             tmpPath = path.replace(key, value)
             if os.path.isfile("templates/assets/" + tmpPath):
