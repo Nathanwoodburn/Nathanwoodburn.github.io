@@ -11,8 +11,8 @@ Welcome to my personal website! Wow I didn't expect to see anyone using the fing
 ----------
 
 Hi, I'm Nathan Woodburn from Canberra, Australia.
-I've been homeschooled through Year 12 and am now studying a
-Bachelor of Computer Science.
+I've been homeschooled through Year 12 and have a
+Bachelor of Computing.
 
 I'm currently working on: {{ repo | safe }}
 {% if not spotify.message %}Currently listening to: {{ spotify.song_name }} by {{ spotify.artist }}{% endif %}
