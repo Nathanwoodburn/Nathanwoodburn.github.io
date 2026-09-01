@@ -10,6 +10,12 @@ HTTP 200
 GET http://127.0.0.1:5000/now/26_03_04
 HTTP 200
 
+GET http://127.0.0.1:5000/now/26_03_04.md
+HTTP 200
+
+GET http://127.0.0.1:5000/now/26_03_04.json
+HTTP 200
+
 GET http://127.0.0.1:5000/now.json
 HTTP 200
 
@@ -21,4 +27,5 @@ HTTP 200
 
 GET http://127.0.0.1:5000/rss.xml
 HTTP 200
+
 

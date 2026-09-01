@@ -1,3 +1,7 @@
+---
+title: Nameserver Setup On BobWallet
+description: A step-by-step guide to setting up nameservers for your Handshake domains in BobWallet.
+---
 
 Setting up a Nameserver for your domains held in BobWallet is needed in order to use your domains for websites or other services.
 This guide will walk you through the process of setting up a nameserver using the BobWallet app.

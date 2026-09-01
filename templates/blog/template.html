@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>{{title}} | Nathan.Woodburn/</title>
     <meta name="theme-color" content="#000000">
-    <link rel="canonical" href="https://nathan.woodburn.au/blog/template">
-    <meta property="og:url" content="https://nathan.woodburn.au/blog/template">
+    <link rel="canonical" href="https://nathan.woodburn.au/blog/{{slug if slug else 'template'}}">
+    <meta property="og:url" content="https://nathan.woodburn.au/blog/{{slug if slug else 'template'}}">
     <meta name="fediverse:creator" content="@nathanwoodburn@mastodon.woodburn.au">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:image" content="https://nathan.woodburn.au/assets/img/profile.jpg">
@@ -65,7 +65,9 @@ Find something interesting to read. Or maybe check one of my tutorials">
     <div class="profile-container" style="margin-bottom: 2em;"><img class="profile background" src="/assets/img/profile.jpg" style="border-radius: 50%;"><img class="profile foreground" src="/assets/img/pfront.webp"></div>
     <h1 class="nathanwoodburn" style="margin-bottom: 0px;">Nathan.Woodburn/</h1>
     <h3 style="margin-bottom: 0px;margin-top: 25px;">{{title}}</h3>
-    <section style="margin-bottom: 50px;max-width: 95%;margin-right: auto;margin-left: auto;margin-top: 50px;">
+    {% if date %}<h6>{{date}}</h6>{% endif %}
+    {% if description %}<p class="text-muted" style="margin-bottom: 0px; max-width: 700px; margin-left: auto; margin-right: auto;">{{description}}</p>{% endif %}
+    <section style="margin-bottom: 50px;max-width: 95%;margin-right: auto;margin-left: auto;margin-top: 30px;">
         <div style="max-width: 700px;margin: auto;">{{content | safe}}</div>
     </section>
     <section class="text-center content-section" id="contact" style="padding-top: 0px;padding-bottom: 3em;">

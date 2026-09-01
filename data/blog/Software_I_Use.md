@@ -1,3 +1,8 @@
+---
+title: Software I Use
+description: A list of desktop applications, terminal tools, and software I use regularly.
+---
+
 G'day,  
 Just thought it might be useful to write down some of the software I use regularly. I've no clue if you'll find any useful :)  
 

@@ -1,3 +1,4 @@
+import json
 import os
 import re
 from functools import lru_cache
@@ -10,63 +11,128 @@ from tools import getClientIP, getHandshakeScript, isCLI
 
 app = Blueprint("blog", __name__, url_prefix="/blog")
 
+BLOG_DIR = "data/blog"
+
 
 @lru_cache(maxsize=32)
 def list_page_files():
-    blog_pages = os.listdir("data/blog")
+    if not os.path.isdir(BLOG_DIR):
+        return []
+    blog_files = [f for f in os.listdir(BLOG_DIR) if f.endswith((".md", ".json"))]
     # Sort pages by modified time, newest first
-    blog_pages.sort(
-        key=lambda x: os.path.getmtime(os.path.join("data/blog", x)), reverse=True
+    blog_files.sort(
+        key=lambda x: os.path.getmtime(os.path.join(BLOG_DIR, x)), reverse=True
     )
 
-    # Remove .md extension
-    blog_pages = [
-        page.removesuffix(".md") for page in blog_pages if page.endswith(".md")
-    ]
+    seen = set()
+    slugs = []
+    for f in blog_files:
+        slug = f.rsplit(".", 1)[0]
+        if slug not in seen:
+            seen.add(slug)
+            slugs.append(slug)
 
-    return blog_pages
+    return slugs
 
 
 @lru_cache(maxsize=64)
-def get_blog_content(date):
-    """Get and cache blog content."""
-    if not os.path.exists(f"data/blog/{date}.md"):
-        return None
+def get_blog_post(slug):
+    """Get and parse blog post from markdown or json."""
+    slug = slug.removesuffix(".html").removesuffix(".md").removesuffix(".json")
+    md_path = os.path.join(BLOG_DIR, f"{slug}.md")
+    json_path = os.path.join(BLOG_DIR, f"{slug}.json")
 
-    with open(f"data/blog/{date}.md", "r") as f:
-        return f.read()
+    if os.path.isfile(md_path):
+        with open(md_path, "r", encoding="utf-8") as f:
+            raw = f.read()
+
+        title = slug.replace("_", " ")
+        date = ""
+        description = ""
+        content = raw
+
+        # Parse frontmatter if present
+        stripped_raw = raw.lstrip()
+        if stripped_raw.startswith("---"):
+            parts = stripped_raw.split("---", 2)
+            if len(parts) >= 3:
+                frontmatter = parts[1]
+                content = parts[2].strip()
+                for line in frontmatter.splitlines():
+                    if ":" in line:
+                        k, v = line.split(":", 1)
+                        k = k.strip().lower()
+                        v = v.strip().strip("\"'")
+                        if k == "title":
+                            title = v
+                        elif k == "date":
+                            date = v
+                        elif k == "description":
+                            description = v
+
+        if not description:
+            for p in content.split("\n\n"):
+                clean_p = p.strip()
+                if not clean_p or clean_p.startswith(("#", "<", "```", "[View")):
+                    continue
+                snippet = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", clean_p)
+                snippet = re.sub(r"[*_`]", "", snippet).strip()
+                snippet = " ".join(snippet.split())
+                if snippet and len(snippet) > 15:
+                    description = (
+                        (snippet[:150] + "...") if len(snippet) > 150 else snippet
+                    )
+                    break
+
+        return {
+            "title": title,
+            "date": date,
+            "description": description,
+            "content": content,
+            "raw": raw,
+            "type": "md",
+            "slug": slug,
+        }
+
+    elif os.path.isfile(json_path):
+        with open(json_path, "r", encoding="utf-8") as f:
+            raw = f.read()
+        try:
+            data = json.loads(raw)
+            title = data.get("title", slug.replace("_", " "))
+            content = data.get("content", "")
+            date = data.get("date", "")
+            description = data.get("description", "")
+            return {
+                "title": title,
+                "date": date,
+                "description": description,
+                "content": content,
+                "raw": raw,
+                "type": "json",
+                "slug": slug,
+            }
+        except json.JSONDecodeError:
+            return None
+
+    return None
 
 
 @lru_cache(maxsize=64)
 def render_markdown_to_html(content):
     """Convert markdown to HTML with caching."""
     html = markdown.markdown(
-        content, extensions=["sane_lists", "codehilite", "fenced_code"]
+        content, extensions=["sane_lists", "codehilite", "fenced_code", "tables"]
     )
     # Add target="_blank" to all links
-    html = html.replace('<a href="', '<a target="_blank" href="')
+    html = re.sub(
+        r'<a\s+(?![^>]*target=)(href="[^"]*")',
+        r'<a target="_blank" \1',
+        html,
+    )
     html = html.replace("<h4", "<h4 style='margin-bottom:0px;'")
     html = fix_numbered_lists(html)
     return html
-
-
-def render_page(date, handshake_scripts=None):
-    # Get cached content
-    content = get_blog_content(date)
-    if content is None:
-        return render_template("404.html"), 404
-
-    # Get the title from the file name
-    title = date.removesuffix(".md").replace("_", " ")
-    # Convert the md to html (cached)
-    html_content = render_markdown_to_html(content)
-
-    return render_template(
-        "blog/template.html",
-        title=title,
-        content=html_content,
-        handshake_scripts=handshake_scripts,
-    )
 
 
 def fix_numbered_lists(html):
@@ -108,23 +174,55 @@ def fix_numbered_lists(html):
     return str(soup)
 
 
+def render_page(slug, handshake_scripts=None):
+    post = get_blog_post(slug)
+    if post is None:
+        return render_template("404.html"), 404
+
+    # Convert the md to html (cached)
+    html_content = render_markdown_to_html(post["content"])
+
+    return render_template(
+        "blog/template.html",
+        title=post["title"],
+        date=post["date"],
+        description=post["description"],
+        content=html_content,
+        handshake_scripts=handshake_scripts,
+        slug=post["slug"],
+    )
+
+
 def render_home(handshake_scripts: str | None = None):
     # Get a list of pages
-    blog_pages = list_page_files()
-    # Create a html list of pages
-    blog_pages = [
-        f"""<li class="list-group-item">
-        
-            <p style="margin-bottom: 0px;"><a href='/blog/{page}'>{page.replace("_", " ")}</a></p>
-        </li>"""
-        for page in blog_pages
-    ]
-    # Join the list
-    blog_pages = "\n".join(blog_pages)
+    slugs = list_page_files()
+    posts = [get_blog_post(s) for s in slugs if get_blog_post(s)]
+
+    # Create a fallback html list of pages
+    blog_items = []
+    for p in posts:
+        name = p["title"]
+        slug = p["slug"]
+        desc_html = (
+            f'<br><small style="color:#aaaaaa;">{p["description"]}</small>'
+            if p["description"]
+            else ""
+        )
+        blog_items.append(
+            f"""<a href='/blog/{slug}' class="blog-item-link" style="text-decoration: none; margin-bottom: 12px; display: block;">
+            <li class="list-group-item blog-card" style="background-color: #000000; border: 1px solid #282828; border-radius: 8px; padding: 18px 24px; text-align: left; color: #ffffff;">
+                <h4 style="margin: 0; color: #ffffff; font-size: 1.2rem;">{name}</h4>{desc_html}
+            </li>
+        </a>"""
+        )
+
+    blogs_html = "\n".join(blog_items)
+
     # Render the template
     return render_template(
         "blog/blog.html",
-        blogs=blog_pages,
+        posts=posts,
+        blogs=blogs_html,
         handshake_scripts=handshake_scripts,
     )
 
@@ -135,22 +233,23 @@ def index():
         return render_home(handshake_scripts=getHandshakeScript(request.host))
 
     # Get a list of pages
-    blog_pages = list_page_files()
-    # Create a html list of pages
+    slugs = list_page_files()
+    posts = [get_blog_post(s) for s in slugs if get_blog_post(s)]
+
     blog_pages = [
         {
-            "name": page.replace("_", " "),
-            "url": f"/blog/{page}",
-            "download": f"/blog/{page}.md",
+            "name": p["title"],
+            "url": f"/blog/{p['slug']}",
+            "download": f"/blog/{p['slug']}.{p['type']}",
         }
-        for page in blog_pages
+        for p in posts
     ]
 
     # Render the template
     return jsonify(
         {
             "status": 200,
-            "message": "Check out my various blog postsa",
+            "message": "Check out my various blog posts",
             "ip": getClientIP(request),
             "blogs": blog_pages,
         }
@@ -159,33 +258,45 @@ def index():
 
 @app.route("/<path:path>")
 def path(path):
+    if path.endswith(".md"):
+        post = get_blog_post(path.removesuffix(".md"))
+        if post is None:
+            return render_template("404.html"), 404
+        return post["content"], 200, {"Content-Type": "text/plain; charset=utf-8"}
+
+    if path.endswith(".json"):
+        post = get_blog_post(path.removesuffix(".json"))
+        if post is None:
+            return render_template("404.html"), 404
+        return jsonify(post), 200
+
     if not isCLI(request):
         return render_page(path, handshake_scripts=getHandshakeScript(request.host))
 
     # Get cached content
-    content = get_blog_content(path)
-    if content is None:
+    post = get_blog_post(path)
+    if post is None:
         return render_template("404.html"), 404
 
-    # Get the title from the file name
-    title = path.replace("_", " ")
     return jsonify(
         {
             "status": 200,
-            "message": f"Blog post: {title}",
+            "message": f"Blog post: {post['title']}",
             "ip": getClientIP(request),
-            "title": title,
-            "content": content,
-            "download": f"/blog/{path}.md",
+            "title": post["title"],
+            "date": post["date"],
+            "description": post["description"],
+            "content": post["content"],
+            "download": f"/blog/{post['slug']}.{post['type']}",
         }
     ), 200
 
 
 @app.route("/<path:path>.md")
 def path_md(path):
-    content = get_blog_content(path)
-    if content is None:
+    post = get_blog_post(path)
+    if post is None:
         return render_template("404.html"), 404
 
-    # Return the raw markdown file
-    return content, 200, {"Content-Type": "text/plain; charset=utf-8"}
+    # Return the raw markdown or content
+    return post["content"], 200, {"Content-Type": "text/plain; charset=utf-8"}

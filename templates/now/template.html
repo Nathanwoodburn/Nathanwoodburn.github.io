@@ -4,10 +4,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>What's up at the moment | Nathan.Woodburn/</title>
+    <title>{{title if title else "What's up at the moment"}} | Nathan.Woodburn/</title>
     <meta name="theme-color" content="#000000">
-    <link rel="canonical" href="https://nathan.woodburn.au/now/template">
-    <meta property="og:url" content="https://nathan.woodburn.au/now/template">
+    <link rel="canonical" href="https://nathan.woodburn.au/now/{{date_slug if date_slug else ''}}">
+    <meta property="og:url" content="https://nathan.woodburn.au/now/{{date_slug if date_slug else ''}}">
     <meta name="fediverse:creator" content="@nathanwoodburn@mastodon.woodburn.au">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:image" content="https://nathan.woodburn.au/assets/img/profile.jpg">
@@ -66,12 +66,22 @@ Find out what I've been up to in the last little bit">
     <h1 class="nathanwoodburn" style="margin-bottom: 0px;">Nathan.Woodburn/</h1>
     <h3 style="margin-bottom: 0px;">WHat's Happening Now</h3>
     <h6>{{DATE}}</h6>
-    <section style="margin-bottom: 50px;max-width: 95%;margin-right: auto;margin-left: auto;">
-        <div style="max-width: 700px;margin: auto;">
-            <h1 style="margin-bottom: 0px;">Title</h1>
-            <p>Info</p>
-        </div>
-    </section>
+    {% if sections %}
+        {% for section in sections %}
+        <section style="margin-bottom: 50px;max-width: 95%;margin-right: auto;margin-left: auto;">
+            <div style="max-width: 700px;margin: auto;">
+                {% if section.title %}<h1 style="margin-bottom: 0px;">{{section.title}}</h1>{% endif %}
+                {{section.content | safe}}
+            </div>
+        </section>
+        {% endfor %}
+    {% elif content %}
+        <section style="margin-bottom: 50px;max-width: 95%;margin-right: auto;margin-left: auto;">
+            <div style="max-width: 700px;margin: auto;">
+                {{content | safe}}
+            </div>
+        </section>
+    {% endif %}
     <section class="text-center content-section" id="contact" style="padding-top: 0px;padding-bottom: 3em;">
         <div class="container">
             <div class="row">

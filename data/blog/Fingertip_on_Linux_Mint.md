@@ -1,3 +1,8 @@
+---
+title: Fingertip on Linux Mint
+description: Tutorial on installing and configuring Fingertip on Linux Mint.
+---
+
 [View video tutorial](https://cloud.woodburn.au/s/n7Q3k7QyEnwygjX)
 
 
