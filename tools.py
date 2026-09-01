@@ -331,6 +331,21 @@ def find_chromium() -> str | None:
     return None
 
 
+def parse_support_arg(req) -> bool:
+    """
+    Check if the support query parameter is set on the request.
+    Handles ?support, ?support=1, ?support=true, ?support=yes.
+    """
+    if not req or not req.args:
+        return False
+    val = req.args.get("support")
+    if val is None:
+        return False
+    if val == "":
+        return True
+    return str(val).lower().strip() in ("1", "true", "yes", "support")
+
+
 def get_resume_data(support: bool = False) -> dict:
     """Load and prepare resume data from data/resume.json."""
     with open("data/resume.json", "r", encoding="utf-8") as f:
@@ -351,11 +366,240 @@ def get_resume_data(support: bool = False) -> dict:
     }
 
 
+def get_resume_md(support: bool = False, resume_data: dict | None = None) -> str:
+    """Generate a clean Markdown representation of the resume."""
+    if resume_data is None:
+        resume_data = get_resume_data(support=support)
+
+    lines = []
+    lines.append(f"# {resume_data.get('name', 'Nathan Woodburn')}")
+    active_title = resume_data.get("active_title", "")
+    if active_title:
+        lines.append(f"### {active_title}\n")
+
+    # Contact
+    contact_parts = []
+    for item in resume_data.get("contact", []):
+        label = item.get("label") or ""
+        url = item.get("url")
+        if url:
+            contact_parts.append(f"[{label}]({url})")
+        elif label:
+            contact_parts.append(label)
+    if contact_parts:
+        lines.append(" • ".join(contact_parts) + "\n")
+
+    # Summary
+    summary = resume_data.get("active_summary", "")
+    if summary:
+        lines.append("## Summary\n")
+        lines.append(f"{summary}\n")
+
+    # Experience
+    experience = resume_data.get("experience", [])
+    if experience:
+        lines.append("## Experience\n")
+        for job in experience:
+            role = job.get("role", "")
+            company = job.get("company", "")
+            location = job.get("location")
+            dates = job.get("dates")
+
+            header_parts = [p for p in [role, company] if p]
+            lines.append(f"### {' — '.join(header_parts)}")
+
+            meta_parts = [p for p in [dates, location] if p]
+            if meta_parts:
+                lines.append(f"*{' | '.join(meta_parts)}*")
+
+            for bullet in job.get("bullets", []):
+                lines.append(f"- {bullet}")
+            lines.append("")
+
+    # Projects
+    projects = resume_data.get("projects", [])
+    if projects:
+        lines.append("## Projects\n")
+        for proj in projects:
+            name = proj.get("name", "")
+            tech = proj.get("technologies")
+            lines.append(f"### {name}")
+            if tech:
+                lines.append(f"*Technologies: {tech}*")
+            for bullet in proj.get("bullets", []):
+                lines.append(f"- {bullet}")
+            lines.append("")
+
+    # Education
+    education = resume_data.get("education", [])
+    if education:
+        lines.append("## Education\n")
+        for edu in education:
+            degree = edu.get("degree", "")
+            inst = edu.get("institution", "")
+            dates = edu.get("dates")
+            desc = edu.get("description")
+
+            header_parts = [p for p in [degree, inst] if p]
+            lines.append(f"### {' — '.join(header_parts)}")
+            if dates:
+                lines.append(f"*{dates}*")
+            if desc:
+                lines.append(f"- {desc}")
+            lines.append("")
+
+    # Skills
+    skills = resume_data.get("skills", [])
+    if skills:
+        lines.append("## Skills\n")
+        for skill in skills:
+            lines.append(f"- {skill}")
+        lines.append("")
+
+    return "\n".join(lines).strip() + "\n"
+
+
+def get_resume_txt(support: bool = False, resume_data: dict | None = None) -> str:
+    """Generate a clean plain text representation of the resume."""
+    if resume_data is None:
+        resume_data = get_resume_data(support=support)
+
+    divider = "=" * 80
+    sub_divider = "-" * 80
+
+    lines = [divider]
+    lines.append(resume_data.get("name", "Nathan Woodburn").upper())
+    active_title = resume_data.get("active_title", "")
+    if active_title:
+        lines.append(active_title)
+    lines.append(divider)
+    lines.append("")
+
+    # Contact
+    contact = resume_data.get("contact", [])
+    if contact:
+        lines.append("CONTACT")
+        lines.append(sub_divider)
+        for item in contact:
+            c_type = (item.get("type") or "Info").capitalize()
+            label = item.get("label") or ""
+            url = item.get("url")
+            val = (
+                label
+                if (not url or url.startswith(("tel:", "mailto:")))
+                else (f"{label} ({url})" if label != url else url)
+            )
+            lines.append(f"{c_type + ':':<11} {val}")
+        lines.append("")
+
+    # Summary
+    summary = resume_data.get("active_summary", "")
+    if summary:
+        lines.append("SUMMARY")
+        lines.append(sub_divider)
+        lines.append(summary)
+        lines.append("")
+
+    # Experience
+    experience = resume_data.get("experience", [])
+    if experience:
+        lines.append("EXPERIENCE")
+        lines.append(sub_divider)
+        for job in experience:
+            role = job.get("role", "")
+            company = job.get("company", "")
+            location = job.get("location")
+            dates = job.get("dates")
+
+            role_company = f"{role} — {company}" if company else role
+            meta = " | ".join([p for p in [dates, location] if p])
+            lines.append(role_company)
+            if meta:
+                lines.append(meta)
+            for bullet in job.get("bullets", []):
+                lines.append(f"  * {bullet}")
+            lines.append("")
+
+    # Projects
+    projects = resume_data.get("projects", [])
+    if projects:
+        lines.append("PROJECTS")
+        lines.append(sub_divider)
+        for proj in projects:
+            name = proj.get("name", "")
+            tech = proj.get("technologies")
+            if tech:
+                lines.append(f"{name} ({tech})")
+            else:
+                lines.append(name)
+            for bullet in proj.get("bullets", []):
+                lines.append(f"  * {bullet}")
+            lines.append("")
+
+    # Education
+    education = resume_data.get("education", [])
+    if education:
+        lines.append("EDUCATION")
+        lines.append(sub_divider)
+        for edu in education:
+            degree = edu.get("degree", "")
+            inst = edu.get("institution", "")
+            dates = edu.get("dates")
+            desc = edu.get("description")
+
+            deg_inst = f"{degree} — {inst}" if inst else degree
+            lines.append(deg_inst)
+            if dates:
+                lines.append(dates)
+            if desc:
+                lines.append(f"  * {desc}")
+            lines.append("")
+
+    # Skills
+    skills = resume_data.get("skills", [])
+    if skills:
+        lines.append("SKILLS")
+        lines.append(sub_divider)
+        for skill in skills:
+            lines.append(f"  * {skill}")
+        lines.append("")
+
+    lines.append(divider)
+    return "\n".join(lines).strip() + "\n"
+
+
+def get_resume_ascii(
+    support: bool = False,
+    header: str | None = None,
+    resume_data: dict | None = None,
+) -> str:
+    """Generate the CLI ASCII/ANSI terminal representation of the resume."""
+    if resume_data is None:
+        resume_data = get_resume_data(support=support)
+
+    if header is None:
+        if os.path.exists("templates/header.ascii"):
+            with open("templates/header.ascii", "r", encoding="utf-8") as f:
+                header = f.read()
+        else:
+            header = ""
+
+    if os.path.exists("templates/resume.ascii"):
+        with open("templates/resume.ascii", "r", encoding="utf-8") as f:
+            template_str = f.read()
+        return jinja2.Template(template_str).render(
+            header=header, resume=resume_data, support=support
+        )
+
+    return get_resume_txt(support=support, resume_data=resume_data)
+
+
 def get_resume_source_mtime() -> float:
     """Get the latest modification timestamp of resume templates, data, and styling assets."""
     source_files = [
         "data/resume.json",
         "templates/resume.html",
+        "templates/resume.ascii",
         "templates/assets/css/resume-print.css",
         "templates/assets/css/resume-custom.css",
         "templates/assets/css/resume.min.css",
@@ -458,7 +702,16 @@ def get_resume_pdf(support: bool = False, force: bool = False) -> str:
 if __name__ == "__main__":
     import sys
 
-    if "--build-resume" in sys.argv or "-b" in sys.argv or len(sys.argv) == 1:
+    support = "--support" in sys.argv or "-s" in sys.argv
+    if "--json" in sys.argv:
+        print(json.dumps(get_resume_data(support=support), indent=2))
+    elif "--md" in sys.argv or "--markdown" in sys.argv:
+        print(get_resume_md(support=support))
+    elif "--txt" in sys.argv or "--text" in sys.argv:
+        print(get_resume_txt(support=support))
+    elif "--ascii" in sys.argv or "--cli" in sys.argv:
+        print(get_resume_ascii(support=support))
+    elif "--build-resume" in sys.argv or "-b" in sys.argv or len(sys.argv) == 1:
         print("Building standard resume PDF...")
         p1 = build_resume_pdf(support=False)
         print(f"Built {p1} ({os.path.getsize(p1)} bytes)")

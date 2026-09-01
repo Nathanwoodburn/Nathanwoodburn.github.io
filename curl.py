@@ -1,12 +1,20 @@
 import os
 from functools import lru_cache
 
-from flask import render_template, send_file
+from flask import jsonify, render_template, send_file
 
 from blueprints.spotify import get_playing_spotify_track
 from cache_helper import get_git_latest_activity
 from cache_helper import get_projects as get_projects_cached
-from tools import get_tools_data, getAddress, getClientIP
+from tools import (
+    get_resume_data,
+    get_resume_md,
+    get_resume_txt,
+    get_tools_data,
+    getAddress,
+    getClientIP,
+    parse_support_arg,
+)
 
 MAX_WIDTH = 80
 
@@ -122,6 +130,40 @@ def curl_response(request):
         tools = get_tools_data()
         return (
             render_template("tools.ascii", header=get_header(), tools=tools),
+            200,
+            {"Content-Type": "text/plain; charset=utf-8"},
+        )
+
+    if path in ("resume", "resume.ascii"):
+        support = parse_support_arg(request)
+        resume_data = get_resume_data(support=support)
+        return (
+            render_template(
+                "resume.ascii",
+                header=get_header(),
+                resume=resume_data,
+                support=support,
+            ),
+            200,
+            {"Content-Type": "text/plain; charset=utf-8"},
+        )
+
+    if path == "resume.json":
+        support = parse_support_arg(request)
+        return jsonify(get_resume_data(support=support)), 200
+
+    if path == "resume.md":
+        support = parse_support_arg(request)
+        return (
+            get_resume_md(support=support),
+            200,
+            {"Content-Type": "text/markdown; charset=utf-8"},
+        )
+
+    if path == "resume.txt":
+        support = parse_support_arg(request)
+        return (
+            get_resume_txt(support=support),
             200,
             {"Content-Type": "text/plain; charset=utf-8"},
         )

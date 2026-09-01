@@ -8,11 +8,16 @@ The canonical repository is hosted on [git.woodburn.au](https://git.woodburn.au)
 
 ## Features
 
-- **Dynamic & Config-Driven Resume**:
+- **Dynamic & Multi-Format Resume**:
   - Structured content managed via [`data/resume.json`](data/resume.json).
-  - Responsive layout with desktop centering and mobile-first design.
-  - Automatic dark mode support (`prefers-color-scheme: dark` and `data-bs-theme="dark"`).
-  - On-demand and build-time 1-page A4 PDF generation via headless Chromium (`/resume.pdf` and `/resume.pdf?support=1`).
+  - Responsive web layout with desktop centering and automatic dark mode support (`prefers-color-scheme: dark`).
+  - Available across multiple formats on demand:
+    - **Web**: `/resume` (Interactive HTML)
+    - **PDF**: `/resume.pdf` & `/resume.pdf?support=1` (1-page A4 PDF compiled via headless Chromium)
+    - **Markdown**: `/resume.md` & `/resume.md?support=1`
+    - **Plain Text**: `/resume.txt` & `/resume.txt?support=1`
+    - **JSON**: `/resume.json` & `/resume.json?support=1`
+    - **Terminal / CLI**: `curl https://nathan.woodburn.au/resume` or `/resume.ascii` (ANSI-colored terminal view)
 - **Terminal & CLI Friendly**:
   - Native `curl` and `finger` terminal views with custom ASCII art, system info, and plain-text output.
 - **Blog & "Now" Updates**:
@@ -62,7 +67,8 @@ The canonical repository is hosted on [git.woodburn.au](https://git.woodburn.au)
 │   │   └── css/
 │   │       ├── resume-custom.css  # Responsive & dark theme resume stylesheet
 │   │       └── resume-print.css   # 1-page A4 print layout stylesheet
-│   └── resume.html          # Dynamic resume template
+│   ├── resume.html          # Dynamic resume template
+│   └── resume.ascii         # Terminal / ANSI resume template
 ├── pwa/                     # Progressive Web App assets & service worker
 ├── Dockerfile               # Multi-stage Docker build
 ├── main.py                  # Production entrypoint (Gunicorn runner)
@@ -107,9 +113,20 @@ The canonical repository is hosted on [git.woodburn.au](https://git.woodburn.au)
 
 ---
 
-## Resume Management & PDF Compilation
+## Resume Management & Formats
 
 Resume data is edited in [`data/resume.json`](data/resume.json).
+
+### Formats & Endpoints
+
+- **Web Browser**: `/resume`
+- **PDF**: `/resume.pdf` (Standard) or `/resume.pdf?support=1` (Support tailored)
+- **Markdown**: `/resume.md` or `/resume.md?support=1`
+- **Plain Text**: `/resume.txt` or `/resume.txt?support=1`
+- **JSON**: `/resume.json` or `/resume.json?support=1`
+- **CLI / Terminal**: `curl https://nathan.woodburn.au/resume` or `/resume.ascii`
+
+### PDF & CLI Tools
 
 To compile the latest resume changes into standard and support PDFs manually:
 
@@ -117,9 +134,15 @@ To compile the latest resume changes into standard and support PDFs manually:
 uv run python3 tools.py --build-resume
 ```
 
-This compiles:
-- `data/resume.pdf` (Standard 1-page A4 format)
-- `data/resume_support.pdf` (Technical Support tailored 1-page A4 format)
+To preview or generate different formats directly via CLI:
+
+```bash
+uv run python3 tools.py --md        # Output Markdown
+uv run python3 tools.py --txt       # Output Plain Text
+uv run python3 tools.py --json      # Output JSON
+uv run python3 tools.py --ascii     # Output Terminal ANSI view
+# Append --support or -s for Technical Support tailored resume
+```
 
 ---
 

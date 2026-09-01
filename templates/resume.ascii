@@ -1,0 +1,52 @@
+{{ header }}
+[1;36m─────────────────────────────────────────────────────[0m
+[1;36m RESUME: {{ resume.name | upper }}[0m
+[1;33m {{ resume.active_title }}[0m
+[1;36m─────────────────────────────────────────────────────[0m
+
+[1;36m CONTACT[0m
+[1;36m────────[0m
+{% for item in resume.contact -%}
+- [1m{{ (item.type or 'Info') | capitalize }}:[0m {% if item.url and not item.url.startswith('tel:') and not item.url.startswith('mailto:') %}{{ item.url }}{% else %}{{ item.label }}{% endif %}
+{% endfor %}
+[1;36m SUMMARY[0m
+[1;36m────────[0m
+{{ resume.active_summary }}
+
+[1;36m EXPERIENCE[0m
+[1;36m───────────[0m
+{% for item in resume.experience -%}
+[1;33m{{ item.role }}[0m — [1m{{ item.company }}[0m{% if item.location %} [90m({{ item.location }})[0m{% endif %}{% if item.dates %}
+[36m{{ item.dates }}[0m{% endif %}
+{% for bullet in item.bullets %}
+  • {{ bullet }}
+{%- endfor %}
+
+{% endfor %}
+[1;36m PROJECTS[0m
+[1;36m──────────[0m
+{% for item in resume.projects -%}
+[1;33m{{ item.name }}[0m{% if item.technologies %} [90m({{ item.technologies }})[0m{% endif %}
+{% for bullet in item.bullets %}
+  • {{ bullet }}
+{%- endfor %}
+
+{% endfor %}
+[1;36m EDUCATION[0m
+[1;36m───────────[0m
+{% for item in resume.education -%}
+[1;33m{{ item.degree }}[0m — [1m{{ item.institution }}[0m{% if item.dates %} [36m({{ item.dates }})[0m{% endif %}
+{% if item.description %}
+  • {{ item.description }}
+{%- endif %}
+
+{% endfor %}
+[1;36m SKILLS[0m
+[1;36m────────[0m
+{% for skill in resume.skills %}
+  • {{ skill }}
+{%- endfor %}
+
+[1;36m─────────────────────────────────────────────────────[0m
+[90mFormats: [/resume.pdf] [/resume.md] [/resume.txt] [/resume.json][0m
+[1;36m─────────────────────────────────────────────────────[0m

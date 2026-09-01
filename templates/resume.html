@@ -32,6 +32,11 @@
     <link rel="stylesheet" href="/assets/css/resume-custom.css">
     <link rel="me" href="https://mastodon.woodburn.au/@nathanwoodburn" />
     <script async src="https://umami.woodburn.au/script.js" data-website-id="6a55028e-aad3-481c-9a37-3e096ff75589"></script>
+    <link rel="alternate" type="application/json" href="/resume.json{% if support %}?support=1{% endif %}" title="Resume (JSON)">
+    <link rel="alternate" type="text/markdown" href="/resume.md{% if support %}?support=1{% endif %}" title="Resume (Markdown)">
+    <link rel="alternate" type="text/plain" href="/resume.txt{% if support %}?support=1{% endif %}" title="Resume (Plain Text)">
+    <link rel="alternate" type="text/plain" href="/resume.ascii{% if support %}?support=1{% endif %}" title="Resume (CLI / ASCII)">
+    <link rel="alternate" type="application/pdf" href="/resume.pdf{% if support %}?support=1{% endif %}" title="Resume (PDF)">
     <link rel="stylesheet" href="/assets/css/resume-print.css" media="print">
 </head>
 
@@ -50,6 +55,17 @@
                         <div class="mobile-header d-md-none text-center">
                             <h1 class="mobile-title">{{ resume.name }}</h1>
                             <h2 class="mobile-subtitle">{{ resume.active_title }}</h2>
+                        </div>
+
+                        <!-- Format Links (Screen only, hidden on print) -->
+                        <div class="d-print-none text-center mb-3">
+                            <div class="d-flex flex-wrap justify-content-center gap-1">
+                                <a class="btn btn-sm btn-outline-light" href="/resume.pdf{% if support %}?support=1{% endif %}" target="_blank">PDF</a>
+                                <a class="btn btn-sm btn-outline-light" href="/resume.md{% if support %}?support=1{% endif %}">Markdown</a>
+                                <a class="btn btn-sm btn-outline-light" href="/resume.txt{% if support %}?support=1{% endif %}">Text</a>
+                                <a class="btn btn-sm btn-outline-light" href="/resume.json{% if support %}?support=1{% endif %}">JSON</a>
+                                <a class="btn btn-sm btn-outline-light" href="/resume.ascii{% if support %}?support=1{% endif %}">CLI</a>
+                            </div>
                         </div>
 
                         <!-- Contact Section -->

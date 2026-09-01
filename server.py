@@ -36,7 +36,9 @@ from curl import curl_response, finger_response
 from tools import (
     error_response,
     get_resume_data,
+    get_resume_md,
     get_resume_pdf,
+    get_resume_txt,
     get_tools_data,
     getAddress,
     getClientIP,
@@ -45,6 +47,7 @@ from tools import (
     isCLI,
     isFinger,
     json_response,
+    parse_support_arg,
 )
 
 app = Flask(__name__)
@@ -606,16 +609,55 @@ def hosting_post():
 
 @app.route("/resume")
 def resume():
-    # Check if arg for support is passed
-    support = bool(request.args.get("support"))
+    if isCLI(request):
+        return curl_response(request)
+    support = parse_support_arg(request)
     resume_data = get_resume_data(support=support)
     return render_template("resume.html", resume=resume_data, support=support)
 
 
+@app.route("/resume.json")
+def resume_json():
+    support = parse_support_arg(request)
+    resume_data = get_resume_data(support=support)
+    return jsonify(resume_data)
+
+
+@app.route("/resume.md")
+def resume_md():
+    support = parse_support_arg(request)
+    md_content = get_resume_md(support=support)
+    return md_content, 200, {"Content-Type": "text/markdown; charset=utf-8"}
+
+
+@app.route("/resume.txt")
+def resume_txt():
+    support = parse_support_arg(request)
+    txt_content = get_resume_txt(support=support)
+    return txt_content, 200, {"Content-Type": "text/plain; charset=utf-8"}
+
+
+@app.route("/resume.ascii")
+def resume_ascii():
+    support = parse_support_arg(request)
+    resume_data = get_resume_data(support=support)
+    from curl import get_header
+
+    return (
+        render_template(
+            "resume.ascii",
+            header=get_header(),
+            resume=resume_data,
+            support=support,
+        ),
+        200,
+        {"Content-Type": "text/plain; charset=utf-8"},
+    )
+
+
 @app.route("/resume.pdf")
 def resume_pdf():
-    # Check if arg for support is passed
-    support = bool(request.args.get("support"))
+    support = parse_support_arg(request)
     force = bool(request.args.get("force") or request.args.get("rebuild"))
     pdf_path = get_resume_pdf(support=support, force=force)
     return send_file(pdf_path, mimetype="application/pdf")
