@@ -14,7 +14,7 @@
         max-width: 100% !important;
         box-sizing: border-box !important;
         padding: 45px 1.5rem 40px !important;
-        background: radial-gradient(ellipse 80% 60% at 50% 15%, rgba(110, 14, 156, 0.22), transparent 75%), #110820 !important;
+        background: radial-gradient(ellipse 70% 50% at 50% 50%, rgba(110, 14, 156, 0.22), transparent 70%), #110820 !important;
         position: relative;
         overflow: hidden !important;
         font-family: 'Fira Code', 'JetBrains Mono', 'Cascadia Code', 'Source Code Pro', 'Anonymous Pro', Menlo, Monaco, Consolas, monospace;
@@ -467,6 +467,7 @@
 
                 <!-- Projects as git repo directories -->
                 {% for project in projects %}
+                <!-- {project} -->
                 {% set repo_slug = project.slug or project.name.replace(' ', '-') %}
                 <div class="term-row term-dir-row term-project-row site"
                      role="row"
