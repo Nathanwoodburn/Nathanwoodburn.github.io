@@ -647,8 +647,8 @@ def build_resume_pdf(support: bool = False, output_path: str | None = None) -> s
         "</head>",
         f"<style>\n{chr(10).join(css_parts)}\n</style>\n</head>",
     )
-    img_path = os.path.abspath("templates/assets/img/nathanwoodburn.jpeg")
-    rendered = rendered.replace("/assets/img/nathanwoodburn.jpeg", f"file://{img_path}")
+    assets_dir = os.path.abspath("templates/assets")
+    rendered = rendered.replace("/assets/", f"file://{assets_dir}/")
 
     tmp_html = f"data/.tmp_resume_{'support' if support else 'main'}.html"
     with open(tmp_html, "w", encoding="utf-8") as f:
@@ -665,6 +665,7 @@ def build_resume_pdf(support: bool = False, output_path: str | None = None) -> s
                 "--allow-file-access-from-files",
                 "--enable-local-file-accesses",
                 "--no-pdf-header-footer",
+                "--generate-pdf-document-outline",
                 f"--print-to-pdf={os.path.abspath(target_pdf)}",
                 f"file://{os.path.abspath(tmp_html)}",
             ],

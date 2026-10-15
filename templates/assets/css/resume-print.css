@@ -1,216 +1,353 @@
-/* print.css */
+/* ==========================================================================
+   Resume Print & PDF Export Stylesheet
+   Preserves custom styling (pills, badges, brand colors, typography)
+   while fitting cleanly on a single A4 page.
+   ========================================================================== */
+
+@page {
+    size: A4;
+    margin: 0;
+}
+
 @media print {
-    .no-print, .mobile-header, .resume-topbar {
+    /* Hide interactive & screen-only elements */
+    .no-print,
+    .mobile-header,
+    .resume-topbar,
+    .d-print-none {
         display: none !important;
     }
+
+    /* Force desktop header visible */
     .resume-header {
         display: block !important;
     }
 
-    /* Page margins */
-    @page {
-        size: A4;
-        margin: 6mm 8mm;
-    }
-
-    /* Reset body */
-    body, html {
+    /* Base page setup */
+    html, body {
         margin: 0 !important;
         padding: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
         font-size: 9pt !important;
-        line-height: 1.22 !important;
-        background: #fff !important;
-        color: #000 !important;
+        line-height: 1.25 !important;
+        background: #ffffff !important;
+        color: #1f2937 !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
 
-    /* Container adjustments */
-    .resume-wrapper, .resume-card, .container, .container-fluid {
+    /* Container adjustments: full A4 dimensions */
+    .resume-wrapper {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+        min-height: 297mm !important;
+        height: 297mm !important;
+        width: 100% !important;
+    }
+
+    .resume-card, .container, .container-fluid {
         padding: 0 !important;
         margin: 0 !important;
         box-sizing: border-box !important;
         border-radius: 0 !important;
         box-shadow: none !important;
+        border: none !important;
         max-width: 100% !important;
         width: 100% !important;
-        background: transparent !important;
+        min-height: 297mm !important;
+        height: 297mm !important;
+        background: #ffffff !important;
     }
 
-    /* Flex layout for 31/69 split */
+    /* 2-column flex layout spanning full height */
     .resume-row {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
         width: 100% !important;
+        min-height: 297mm !important;
+        height: 297mm !important;
         margin: 0 !important;
     }
 
+    /* Left Sidebar: Brand purple spanning top to bottom */
     .resume-column-left {
-        flex: 0 0 31% !important;
-        max-width: 31% !important;
-        width: 31% !important;
-        padding: 3mm 4mm !important;
+        flex: 0 0 32% !important;
+        max-width: 32% !important;
+        width: 32% !important;
+        padding: 8mm 6mm !important;
         background: #6E0E9C !important;
-        color: #fff !important;
+        color: #ffffff !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
         border: none !important;
+        box-sizing: border-box !important;
     }
 
     .resume-column-left * {
-        color: #fff !important;
+        color: #ffffff !important;
     }
 
-    .resume-column-left a, .resume-column-left .print_text {
-        color: #fff !important;
-        text-decoration: none !important;
-        background: transparent !important;
-        padding: 0 !important;
-        margin-bottom: 1.2mm !important;
-        font-size: 8.5pt !important;
-    }
-
+    /* Right Column: Main content */
     .resume-column-right {
-        flex: 0 0 69% !important;
-        max-width: 69% !important;
-        width: 69% !important;
-        padding: 3mm 5mm !important;
-        background: #fff !important;
-        color: #000 !important;
+        flex: 0 0 68% !important;
+        max-width: 68% !important;
+        width: 68% !important;
+        padding: 8mm 9mm 8mm 8mm !important;
+        background: #ffffff !important;
+        color: #1f2937 !important;
         border: none !important;
+        box-sizing: border-box !important;
     }
 
-    /* Images adjustments */
+    /* Profile photo */
     img.profile-side {
-        width: 85px !important;
-        height: 85px !important;
-        display: block !important;
-        margin: 1mm auto 3mm auto !important;
-        border: 2.5px solid #fff !important;
+        width: 100px !important;
+        height: 100px !important;
+        aspect-ratio: 1 !important;
+        object-fit: cover !important;
         border-radius: 50% !important;
+        border: 3px solid rgba(255, 255, 255, 0.95) !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+        display: block !important;
+        margin: 0 auto 3.5mm auto !important;
     }
 
-    /* Text adjustments for print */
-    h1 { font-size: 12pt !important; margin-bottom: 1.5mm !important; }
-    h2 { font-size: 10.5pt !important; margin-bottom: 1mm !important; }
-    h3 { font-size: 9.5pt !important; margin-bottom: 0.8mm !important; }
-    h4 { font-size: 9pt !important; margin-bottom: 0.8mm !important; }
-    h5, h6 { font-size: 8.5pt !important; margin-bottom: 0.8mm !important; }
-    p, li, .r-body, .l-body, .summary-text { font-size: 8.5pt !important; line-height: 1.22 !important; }
+    /* Section Headings in Left Column */
+    .l-heading1 {
+        font-size: 9.8pt !important;
+        font-weight: 700 !important;
+        color: #ffffff !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.06em !important;
+        margin-top: 3mm !important;
+        margin-bottom: 0.8mm !important;
+    }
 
-    .title {
-        font-size: 23pt !important;
-        line-height: 1.05 !important;
+    .sidebar-section:first-of-type .l-heading1 {
+        margin-top: 1mm !important;
+    }
+
+    .hr-l {
+        border: 0 !important;
+        height: 2px !important;
+        background: rgba(255, 255, 255, 0.35) !important;
+        margin: 0.8mm 0 2mm 0 !important;
+        opacity: 1 !important;
+        width: 100% !important;
+        border-radius: 2px !important;
+    }
+
+    /* Contact Items (Styled pill buttons matching web) */
+    .contact-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 1.5mm !important;
+    }
+
+    .contact-grid .r-small {
+        margin-bottom: 0 !important;
+    }
+
+    .contact-grid .print_text {
+        color: #ffffff !important;
+        text-decoration: none !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 2mm !important;
+        font-size: 8.2pt !important;
+        line-height: 1.3 !important;
+        padding: 1.2mm 2.5mm !important;
+        border-radius: 6px !important;
+        background: rgba(255, 255, 255, 0.12) !important;
+        border: 1px solid rgba(255, 255, 255, 0.25) !important;
+        box-sizing: border-box !important;
+        word-break: break-word !important;
+    }
+
+    .contact-grid .icon {
+        font-size: 9.5pt !important;
+        width: 1em !important;
+        height: 1em !important;
+        flex-shrink: 0 !important;
+        display: inline-block !important;
+    }
+
+    /* Education in Left Column */
+    .r-heading2 {
+        font-size: 9.5pt !important;
+        font-weight: 700 !important;
+        color: #ffffff !important;
+        margin-bottom: 0.3mm !important;
+        line-height: 1.25 !important;
+    }
+
+    .r-heading3 {
+        font-size: 8.4pt !important;
+        font-weight: 500 !important;
+        color: rgba(255, 255, 255, 0.88) !important;
+        line-height: 1.3 !important;
         margin-bottom: 0.5mm !important;
     }
-    .subtitle {
-        font-size: 11.5pt !important;
-        color: #6E0E9C !important;
+
+    .edu-date {
+        display: inline-block !important;
+        font-size: 7.6pt !important;
+        font-weight: 600 !important;
+        color: #ffffff !important;
+        background: rgba(255, 255, 255, 0.2) !important;
+        padding: 0.6mm 1.8mm !important;
+        border-radius: 4px !important;
+        margin-top: 0.5mm !important;
+    }
+
+    .l-body {
+        font-size: 8.2pt !important;
+        color: rgba(255, 255, 255, 0.88) !important;
+        line-height: 1.3 !important;
+        margin-top: 0.5mm !important;
         margin-bottom: 1.5mm !important;
     }
-    .title-hr {
-        width: 35px !important;
-        height: 2.5px !important;
-        background: #6E0E9C !important;
-        margin: 1.5mm 0 2mm 0 !important;
-        opacity: 1 !important;
+
+    /* Skills List (Pill badges matching web) */
+    .skills-list {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 1.5mm !important;
+        padding-left: 0 !important;
+        margin-bottom: 0 !important;
+        list-style: none !important;
     }
 
-    .r-heading1 {
-        font-size: 10pt !important;
-        color: #6E0E9C !important;
-        margin-top: 1.8mm !important;
+    .skills-list li {
+        background: rgba(255, 255, 255, 0.12) !important;
+        border: 1px solid rgba(255, 255, 255, 0.25) !important;
+        color: #ffffff !important;
+        padding: 1mm 2.8mm !important;
+        border-radius: 20px !important;
+        font-size: 8pt !important;
+        font-weight: 500 !important;
+        line-height: 1.3 !important;
+        letter-spacing: 0.01em !important;
+        display: inline-block !important;
+    }
+
+    /* Main Content: Header */
+    .resume-header {
+        margin-bottom: 2mm !important;
+    }
+
+    .title {
+        font-size: 24pt !important;
+        font-weight: 700 !important;
+        color: #111827 !important;
         margin-bottom: 0.8mm !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.03em !important;
+        letter-spacing: -0.02em !important;
+        line-height: 1.1 !important;
     }
 
-    .l-heading1 {
-        font-size: 9.5pt !important;
+    .subtitle {
+        font-size: 11.5pt !important;
+        font-weight: 600 !important;
+        color: #6E0E9C !important;
+        margin-bottom: 2mm !important;
+        letter-spacing: -0.01em !important;
+    }
+
+    .title-hr {
+        width: 45px !important;
+        height: 3px !important;
+        border: 0 !important;
+        background: #6E0E9C !important;
+        margin: 1.8mm 0 2.5mm 0 !important;
+        opacity: 1 !important;
+        border-radius: 2px !important;
+    }
+
+    /* Main Content: Section Headings */
+    .r-heading1 {
+        font-size: 10.5pt !important;
+        font-weight: 700 !important;
+        color: #6E0E9C !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.04em !important;
         margin-top: 2.5mm !important;
         margin-bottom: 0.8mm !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.03em !important;
-    }
-
-    .hr-l, .hr-l-primary {
-        margin: 0.8mm 0 1.5mm 0 !important;
     }
 
     .hr-l-primary {
-        background: #6E0E9C !important;
-        width: 30px !important;
+        border: 0 !important;
         height: 2px !important;
+        background: #6E0E9C !important;
+        margin: 0.8mm 0 2mm 0 !important;
+        opacity: 1 !important;
+        width: 35px !important;
+        border-radius: 2px !important;
+    }
+
+    /* Summary */
+    .summary-text {
+        font-size: 8.5pt !important;
+        line-height: 1.35 !important;
+        color: #374151 !important;
+        margin-bottom: 2mm !important;
+    }
+
+    /* Timeline / Experience / Projects Items */
+    .timeline-item {
+        margin-bottom: 2.2mm !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
     }
 
     .l-heading2 {
-        font-size: 9pt !important;
-        font-weight: bold !important;
-        margin-bottom: 0.3mm !important;
+        font-size: 9.5pt !important;
+        font-weight: 700 !important;
+        color: #111827 !important;
+        margin-bottom: 0.4mm !important;
+        line-height: 1.25 !important;
+    }
+
+    .job-date {
+        font-size: 7.8pt !important;
+        font-weight: 600 !important;
+        color: #6E0E9C !important;
+        background: rgba(110, 14, 156, 0.08) !important;
+        padding: 0.8mm 2.2mm !important;
+        border-radius: 6px !important;
+        white-space: nowrap !important;
+        display: inline-block !important;
     }
 
     .l-heading3 {
-        font-size: 8.2pt !important;
+        font-size: 8.4pt !important;
+        font-weight: 600 !important;
         color: #4b5563 !important;
         margin-bottom: 0.6mm !important;
     }
 
-    .r-heading2 {
-        font-size: 9pt !important;
-        font-weight: bold !important;
-        margin-bottom: 0.3mm !important;
-    }
-
-    .r-heading3 {
-        font-size: 8.2pt !important;
-        margin-bottom: 0.4mm !important;
-    }
-
-    .edu-date {
-        font-size: 7.8pt !important;
-        background: rgba(255, 255, 255, 0.2) !important;
-        padding: 0 1mm !important;
-        border-radius: 2px !important;
-    }
-
-    .job-date {
-        background: transparent !important;
-        color: #6E0E9C !important;
-        font-size: 8pt !important;
-        font-weight: bold !important;
-        padding: 0 !important;
-    }
-
-    .timeline-item {
-        margin-bottom: 1.8mm !important;
-    }
-
-    .skills-list {
-        display: block !important;
-        padding-left: 14px !important;
-        list-style: disc !important;
-        margin-bottom: 0 !important;
-    }
-    .skills-list li {
-        background: transparent !important;
-        border: none !important;
-        padding: 0 !important;
-        margin-bottom: 0.6mm !important;
-        font-size: 8.2pt !important;
-        display: list-item !important;
-    }
-
+    /* Bullet lists */
     .r-body {
+        line-height: 1.25 !important;
+        color: #374151 !important;
+        font-size: 8.5pt !important;
         padding-left: 14px !important;
         margin-bottom: 0 !important;
     }
 
     .r-body li {
-        margin-bottom: 0.3mm !important;
+        margin-bottom: 0.35mm !important;
     }
 
-    .noprintbreak, .timeline-item {
+    .r-body li::marker {
+        color: #6E0E9C !important;
+    }
+
+    /* Avoid page breaks inside items */
+    .noprintbreak {
         break-inside: avoid !important;
         page-break-inside: avoid !important;
     }
