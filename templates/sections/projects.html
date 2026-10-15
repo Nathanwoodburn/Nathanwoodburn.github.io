@@ -73,8 +73,7 @@
         border: none !important;
         box-shadow: none !important;
         padding: 0.5rem 0;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+        overflow-x: hidden;
     }
 
     /* Custom Terminal Scrollbar */
@@ -152,9 +151,12 @@
         display: flex;
         flex-direction: column;
         gap: 0.15rem;
-        min-width: 680px;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
         margin-bottom: 0.45rem;
         font-family: inherit;
+        box-sizing: border-box;
     }
 
     /* Disable old pink overlay pseudo-element */
@@ -169,12 +171,13 @@
         border-radius: 6px;
         font-size: 0.88rem;
         color: #cbd5e1;
-        transition: background-color 0.16s ease, transform 0.16s ease;
+        transition: background-color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
         border: 1px solid transparent !important;
         white-space: nowrap;
         box-sizing: border-box !important;
         text-align: left;
         background: transparent !important;
+        width: 100% !important;
         max-width: 100% !important;
         height: auto !important;
         line-height: 1.35;
