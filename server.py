@@ -261,7 +261,7 @@ def index():
     repo_description = git["repo"]["description"]
 
     # Use cached projects data
-    projects = get_projects(limit=3)
+    projects = get_projects(limit=8)
 
     # Special names
     if repo_name == "nathanwoodburn.github.io":

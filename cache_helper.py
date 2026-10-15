@@ -108,7 +108,21 @@ def get_projects(limit=3):
     for project in projects:
         if project.get("avatar_url") in ("https://git.woodburn.au/", ""):
             project["avatar_url"] = "/favicon.png"
+        raw_slug = project.get("html_url", "").rstrip("/").split("/")[
+            -1
+        ] or project.get("name", "")
+        project["slug"] = raw_slug
         project["name"] = project["name"].replace("_", " ").replace("-", " ")
+        # Format updated_at to terminal ls-style timestamp (e.g. Oct 15 12:07)
+        up_at = project.get("updated_at", "")
+        try:
+            if up_at:
+                dt = datetime.datetime.fromisoformat(up_at)
+                project["date_str"] = dt.strftime("%b %d %H:%M")
+            else:
+                project["date_str"] = "Oct 15 12:00"
+        except (ValueError, TypeError):
+            project["date_str"] = "Oct 15 12:00"
 
     # Sort by last updated
     projects_sorted = sorted(
