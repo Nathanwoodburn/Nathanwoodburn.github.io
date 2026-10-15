@@ -11,7 +11,118 @@
 ] %}
 {% set links_to_render = nav_links or default_nav_links %}
 
-<nav class="navbar navbar-expand-md fixed-top navbar-light" id="mainNav" style="background: var(--bs-navbar-hover-color);">
+<style>
+    #mainNav {
+        background: rgba(13, 8, 24, 0.85) !important;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border-bottom: 1px solid rgba(110, 14, 156, 0.25);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+        padding: 0.55rem 1.25rem;
+        transition: all 0.3s ease;
+    }
+
+    #mainNav .navbar-brand {
+        color: #ffffff !important;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+    }
+
+    #mainNav .navbar-nav {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    #mainNav .nav-item {
+        list-style: none;
+    }
+
+    #mainNav .nav-link {
+        color: rgba(255, 255, 255, 0.78) !important;
+        font-size: 0.92rem;
+        font-weight: 500;
+        letter-spacing: 0.03em;
+        padding: 0.45rem 1.15rem !important;
+        border-radius: 9999px;
+        transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        border: 1px solid transparent;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    #mainNav .nav-link:hover {
+        color: #ffffff !important;
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.15);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    #mainNav .nav-link.active {
+        color: #ffffff !important;
+        background: linear-gradient(135deg, rgba(110, 14, 156, 0.55), rgba(164, 22, 133, 0.45));
+        border-color: rgba(214, 153, 255, 0.4);
+        box-shadow: 0 2px 12px rgba(110, 14, 156, 0.4);
+        font-weight: 600;
+    }
+
+    #mainNav .nav-link.active:hover {
+        background: linear-gradient(135deg, rgba(110, 14, 156, 0.7), rgba(164, 22, 133, 0.55));
+        border-color: rgba(214, 153, 255, 0.65);
+        box-shadow: 0 4px 16px rgba(110, 14, 156, 0.55);
+        transform: translateY(-1px);
+    }
+
+    #mainNav .nav-link:active {
+        transform: translateY(0);
+    }
+
+    #mainNav .navbar-toggler {
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 10px;
+        padding: 0.4rem 0.7rem;
+        background: rgba(255, 255, 255, 0.05);
+        transition: all 0.2s ease;
+    }
+
+    #mainNav .navbar-toggler:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    #mainNav .navbar-toggler:focus {
+        box-shadow: 0 0 0 0.2rem rgba(110, 14, 156, 0.4);
+    }
+
+    #mainNav .navbar-toggler i {
+        color: #ffffff;
+    }
+
+    @media (max-width: 767.98px) {
+        #mainNav .navbar-collapse {
+            background: rgba(17, 0, 51, 0.96);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            margin-top: 0.75rem;
+            padding: 0.85rem;
+            border-radius: 14px;
+            border: 1px solid rgba(110, 14, 156, 0.35);
+            box-shadow: 0 10px 32px rgba(0, 0, 0, 0.6);
+        }
+        #mainNav .navbar-nav {
+            gap: 0.4rem;
+            align-items: stretch;
+            margin-top: 0.25rem;
+        }
+        #mainNav .nav-link {
+            text-align: center;
+            padding: 0.6rem 1rem !important;
+        }
+    }
+</style>
+
+<nav class="navbar navbar-expand-md fixed-top navbar-dark" id="mainNav">
     <div class="container-fluid">
         <a class="navbar-brand" href="/#">
             <div style="padding-right: 1em; display: inline-flex;">
@@ -25,7 +136,7 @@
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav ms-auto">
                 {% for url, label, page_id in links_to_render %}
-                <li class="nav-item nav-link">
+                <li class="nav-item">
                     <a class="nav-link{% if active_page == page_id %} active{% endif %}" href="{{ url }}">{{ label }}</a>
                 </li>
                 {% endfor %}
