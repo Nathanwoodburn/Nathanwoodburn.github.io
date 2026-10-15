@@ -113,16 +113,16 @@ def get_projects(limit=3):
         ] or project.get("name", "")
         project["slug"] = raw_slug
         project["name"] = project["name"].replace("_", " ").replace("-", " ")
-        # Format updated_at to terminal ls-style timestamp (e.g. Oct 15 12:07)
+        # Format updated_at to eza ls -lah timestamp (e.g. 15 Oct 16:18 or  7 May 17:12)
         up_at = project.get("updated_at", "")
         try:
             if up_at:
                 dt = datetime.datetime.fromisoformat(up_at)
-                project["date_str"] = dt.strftime("%b %d %H:%M")
+                project["date_str"] = f"{dt.day:>2} {dt.strftime('%b %H:%M')}"
             else:
-                project["date_str"] = "Oct 15 12:00"
+                project["date_str"] = "15 Oct 12:00"
         except (ValueError, TypeError):
-            project["date_str"] = "Oct 15 12:00"
+            project["date_str"] = "15 Oct 12:00"
 
     # Sort by last updated
     projects_sorted = sorted(

@@ -94,28 +94,23 @@
 
     /* Oh-My-Posh Multi-line Prompt (Matching NWLaptop) */
     .omp-prompt-block {
-        display: flex;
-        flex-direction: column;
-        gap: 0.15rem;
+        display: block;
+        margin: 0 0 0.55rem 0;
         font-family: inherit;
-        font-size: 0.94rem;
-        line-height: 1.55;
+        font-size: 0.92rem;
+        line-height: 1.25 !important;
         white-space: nowrap;
-        margin-bottom: 0.65rem;
         user-select: none;
         -webkit-user-select: none;
     }
 
-    .omp-line-top {
-        display: flex;
-        align-items: center;
-        white-space: nowrap;
-    }
-
+    .omp-line-top,
     .omp-line-bottom {
-        display: flex;
-        align-items: center;
-        white-space: nowrap;
+        display: block;
+        line-height: 1.25 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        white-space: pre;
     }
 
     .omp-bracket {
@@ -141,7 +136,8 @@
     .omp-dollar {
         color: #60a5fa;
         font-weight: 700;
-        margin-right: 0.5rem;
+        margin: 0;
+        padding: 0;
     }
 
     .omp-cmd {
@@ -151,22 +147,13 @@
         -webkit-user-select: text;
     }
 
-    /* Output header (total XXK) */
-    .term-meta-header {
-        color: #64748b;
-        font-size: 0.86rem;
-        margin-bottom: 0.55rem;
-        white-space: nowrap;
-        padding-left: 0.65rem;
-    }
-
-    /* Directory Table */
+    /* Directory Table (eza ls -lah format) */
     .terminal-table {
         display: flex;
         flex-direction: column;
-        gap: 0.2rem;
-        min-width: 720px;
-        margin-bottom: 1rem;
+        gap: 0.15rem;
+        min-width: 680px;
+        margin-bottom: 0.85rem;
         font-family: inherit;
     }
 
@@ -178,7 +165,7 @@
     .term-row {
         display: flex;
         align-items: center;
-        padding: 0.35rem 0.65rem !important;
+        padding: 0.3rem 0.65rem !important;
         border-radius: 6px;
         font-size: 0.88rem;
         color: #cbd5e1;
@@ -190,10 +177,30 @@
         background: transparent !important;
         max-width: 100% !important;
         height: auto !important;
+        line-height: 1.35;
+    }
+
+    /* Eza Table Headers */
+    .term-header-row {
+        cursor: default !important;
+        padding: 0.25rem 0.65rem !important;
+        margin-bottom: 0.15rem;
+        background: transparent !important;
+        border: none !important;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+
+    .t-head {
+        color: #cbd5e1;
+        font-weight: 600;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        text-decoration-thickness: 1px;
     }
 
     .term-parent {
-        opacity: 0.65;
+        opacity: 0.7;
         user-select: none;
     }
 
@@ -202,38 +209,46 @@
         flex-shrink: 0;
     }
 
+    /* Eza Columns */
     .t-perm {
-        color: #2dd4bf;
-        width: 6.8rem;
+        width: 12ch;
+        flex-shrink: 0;
+        font-weight: 500;
+        letter-spacing: 0;
+    }
+
+    .perm-d { color: #60a5fa; font-weight: 700; }
+    .perm-r { color: #facc15; }
+    .perm-w { color: #ef4444; }
+    .perm-x { color: #22c55e; }
+    .perm-dash { color: #64748b; font-weight: 600; }
+
+    .t-size {
+        width: 5ch;
+        text-align: right;
+        margin-right: 1.5ch;
+        flex-shrink: 0;
         font-weight: 500;
     }
 
-    .t-links {
-        color: #94a3b8;
-        width: 1.8rem;
-        text-align: right;
-        margin-right: 0.85rem;
-    }
-
-    .t-owner,
-    .t-group {
-        color: #facc15;
-        width: 4.2rem;
+    .size-dash {
+        color: #64748b;
         font-weight: 600;
     }
 
-    .t-size {
-        color: #c084fc;
-        width: 3.2rem;
-        text-align: right;
-        margin-right: 0.85rem;
-        font-weight: 500;
+    .t-user {
+        color: #facc15;
+        width: 8ch;
+        font-weight: 600;
+        flex-shrink: 0;
     }
 
     .t-date {
-        color: #94a3b8;
-        width: 6.8rem;
+        color: #38bdf8;
+        width: 15ch;
         font-weight: 400;
+        flex-shrink: 0;
+        white-space: pre;
     }
 
     .t-target {
@@ -242,7 +257,6 @@
         gap: 0.5rem;
         flex-grow: 1;
         min-width: 0;
-        margin-left: 0.35rem;
     }
 
     .term-indicator {
@@ -413,29 +427,30 @@
         <div class="terminal-screen" tabindex="0" aria-label="Terminal directory view of ~/git on NWLaptop">
             <!-- Initial Prompt & Command (Matching oh-my-posh on NWLaptop) -->
             <div class="omp-prompt-block">
-                <div class="omp-line-top">
-                    <span class="omp-bracket">┌──(</span><span class="omp-userhost">nathan@NWLaptop</span><span class="omp-bracket">)-[</span><span class="omp-path-tilde">~</span><span class="omp-path-slash">/</span><span class="omp-path-dir">git</span><span class="omp-bracket">]</span>
-                </div>
-                <div class="omp-line-bottom">
-                    <span class="omp-bracket">└─</span><span class="omp-dollar">$</span>
-                    <span class="omp-cmd">cd git &amp;&amp; ls -la --color=auto</span>
-                </div>
+                <div class="omp-line-top"><span class="omp-bracket">┌──(</span><span class="omp-userhost">nathan@NWLaptop</span><span class="omp-bracket">)-[</span><span class="omp-path-tilde">~</span><span class="omp-path-slash">/</span><span class="omp-path-dir">git</span><span class="omp-bracket">]</span></div>
+                <div class="omp-line-bottom"><span class="omp-bracket">└─</span><span class="omp-dollar">$</span> <span class="omp-cmd">l</span></div>
             </div>
 
-            <div class="term-meta-header">
-                <span>total {{ (projects | length * 4) + 8 }}K</span>
-            </div>
-
-            <!-- Directory Table -->
+            <!-- Directory Table (eza ls -lah format) -->
             <div class="terminal-table" role="table" aria-label="Directory listing of ~/git">
+                <!-- Underlined Headers Row (eza format) -->
+                <div class="term-row term-header-row" role="row">
+                    <span class="term-col t-perm t-head">Permissions</span>
+                    <span class="term-col t-size t-head">Size</span>
+                    <span class="term-col t-user t-head">User</span>
+                    <span class="term-col t-date t-head">Date Modified</span>
+                    <div class="term-col t-target">
+                        <span class="term-indicator" aria-hidden="true">&nbsp;</span>
+                        <span class="t-head">Name</span>
+                    </div>
+                </div>
+
                 <!-- Special directories . and .. -->
                 <div class="term-row term-dir-row term-parent" role="row">
-                    <span class="term-col t-perm">drwxr-xr-x</span>
-                    <span class="term-col t-links">12</span>
-                    <span class="term-col t-owner">nathan</span>
-                    <span class="term-col t-group">nathan</span>
-                    <span class="term-col t-size">4.0K</span>
-                    <span class="term-col t-date">Oct 15 15:40</span>
+                    <span class="term-col t-perm" aria-label="drwxr-xr-x"><span class="perm-d">d</span><span class="perm-r">r</span><span class="perm-w">w</span><span class="perm-x">x</span><span class="perm-r">r</span><span class="perm-dash">-</span><span class="perm-x">x</span><span class="perm-r">r</span><span class="perm-dash">-</span><span class="perm-x">x</span></span>
+                    <span class="term-col t-size"><span class="size-dash">-</span></span>
+                    <span class="term-col t-user">nathan</span>
+                    <span class="term-col t-date">15 Oct 16:18</span>
                     <div class="term-col t-target">
                         <span class="term-indicator" aria-hidden="true">&nbsp;</span>
                         <span class="term-dir-icon" aria-hidden="true">
@@ -448,12 +463,10 @@
                 </div>
 
                 <div class="term-row term-dir-row term-parent" role="row">
-                    <span class="term-col t-perm">drwxr-xr-x</span>
-                    <span class="term-col t-links">24</span>
-                    <span class="term-col t-owner">nathan</span>
-                    <span class="term-col t-group">nathan</span>
-                    <span class="term-col t-size">4.0K</span>
-                    <span class="term-col t-date">Oct 15 12:00</span>
+                    <span class="term-col t-perm" aria-label="drwx------"><span class="perm-d">d</span><span class="perm-r">r</span><span class="perm-w">w</span><span class="perm-x">x</span><span class="perm-dash">------</span></span>
+                    <span class="term-col t-size"><span class="size-dash">-</span></span>
+                    <span class="term-col t-user">nathan</span>
+                    <span class="term-col t-date">15 Oct 15:53</span>
                     <div class="term-col t-target">
                         <span class="term-indicator" aria-hidden="true">&nbsp;</span>
                         <span class="term-dir-icon" aria-hidden="true">
@@ -467,7 +480,6 @@
 
                 <!-- Projects as git repo directories -->
                 {% for project in projects %}
-                <!-- {project} -->
                 {% set repo_slug = project.slug or project.name.replace(' ', '-') %}
                 <div class="term-row term-dir-row term-project-row site"
                      role="row"
@@ -476,12 +488,10 @@
                      onclick="window.open('{{ project.html_url }}', '_blank')"
                      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.open('{{ project.html_url }}','_blank');}"
                      title="Click to view {{ repo_slug }} on git.woodburn.au">
-                    <span class="term-col t-perm">drwxr-xr-x</span>
-                    <span class="term-col t-links">{{ loop.index + 2 }}</span>
-                    <span class="term-col t-owner">nathan</span>
-                    <span class="term-col t-group">nathan</span>
-                    <span class="term-col t-size">4.0K</span>
-                    <span class="term-col t-date">{{ project.date_str or 'Oct 15 12:00' }}</span>
+                    <span class="term-col t-perm" aria-label="drwxr-xr-x"><span class="perm-d">d</span><span class="perm-r">r</span><span class="perm-w">w</span><span class="perm-x">x</span><span class="perm-r">r</span><span class="perm-dash">-</span><span class="perm-x">x</span><span class="perm-r">r</span><span class="perm-dash">-</span><span class="perm-x">x</span></span>
+                    <span class="term-col t-size"><span class="size-dash">-</span></span>
+                    <span class="term-col t-user">nathan</span>
+                    <span class="term-col t-date">{{ project.date_str or '15 Oct 12:00' }}</span>
                     <div class="term-col t-target">
                         <span class="term-indicator" aria-hidden="true">&rsaquo;</span>
                         <span class="term-dir-icon" aria-hidden="true">
@@ -510,13 +520,8 @@
 
             <!-- Active Shell Prompt with Blinking Cursor -->
             <div class="omp-prompt-block omp-prompt-active">
-                <div class="omp-line-top">
-                    <span class="omp-bracket">┌──(</span><span class="omp-userhost">nathan@NWLaptop</span><span class="omp-bracket">)-[</span><span class="omp-path-tilde">~</span><span class="omp-path-slash">/</span><span class="omp-path-dir">git</span><span class="omp-bracket">]</span>
-                </div>
-                <div class="omp-line-bottom">
-                    <span class="omp-bracket">└─</span><span class="omp-dollar">$</span>
-                    <span class="term-cursor" aria-hidden="true"></span>
-                </div>
+                <div class="omp-line-top"><span class="omp-bracket">┌──(</span><span class="omp-userhost">nathan@NWLaptop</span><span class="omp-bracket">)-[</span><span class="omp-path-tilde">~</span><span class="omp-path-slash">/</span><span class="omp-path-dir">git</span><span class="omp-bracket">]</span></div>
+                <div class="omp-line-bottom"><span class="omp-bracket">└─</span><span class="omp-dollar">$</span> <span class="term-cursor" aria-hidden="true"></span></div>
             </div>
         </div>
 
