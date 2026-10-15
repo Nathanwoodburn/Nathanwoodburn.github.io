@@ -621,6 +621,7 @@ def build_resume_pdf(support: bool = False, output_path: str | None = None) -> s
     )
     chromium_bin = find_chromium()
     if not chromium_bin:
+        print("Warning: Failed to find chromium binary")
         return target_pdf
 
     os.makedirs(os.path.dirname(os.path.abspath(target_pdf)), exist_ok=True)
