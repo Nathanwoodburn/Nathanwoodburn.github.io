@@ -1,0 +1,25 @@
+{# ==========================================================================
+   Recent Projects Swiper Carousel Section
+   ========================================================================== #}
+<section class="text-center content-section sites" id="sites" style="background: #363636; padding-top: 0px; padding-bottom: 0px;">
+    <div class="site-container">
+        <h1>Some recent projects</h1>
+        <div class="swiper">
+            <div class="swiper-wrapper">
+                {% for project in projects %}
+                <div class="swiper-slide site" data-url="{{ project.html_url }}">
+                    <img class="site-img" src="{{ project.avatar_url }}" alt="{{ project.name }} Icon" />
+                    <div class="site-body">
+                        <div class="site-detail" style="width: 100%;">
+                            <h2 class="site-name" style="text-align: left;">{{ project.name }}</h2>
+                            <p class="text-start site-author">{{ project.description }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="swiper-scrollbar"></div>
+        </div>
+    </div>
+</section>
+<img class="no-drag" src="/assets/img/tilt.svg" style="width: 100%; background: #363636; transform: rotate(180deg);" alt="">

@@ -1,0 +1,57 @@
+{# ==========================================================================
+   Donate / Crypto Support Section
+   ========================================================================== #}
+<section class="text-center content-section" id="donate" style="background: #110033;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h2>Donate</h2>
+                <p>Feel free to support me by donating</p>
+                <ul class="list-inline banner-social-buttons">
+                    <li class="list-inline-item">&nbsp;<a class="btn btn-primary btn-lg btn-default" role="button" href="https://paypal.me/nathanwoodburn" style="width: 170px;" target="_blank" rel="noopener"><i class="fab fa-paypal fa-fw"></i><span class="network-name">&nbsp; Paypal</span></a></li>
+                    <li class="list-inline-item">&nbsp;<a class="btn btn-primary btn-lg btn-default" role="button" href="https://github.com/sponsors/Nathanwoodburn" style="width: 170px;" target="_blank" rel="noopener"><i class="fab fa-github fa-fw"></i><span class="network-name">&nbsp; Github</span></a></li>
+                    <li class="list-inline-item">&nbsp;<a class="btn btn-primary btn-lg btn-default" role="button" href="https://donate.stripe.com/8wM6pv0VD08Xe408ww" style="width: 170px;" target="_blank" rel="noopener"><i class="fab fa-stripe-s fa-fw"></i><span class="network-name">&nbsp;Stripe</span></a></li>
+                </ul>
+                <p>
+                    HNS:<br>
+                    <code data-bs-toggle="tooltip" data-bss-tooltip="" id="hns-domain" class="hns" style="color: rgb(242,90,5); display: block;" title="Click to copy">nathan.woodburn</code>
+                    <code data-bs-toggle="tooltip" data-bss-tooltip="" id="hns" class="hns" style="color: rgb(242,90,5); display: block;" title="Click to copy">{{ HNS }}</code><br>
+                    BTC:<br>
+                    <code data-bs-toggle="tooltip" data-bss-tooltip="" id="btc-domain" class="btc" style="color: rgb(242,90,5); display: block;" title="Click to copy">thinbadger6@primal.net</code>
+                    <code data-bs-toggle="tooltip" data-bss-tooltip="" id="btc" class="btc" style="color: rgb(242,90,5); display: block;" title="Click to copy">{{ BTC }}</code><br>
+                    SOL:<br>
+                    <code data-bs-toggle="tooltip" data-bss-tooltip="" id="sol-domain" class="sol" style="color: rgb(242,90,5); display: block;" title="Click to copy">woodburn.sol</code>
+                    <code data-bs-toggle="tooltip" data-bss-tooltip="" id="sol" class="sol" style="color: rgb(242,90,5); display: block;" title="Click to copy">{{ SOL }}</code><br>
+                    ETH:<br>
+                    <code data-bs-toggle="tooltip" data-bss-tooltip="" id="eth-domain" class="eth" style="color: rgb(242,90,5); display: block;" title="Click to copy">woodburn.au</code>
+                    <code data-bs-toggle="tooltip" data-bss-tooltip="" id="eth" class="eth" style="color: rgb(242,90,5); display: block;" title="Click to copy">{{ ETH }}</code>
+                    <a class="btn btn-primary btn-default" role="button" href="/donate" style="width: 170px; margin-top: 10px;">OTHER OPTIONS</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function copyToClipboard(element) {
+        if (!element) return;
+        const textToCopy = element.textContent;
+        const textArea = document.createElement('textarea');
+        textArea.value = textToCopy;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        const tooltips = document.querySelectorAll('.tooltip-inner');
+        tooltips.forEach(tooltip => {
+            tooltip.innerText = 'Copied!';
+        });
+    }
+
+    ['btc', 'eth', 'hns', 'sol', 'btc-domain', 'eth-domain', 'hns-domain', 'sol-domain'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('click', () => copyToClipboard(el));
+        }
+    });
+</script>

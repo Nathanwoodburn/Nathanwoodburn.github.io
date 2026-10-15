@@ -1,63 +1,15 @@
-<!DOCTYPE html>
-<html data-bs-theme="light" lang="en-au">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Projects | Nathan.Woodburn/</title>
-    <meta name="theme-color" content="#000000">
-    <link rel="canonical" href="https://nathan.woodburn.au/projects">
-    <meta property="og:url" content="https://nathan.woodburn.au/projects">
-    <meta name="fediverse:creator" content="@nathanwoodburn@mastodon.woodburn.au">
-    <meta name="twitter:description" content="G'day, this is my personal website. You can find out about me or check out some of my projects.">
-    <meta property="og:title" content="Nathan.Woodburn/">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:image" content="https://nathan.woodburn.au/assets/img/profile.jpg">
-    <meta property="og:type" content="website">
-    <meta name="twitter:title" content="Nathan.Woodburn/">
-    <meta property="og:description" content="G'day, this is my personal website. You can find out about me or check out some of my projects.">
-    <meta property="og:image" content="https://nathan.woodburn.au/assets/img/profile.jpg">
-    <meta name="description" content="Check out some of my projects">
-    <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="/assets/img/favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon/favicon-16x16.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="180x180" href="/assets/img/favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicon/android-chrome-192x192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="/assets/img/favicon/android-chrome-512x512.png">
-    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
-    <link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic&amp;display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Cabin:700&amp;display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Anonymous+Pro&amp;display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&amp;display=swap">
-    <link rel="stylesheet" href="/assets/fonts/font-awesome.min.css">
-    <link rel="stylesheet" href="/assets/css/styles.min.css">
-    <link rel="stylesheet" href="/assets/css/brand-reveal.min.css">
-    <link rel="stylesheet" href="/assets/css/profile.min.css">
-    <link rel="stylesheet" href="/assets/css/Social-Icons.min.css">
-<link rel="me" href="https://mastodon.woodburn.au/@nathanwoodburn" />
-<script async src="https://umami.woodburn.au/script.js" data-website-id="6a55028e-aad3-481c-9a37-3e096ff75589"></script>
-</head>
+{% set active_page = "projects" %}
 
-<body id="page-top" data-bs-spy="scroll" data-bs-target="#mainNav" data-bs-offset="77">
-    <nav class="navbar navbar-expand-md fixed-top navbar-light" id="mainNav" style="background: var(--bs-navbar-hover-color);">
-        <div class="container-fluid"><a class="navbar-brand" href="/#">
-                <div style="padding-right: 1em;display: inline-flex;">
-                    <div class="slider"><span>/</span></div><span class="brand">Nathan.Woodburn</span>
-                </div>
-            </a><button class="navbar-toggler navbar-toggler-right" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" type="button" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation" value="Menu"><i class="fa fa-bars"></i></button>
-            <div class="collapse navbar-collapse" id="navbarResponsive">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item nav-link"><a class="nav-link" href="/">Home</a></li>
-                    <li class="nav-item nav-link"><a class="nav-link" href="/tools">Tools</a></li>
-                    <li class="nav-item nav-link"><a class="nav-link" href="/blog">Blog</a></li>
-                    <li class="nav-item nav-link"><a class="nav-link" href="/now">Now</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    <header class="masthead" style="background: url(&quot;/assets/img/bg/projects.webp&quot;) bottom / cover no-repeat;height: auto;padding-top: 20px;">
-        <div style="margin-top: 150px;margin-bottom: 100px;">
+{% block title %}Projects - Nathan.Woodburn/{% endblock %}
+
+{% block canonical %}https://nathan.woodburn.au/projects{% endblock %}
+{% block og_url %}https://nathan.woodburn.au/projects{% endblock %}
+
+{% block content %}
+    <header class="masthead" style="background: url('/assets/img/bg/projects.webp') bottom / cover no-repeat; height: auto; padding-top: 20px;">
+        <div style="margin-top: 150px; margin-bottom: 100px;">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-8 mx-auto">
@@ -67,25 +19,20 @@
             </div>
         </div>
     </header>
+
     <section class="text-center content-section" id="sites" style="padding-bottom: 100px;">
         <div class="container">
-            <div class="row gx-5 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-3 row-cols-xxl-4" style="max-width: 100vw;">{% for site in sites %}
-<div class="col" style="padding-top: 20px;">
-    <h2>{{site.name}}</h2>
-    <p>{{site.description}}</p><a class="btn btn-primary" role="button" href="{{site.url}}" target="_blank">More Info</a>
-</div>
-{% endfor %}</div>
+            <div class="row gx-5 row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-3 row-cols-xxl-4" style="max-width: 100vw;">
+                {% for site in sites %}
+                <div class="col" style="padding-top: 20px;">
+                    <h2>{{ site.name }}</h2>
+                    <p>{{ site.description }}</p>
+                    <a class="btn btn-primary" role="button" href="{{ site.url }}" target="_blank" rel="noopener">More Info</a>
+                </div>
+                {% endfor %}
+            </div>
         </div>
     </section>
-    <p class="text-center" style="font-size: 28px;">Check out my <a href="https://git.woodburn.au/nathanwoodburn" target="_blank">Git</a>&nbsp;for all my projects</p>
-    <footer>
-        <div class="container text-center">
-            <p class="copyright">Copyright ©&nbsp;Nathan.Woodburn/ 2026</p>
-        </div>
-    </footer>{{handshake_scripts | safe}}
-    <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
-    <script src="/assets/js/script.min.js"></script>
-    <script src="/assets/js/hacker.min.js"></script>
-</body>
 
-</html>
+    <p class="text-center" style="font-size: 28px;">Check out my <a href="https://git.woodburn.au/nathanwoodburn" target="_blank" rel="noopener">Git</a>&nbsp;for all my projects</p>
+{% endblock %}
