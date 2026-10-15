@@ -7,8 +7,10 @@
 {% block canonical %}https://nathan.woodburn.au/donate{% endblock %}
 {% block og_url %}https://nathan.woodburn.au/donate{% endblock %}
 
+{% block body_attrs %}id="page-top" data-bs-spy="scroll" data-bs-target="#mainNav" data-bs-offset="77" style="background: #110033;"{% endblock %}
+
 {% block content %}
-    <section class="text-center content-section" id="donate" style="background: #110033; padding-bottom: 100px; padding-top: 100px;">
+    <section class="text-center content-section d-flex flex-column justify-content-center" id="donate" style="background: #110033; padding-bottom: 100px; padding-top: 100px; flex: 1;">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 mx-auto">
@@ -38,7 +40,7 @@
 {% endblock %}
 
 {% block footer %}
-<footer style="background: #110033;">
+<footer style="background: #110033; margin-top: auto;">
     <div class="container text-center">
         <div class="row">
             <div class="col">
@@ -47,10 +49,6 @@
         </div>
         <div class="row">
             <div class="col">
-                <p class="d-none d-print-inline-block d-sm-inline-block d-md-inline-block d-lg-inline-block d-xl-inline-block d-xxl-inline-block">
-                    This site is also available on<br>
-                    <a href="https://learn.namebase.io/" target="_blank">Handshake</a>&nbsp;at <a href="https://nathan.woodburn">https://nathan.woodburn/</a>
-                </p>
                 <p class="copyright">Copyright ©&nbsp;Nathan.Woodburn/ 2026</p>
             </div>
         </div>

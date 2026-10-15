@@ -60,6 +60,24 @@
     <link rel="me" href="https://mastodon.woodburn.au/@nathanwoodburn" />
     <script async src="https://umami.woodburn.au/script.js" data-website-id="6a55028e-aad3-481c-9a37-3e096ff75589"></script>
 
+    <style>
+        html {
+            height: 100%;
+        }
+        body {
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+        }
+        main {
+            flex: 1 0 auto;
+        }
+        footer {
+            margin-top: auto;
+        }
+    </style>
+
     {% block extra_css %}{% endblock %}
     {% block head_extra %}{% endblock %}
 </head>
@@ -76,7 +94,9 @@
         {% include "components/navbar.html" %}
     {% endblock %}
 
-    {% block content %}{% endblock %}
+    <main class="flex-grow-1 d-flex flex-column">
+        {% block content %}{% endblock %}
+    </main>
 
     {% block footer %}
         {% include "components/footer.html" %}
