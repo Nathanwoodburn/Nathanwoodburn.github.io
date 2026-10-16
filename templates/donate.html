@@ -8,32 +8,22 @@
 {% block og_url %}https://nathan.woodburn.au/donate{% endblock %}
 
 {% block extra_css %}
-<style>
-    #donate code, #donate .address {
-        word-break: break-all;
-        overflow-wrap: anywhere;
-        max-width: 100%;
-        display: inline-block;
-    }
-    #donate .dropdown-menu {
-        max-width: 90vw;
-    }
-</style>
+    <link rel="stylesheet" href="/assets/css/donate.css">
 {% endblock %}
 
-{% block body_attrs %}id="page-top" data-bs-spy="scroll" data-bs-target="#mainNav" data-bs-offset="77" style="background: #110033;"{% endblock %}
+{% block body_attrs %}id="page-top" class="donate-page" data-bs-spy="scroll" data-bs-target="#mainNav" data-bs-offset="77"{% endblock %}
 
 {% block content %}
-    <section class="text-center content-section d-flex flex-column justify-content-center" id="donate" style="background: #110033; padding-bottom: 100px; padding-top: 100px; flex: 1;">
+    <section class="text-center content-section d-flex flex-column justify-content-center donate-page-section" id="donate">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 mx-auto">
                     <h2>Donate</h2>
-                    <p style="margin-bottom: 10px;">Feel free to support me by donating</p>
+                    <p class="mb-2">Feel free to support me by donating</p>
                     <ul class="list-inline banner-social-buttons">
-                        <li class="list-inline-item" style="margin-top: 15px;">&nbsp;<a class="btn btn-primary btn-lg btn-default" role="button" href="https://paypal.me/nathanwoodburn" target="_blank" rel="noopener" style="width: auto;"><i class="fab fa-paypal fa-fw"></i><span class="network-name">&nbsp; Paypal</span></a></li>
-                        <li class="list-inline-item" style="margin-top: 15px;">&nbsp;<a class="btn btn-primary btn-lg btn-default" role="button" href="https://github.com/sponsors/Nathanwoodburn" target="_blank" rel="noopener" style="width: auto;"><i class="fab fa-github fa-fw"></i><span class="network-name">&nbsp; Github</span></a></li>
-                        <li class="list-inline-item" style="margin-top: 15px;">&nbsp;<a class="btn btn-primary btn-lg btn-default" role="button" href="https://donate.stripe.com/8wM6pv0VD08Xe408ww" target="_blank" rel="noopener" style="width: auto;"><i class="fab fa-stripe-s fa-fw"></i><span class="network-name">&nbsp;Stripe</span></a></li>
+                        <li class="list-inline-item donate-item-spaced">&nbsp;<a class="btn btn-primary btn-lg btn-default donate-btn-auto" role="button" href="https://paypal.me/nathanwoodburn" target="_blank" rel="noopener"><i class="fab fa-paypal fa-fw"></i><span class="network-name">&nbsp; Paypal</span></a></li>
+                        <li class="list-inline-item donate-item-spaced">&nbsp;<a class="btn btn-primary btn-lg btn-default donate-btn-auto" role="button" href="https://github.com/sponsors/Nathanwoodburn" target="_blank" rel="noopener"><i class="fab fa-github fa-fw"></i><span class="network-name">&nbsp; Github</span></a></li>
+                        <li class="list-inline-item donate-item-spaced">&nbsp;<a class="btn btn-primary btn-lg btn-default donate-btn-auto" role="button" href="https://donate.stripe.com/8wM6pv0VD08Xe408ww" target="_blank" rel="noopener"><i class="fab fa-stripe-s fa-fw"></i><span class="network-name">&nbsp;Stripe</span></a></li>
                     </ul>
                     <h4>Crypto Options</h4>
                     <div class="dropdown">
@@ -54,7 +44,7 @@
 {% endblock %}
 
 {% block footer %}
-<footer style="background: #110033; margin-top: auto;">
+<footer class="donate-footer">
     <div class="container text-center">
         <div class="row">
             <div class="col">
@@ -71,67 +61,6 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-    const dropdownButton = document.getElementById('dropdownButton');
-    const cryptoSearch = document.getElementById('cryptoSearch');
-
-    if (dropdownButton && cryptoSearch) {
-        dropdownButton.addEventListener('click', function() {
-            setTimeout(() => cryptoSearch.focus(), 0);
-        });
-
-        cryptoSearch.addEventListener('input', function() {
-            const searchValue = this.value.toLowerCase();
-            const cryptoList = document.getElementById('cryptoList').getElementsByTagName('a');
-
-            if (searchValue === '') {
-                const defaultCoins = {{ default_coins | tojson }};
-                for (let i = 0; i < cryptoList.length; i++) {
-                    const cryptoName = cryptoList[i].getAttribute('href').split('=')[1];
-                    if (defaultCoins.includes(cryptoName)) {
-                        cryptoList[i].style.display = '';
-                    } else {
-                        cryptoList[i].style.display = 'none';
-                    }
-                }
-            } else {
-                for (let i = 0; i < cryptoList.length; i++) {
-                    const cryptoName = cryptoList[i].textContent.toLowerCase();
-                    if (cryptoName.indexOf(searchValue) > -1) {
-                        cryptoList[i].style.display = '';
-                    } else {
-                        cryptoList[i].style.display = 'none';
-                    }
-                }
-            }
-        });
-
-        cryptoSearch.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                const cryptoList = document.getElementById('cryptoList').getElementsByTagName('a');
-                for (let i = 0; i < cryptoList.length; i++) {
-                    if (cryptoList[i].style.display === '') {
-                        window.location.href = cryptoList[i].getAttribute('href');
-                        break;
-                    }
-                }
-            }
-        });
-    }
-
-    function copyToClipboard(element) {
-        const textToCopy = element.textContent;
-        const textArea = document.createElement('textarea');
-        textArea.value = textToCopy;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        const tooltips = document.querySelectorAll('.tooltip-inner');
-        tooltips.forEach(tooltip => {
-            tooltip.innerText = 'Copied!';
-        });
-    }
-</script>
+<script>window.DEFAULT_COINS = {{ default_coins | tojson }};</script>
+<script src="/assets/js/donate.js"></script>
 {% endblock %}

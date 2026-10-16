@@ -1,0 +1,42 @@
+/* ==========================================================================
+   Public Key Pages Styles (PGP & Git PGP)
+   ========================================================================== */
+body.keys-page {
+    text-align: center;
+    padding: 20px 15px;
+    box-sizing: border-box;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+body.keys-page code {
+    display: block;
+    max-width: 100%;
+    word-break: break-all;
+    overflow-wrap: anywhere;
+    font-size: clamp(0.65rem, 2.7vw, 0.9rem);
+    line-height: 1.35;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+body.keys-page p,
+body.keys-page a {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+.key-section {
+    border-bottom: 4px solid rgb(255, 255, 255);
+    margin-top: 50px;
+}
+
+.key-download-btn {
+    display: block;
+    margin: 20px auto 0;
+    max-width: 150px;
+}
+
+.key-fingerprint {
+    margin-top: 3em;
+}

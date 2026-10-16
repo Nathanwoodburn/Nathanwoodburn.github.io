@@ -17,50 +17,33 @@ Find something interesting to read. Or maybe check one of my tutorials{% endbloc
 Find something interesting to read. Or maybe check one of my tutorials{% endblock %}
 
 {% block extra_css %}
-    <style>
-        .blog-item-link .blog-card {
-            background-color: #000000 !important;
-            border: 1px solid #282828 !important;
-            color: #ffffff !important;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        }
-        .blog-item-link:hover .blog-card {
-            border-color: #6E0E9C !important;
-            background-color: #0d0614 !important;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(110, 14, 156, 0.35);
-        }
-        .blog-item-link .blog-card h4 {
-            color: #ffffff;
-            transition: color 0.2s ease;
-        }
-        .blog-item-link:hover .blog-card h4 {
-            color: #d699ff !important;
-        }
-    </style>
+    <link rel="stylesheet" href="/assets/css/blog-list.css">
 {% endblock %}
 
-{% block body_attrs %}class="text-center" style="background: linear-gradient(rgba(0,0,0,0.80), rgba(0,0,0,0.80)), url(&quot;/assets/img/bg/background.webp&quot;) center / cover no-repeat;"{% endblock %}
+{% block body_attrs %}class="blog-page"{% endblock %}
 
 {% block content %}
-    <div style="height: 10em;"></div>
-    <div class="profile-container" style="margin-bottom: 2em;"><img class="profile background" src="/assets/img/profile.jpg" style="border-radius: 50%;"><img class="profile foreground" src="/assets/img/pfront.webp"></div>
-    <h1 class="nathanwoodburn" style="margin-bottom: 0px;">Nathan.Woodburn/</h1>
-    <h3 style="margin-bottom: 0px; margin-top: 15px;">Blogs</h3>
-    <p style="color: #aaaaaa; margin-top: 5px; margin-bottom: 30px;">Check out my tutorials, guides, and articles</p>
-    <section style="margin-bottom: 50px; max-width: 95%; margin-right: auto; margin-left: auto;">
-        <div style="max-width: 700px; margin: auto;">
-            <ul class="list-group" style="padding-left: 0; list-style: none;">
+    <div class="blog-spacer"></div>
+    <div class="profile-container blog-profile-container">
+        <img class="profile background blog-profile-img" src="/assets/img/profile.jpg" alt="Profile Background">
+        <img class="profile foreground" src="/assets/img/pfront.webp" alt="Profile Foreground">
+    </div>
+    <h1 class="nathanwoodburn blog-header-title">Nathan.Woodburn/</h1>
+    <h3 class="blog-header-sub">Blogs</h3>
+    <p class="blog-header-desc">Check out my tutorials, guides, and articles</p>
+    <section class="blog-section">
+        <div class="blog-container">
+            <ul class="list-group blog-list">
                 {% if posts %}
                     {% for post in posts %}
-                    <a href="/blog/{{ post.slug }}" class="blog-item-link" style="text-decoration: none; margin-bottom: 14px; display: block;">
-                        <li class="list-group-item blog-card" style="background-color: #000000; border: 1px solid #282828; border-radius: 8px; padding: 20px 24px; text-align: left; color: #ffffff;">
+                    <a href="/blog/{{ post.slug }}" class="blog-item-link">
+                        <li class="list-group-item blog-card">
                             <div class="d-flex w-100 justify-content-between align-items-center mb-1">
-                                <h4 style="margin: 0; color: #ffffff; font-size: 1.25rem; font-weight: 600;">{{ post.title }}</h4>
-                                {% if post.date %}<small style="color: #888888; font-size: 0.85rem; white-space: nowrap; margin-left: 10px;">{{ post.date }}</small>{% endif %}
+                                <h4 class="blog-card-title">{{ post.title }}</h4>
+                                {% if post.date %}<small class="blog-card-date">{{ post.date }}</small>{% endif %}
                             </div>
                             {% if post.description %}
-                            <p style="margin-top: 8px; margin-bottom: 0; color: #aaaaaa; font-size: 0.95rem; line-height: 1.4;">{{ post.description }}</p>
+                            <p class="blog-card-desc">{{ post.description }}</p>
                             {% endif %}
                         </li>
                     </a>

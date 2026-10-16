@@ -1,0 +1,35 @@
+/* ==========================================================================
+   About Page Styles
+   ========================================================================== */
+body.about-page-body {
+    text-align: center;
+    color: rgb(255, 255, 255);
+    background: transparent;
+}
+
+.about-profile-container {
+    margin-bottom: 2em;
+    margin-top: 5em;
+}
+
+.about-profile-img {
+    border-radius: 50%;
+}
+
+.about-title {
+    margin-bottom: 0.5em;
+}
+
+.about-contact-section {
+    padding-top: 0;
+    padding-bottom: 3em;
+}
+
+.about-bio {
+    margin-top: 1em;
+}
+
+.about-slideout-btn {
+    font-size: 50px;
+    cursor: pointer;
+}

@@ -37,24 +37,16 @@
     <link rel="stylesheet" href="/assets/css/fixes.min.css">
     <link rel="stylesheet" href="/assets/css/profile.min.css">
     <link rel="stylesheet" href="/assets/css/Social-Icons.min.css">
+    <link rel="stylesheet" href="/assets/css/layout.css">
+    <link rel="stylesheet" href="/assets/css/about.css">
     <link rel="me" href="https://mastodon.woodburn.au/@nathanwoodburn" />
     <script async src="https://umami.woodburn.au/script.js" data-website-id="6a55028e-aad3-481c-9a37-3e096ff75589"></script>
-    <style>
-        html, body {
-            max-width: 100%;
-            overflow-x: hidden;
-        }
-        img, svg, video, canvas, audio, iframe, embed, object {
-            max-width: 100%;
-            height: auto;
-        }
-    </style>
 </head>
 
-<body class="about-body" style="text-align: center;color: rgb(255,255,255);background: transparent;">{{handshake_scripts | safe}}
-    <div class="profile-container" style="margin-bottom: 2em;margin-top: 5em;"><img class="profile background" src="/assets/img/profile.jpg" style="border-radius: 50%;"><img class="profile foreground" src="/assets/img/pfront.webp"></div>
-    <h1 class="nathanwoodburn" style="margin-bottom: 0.5em;">Nathan.Woodburn/</h1>
-    <section class="text-center content-section" id="contact" style="padding-top: 0px;padding-bottom: 3em;">
+<body class="about-body about-page-body">{{handshake_scripts | safe}}
+    <div class="profile-container about-profile-container"><img class="profile background about-profile-img" src="/assets/img/profile.jpg" alt="Profile Background"><img class="profile foreground" src="/assets/img/pfront.webp" alt="Profile Foreground"></div>
+    <h1 class="nathanwoodburn about-title">Nathan.Woodburn/</h1>
+    <section class="text-center content-section about-contact-section" id="contact">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 d-none d-print-block d-sm-block d-md-block d-lg-block d-xl-block d-xxl-block mx-auto">
@@ -118,7 +110,7 @@
             </div>
         </div>
     </section>
-    <p style="margin-top: 1em;">Hi, I'm Nathan Woodburn, I'm a computer guy living in Canberra<br>I enjoy managing linux servers for my various projects<br>I code stuff with Python, Bash and tons of other languages<br>I'm currently working as a system admin at <a href="https://www.csiro.au" target="_blank">CSIRO</a><br><br></p><i class="fas fa-arrow-down" style="font-size: 50px;" onclick="slideout()"></i>
+    <p class="about-bio">Hi, I'm Nathan Woodburn, I'm a computer guy living in Canberra<br>I enjoy managing linux servers for my various projects<br>I code stuff with Python, Bash and tons of other languages<br>I'm currently working as a system admin at <a href="https://www.csiro.au" target="_blank">CSIRO</a><br><br></p><i class="fas fa-arrow-down about-slideout-btn" onclick="slideout()"></i>
     <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="/assets/js/script.min.js"></script>
     <script src="/assets/js/about.min.js"></script>

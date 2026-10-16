@@ -70,12 +70,14 @@ EMAIL_RATE_LIMIT = 3  # Max 3 requests per email per hour
 IP_RATE_LIMIT = 5  # Max 5 requests per IP per hour
 RATE_LIMIT_WINDOW = 3600  # 1 hour in seconds
 
+EXCEMPT_ROUTES = ["404"]
 RESTRICTED_ROUTES = ["ascii"]
 REDIRECT_ROUTES = {
     "contact": "/#contact",
-    "/meet": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
-    "/meeting": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
-    "/appointment": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
+    "meet": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
+    "meeting": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
+    "appointment": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
+    "donate/more": "/donate",
 }
 DOWNLOAD_ROUTES = {"pgp": "data/nathanwoodburn.asc"}
 
@@ -680,6 +682,9 @@ def catch_all(path: str):
     if path.lower().replace(".html", "") in RESTRICTED_ROUTES:
         return error_response(request, message="Restricted route", code=403)
 
+    if path.lower().replace(".html", "") in EXCEMPT_ROUTES:
+        return error_response(request)
+
     # If curl request, return curl response
     if isCLI(request):
         return curl_response(request)
@@ -740,7 +745,7 @@ if __name__ == "__main__":
     # If --host argument is passed, use that as host, otherwise use 127.0.0.1
     parser = argparse.ArgumentParser(description="Run the Flask server.")
     parser.add_argument("--host", type=str, default="127.0.0.1")
-
+    parser.add_argument("--port", type=int, default="5000")
     args = parser.parse_args()
 
-    app.run(debug=True, port=5000, host=args.host)
+    app.run(debug=True, port=args.port, host=args.host)

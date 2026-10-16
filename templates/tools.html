@@ -8,12 +8,12 @@
 {% block og_url %}https://nathan.woodburn.au/tools{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="/assets/css/tools.min.css">
+    <link rel="stylesheet" href="/assets/css/tools.css">
 {% endblock %}
 
 {% block content %}
-    <header class="masthead" style="background: url('/assets/img/bg/projects.webp') bottom / cover no-repeat; height: auto; padding-top: 20px;">
-        <div style="margin-top: 150px; margin-bottom: 100px;">
+    <header class="masthead tools-masthead">
+        <div class="tools-masthead-content">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-8 mx-auto">
@@ -25,22 +25,22 @@
         </div>
     </header>
 
-    <section class="text-center content-section" id="tools" style="padding-bottom: 100px;">
+    <section class="text-center content-section tools-section" id="tools">
         <div class="container">
             {% for type, tools_in_type in tools | groupby('type') %}
             <h2 class="mt-4 mb-3 sticky-top bg-primary py-2 section-header" id="{{ type }}">{{ type }}</h2>
             <div class="row">
                 {% for tool in tools_in_type %}
                 <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card h-100 shadow-sm transition-all" style="transition: transform 0.2s, box-shadow 0.2s;">
+                    <div class="card h-100 shadow-sm tool-card">
                         <div class="card-body d-flex flex-column">
                             <h4 class="card-title">{{ tool.name }}</h4>
                             <p class="card-text">{{ tool.description }}</p>
                             <div class="btn-group gap-3 mt-auto" role="group">
                                 {% if tool.demo %}
-                                <button class="btn btn-primary" type="button" data-bs-target="#modal-{{ tool.name }}" data-bs-toggle="modal" style="transition: transform 0.2s, background-color 0.2s;">View Demo</button>
+                                <button class="btn btn-primary tool-btn" type="button" data-bs-target="#modal-{{ tool.name }}" data-bs-toggle="modal">View Demo</button>
                                 {% endif %}
-                                <a class="btn btn-primary" role="button" href="{{ tool.url }}" target="_blank" rel="noopener" style="transition: transform 0.2s, background-color 0.2s;">{{ tool.name }} Website</a>
+                                <a class="btn btn-primary tool-btn" role="button" href="{{ tool.url }}" target="_blank" rel="noopener">{{ tool.name }} Website</a>
                             </div>
                         </div>
                     </div>
@@ -51,7 +51,7 @@
             <!-- Modals for this type -->
             {% for tool in tools_in_type %}
             {% if tool.demo %}
-            <div id="modal-{{ tool.name }}" class="modal fade" role="dialog" tabindex="-1" style="z-index: 1055;" data-demo-url="{{ tool.demo | e }}">
+            <div id="modal-{{ tool.name }}" class="modal fade tool-modal" role="dialog" tabindex="-1" data-demo-url="{{ tool.demo | e }}">
                 <div class="modal-dialog modal-xl" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -73,85 +73,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const navbar = document.getElementById('mainNav');
-        const headers = document.querySelectorAll('.section-header');
-
-        if (navbar) {
-            const navbarHeight = navbar.offsetHeight;
-            headers.forEach(header => {
-                header.style.top = navbarHeight + 'px';
-                header.style.zIndex = '100';
-                header.style.scrollMarginTop = navbarHeight + 'px';
-            });
-
-            if (window.location.hash) {
-                setTimeout(() => {
-                    const target = document.querySelector(window.location.hash);
-                    if (target) {
-                        window.scrollTo({
-                            top: target.offsetTop - navbarHeight,
-                            behavior: 'smooth'
-                        });
-                    }
-                }, 0);
-            }
-        }
-
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('show.bs.modal', () => {
-                const body = modal.querySelector('.modal-body');
-                if (body && body.dataset.demoLoaded === 'false') {
-                    const demoUrl = modal.dataset.demoUrl;
-                    const iframeId = 'iframe-' + modal.id;
-
-                    const loadingDiv = document.createElement('div');
-                    loadingDiv.style.position = 'absolute';
-                    loadingDiv.style.top = '0';
-                    loadingDiv.style.left = '0';
-                    loadingDiv.style.width = '100%';
-                    loadingDiv.style.height = '100%';
-                    loadingDiv.style.backgroundColor = 'rgb(0, 0, 0)';
-                    loadingDiv.style.display = 'flex';
-                    loadingDiv.style.justifyContent = 'center';
-                    loadingDiv.style.alignItems = 'center';
-                    loadingDiv.style.zIndex = '10';
-                    const loadingMsg = document.createElement('p');
-                    loadingMsg.className = 'text-center';
-                    loadingMsg.textContent = 'Loading demo...';
-                    loadingDiv.appendChild(loadingMsg);
-                    body.style.position = 'relative';
-                    body.appendChild(loadingDiv);
-
-                    const iframe = document.createElement('iframe');
-                    iframe.src = demoUrl + '/iframe';
-                    iframe.id = iframeId;
-                    iframe.style.width = '100%';
-                    iframe.style.height = '400px';
-                    iframe.style.border = '0';
-                    iframe.setAttribute('scrolling', 'no');
-                    iframe.setAttribute('allowfullscreen', 'true');
-
-                    body.appendChild(iframe);
-                    body.dataset.demoLoaded = 'true';
-
-                    const origin = new URL(demoUrl).origin;
-                    function onMessage(event) {
-                        if (event.origin !== origin || event.source !== iframe.contentWindow) return;
-                        if (event.data.type === 'bodySize' && event.data.payload.height) {
-                            iframe.style.height = event.data.payload.height + 'px';
-                            if (body.contains(loadingDiv)) {
-                                body.removeChild(loadingDiv);
-                            }
-                            modal.querySelector('.modal-dialog').style.maxHeight = '90vh';
-                        }
-                    }
-
-                    window.addEventListener('message', onMessage, false);
-                }
-            });
-        });
-    });
-</script>
+    <script src="/assets/js/tools.js"></script>
 {% endblock %}

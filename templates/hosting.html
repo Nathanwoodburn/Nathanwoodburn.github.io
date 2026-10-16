@@ -1,329 +1,111 @@
 {% extends "base.html" %}
 
-{% block html_attrs %}style="height: 100%;"{% endblock %}
-
 {% block title %}Web Hosting | Nathan.Woodburn/{% endblock %}
 
 {% block canonical %}https://nathan.woodburn.au/hosting{% endblock %}
 {% block og_url %}https://nathan.woodburn.au/hosting{% endblock %}
 
-{% block body_attrs %}id="page-top" data-bs-spy="scroll" data-bs-target="#mainNav" data-bs-offset="77" style="background: #110033;"{% endblock %}
+{% block extra_css %}
+    <link rel="stylesheet" href="/assets/css/hosting.css">
+{% endblock %}
+
+{% block body_attrs %}id="page-top" class="hosting-page" data-bs-spy="scroll" data-bs-target="#mainNav" data-bs-offset="77"{% endblock %}
 
 {% block content %}
-    <section class="text-center content-section" style="background: #110033;padding-bottom: 100px;flex: 1;display: flex;flex-direction: column;justify-content: center;">
+    <section class="text-center content-section hosting-section">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 mx-auto">
                     <h2>Web Hosting</h2>
-                    <p style="margin-bottom: 10px;">Configure your hosting setup below</p>
+                    <p class="hosting-subtitle">Configure your hosting setup below</p>
                     <form id="costForm">
-  <div style="padding: 10px;">
-    <label style="font-weight: bold; margin-bottom: 15px; display: block;">Choose a plan:</label>
-    <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 10px;">
-      <div class="plan-card" onclick="selectPreset('standard')" style="border: 2px solid #ddd; border-radius: 8px; padding: 20px; cursor: pointer; flex: 1; min-width: 250px; background: white; transition: all 0.3s ease;">
-        <input type="radio" name="preset" value="standard" onchange="handlePresetChange()" checked style="margin-bottom: 10px;">
-        <h4 style="margin: 0 0 10px 0; color: #333;">Standard WordPress</h4>
-        <div style="font-size: 24px; font-weight: bold; color: #007bff; margin-bottom: 10px;">$10/month</div>
-        <ul style="list-style: none; padding: 0; margin: 0; color: #666;">
-          <li style="margin-bottom: 5px;">✓ 1 CPU Core</li>
-          <li style="margin-bottom: 5px;">✓ 1GB RAM</li>
-          <li style="margin-bottom: 5px;">✓ 10GB Storage</li>
-          <li style="margin-bottom: 5px;">✓ Perfect for small sites</li>
-        </ul>
-      </div>
-      
-      <div class="plan-card" onclick="selectPreset('premium')" style="border: 2px solid #ddd; border-radius: 8px; padding: 20px; cursor: pointer; flex: 1; min-width: 250px; background: white; transition: all 0.3s ease;">
-        <input type="radio" name="preset" value="premium" onchange="handlePresetChange()" style="margin-bottom: 10px;">
-        <h4 style="margin: 0 0 10px 0; color: #333;">Premium WordPress</h4>
-        <div style="font-size: 24px; font-weight: bold; color: #28a745; margin-bottom: 10px;">$20/month</div>
-        <ul style="list-style: none; padding: 0; margin: 0; color: #666;">
-          <li style="margin-bottom: 5px;">✓ 2 CPU Core</li>
-          <li style="margin-bottom: 5px;">✓ 2GB RAM</li>
-          <li style="margin-bottom: 5px;">✓ 50GB Storage</li>
-          <li style="margin-bottom: 5px;">✓ Weekly Backups Included</li>
-        </ul>
-      </div>
-      
-      <div class="plan-card" onclick="selectPreset('custom')" style="border: 2px solid #ddd; border-radius: 8px; padding: 20px; cursor: pointer; flex: 1; min-width: 250px; background: white; transition: all 0.3s ease;">
-        <input type="radio" name="preset" value="custom" onchange="handlePresetChange()" style="margin-bottom: 10px;">
-        <h4 style="margin: 0 0 10px 0; color: #333;">Custom Configuration</h4>
-        <div style="font-size: 24px; font-weight: bold; color: #6c757d; margin-bottom: 10px;">Variable</div>
-        <ul style="list-style: none; padding: 0; margin: 0; color: #666;">
-          <li style="margin-bottom: 5px;">✓ Choose your CPU</li>
-          <li style="margin-bottom: 5px;">✓ Choose your RAM</li>
-          <li style="margin-bottom: 5px;">✓ Choose your Storage</li>
-          <li style="margin-bottom: 5px;">✓ Optional Backups</li>
-        </ul>
-      </div>
-    </div>
-  </div>
+                        <div class="hosting-form-wrap">
+                            <label class="hosting-plan-label">Choose a plan:</label>
+                            <div class="plan-cards-container">
+                                <div class="plan-card" onclick="selectPreset('standard')">
+                                    <input type="radio" name="preset" value="standard" onchange="handlePresetChange()" checked>
+                                    <h4>Standard WordPress</h4>
+                                    <div class="plan-price standard">$10/month</div>
+                                    <ul>
+                                        <li>✓ 1 CPU Core</li>
+                                        <li>✓ 1GB RAM</li>
+                                        <li>✓ 10GB Storage</li>
+                                        <li>✓ Perfect for small sites</li>
+                                    </ul>
+                                </div>
 
-  <div id="customSliders" style="display: none;">
-    <div>
-      <label class="form-label" for="cpus" style="padding: 10px;">CPUs: 
-        <span id="cpusValue" style="display:inline-block; min-width: 3ch; font-family: monospace;">1</span>
-      </label>
-      <input id="cpus" name="cpus" class="form-range" type="range" 
-             min="1" max="4" value="1" step="1" 
-             style="max-width: 500px; padding-top: 10px;" 
-             oninput="updateValue('cpus')">
-    </div>
+                                <div class="plan-card" onclick="selectPreset('premium')">
+                                    <input type="radio" name="preset" value="premium" onchange="handlePresetChange()">
+                                    <h4>Premium WordPress</h4>
+                                    <div class="plan-price premium">$20/month</div>
+                                    <ul>
+                                        <li>✓ 2 CPU Core</li>
+                                        <li>✓ 2GB RAM</li>
+                                        <li>✓ 50GB Storage</li>
+                                        <li>✓ Weekly Backups Included</li>
+                                    </ul>
+                                </div>
 
-    <div>
-      <label class="form-label" for="memory" style="padding: 10px;">Memory (GB): 
-        <span id="memoryValue" style="display:inline-block; min-width: 5ch; font-family: monospace;">1</span>
-      </label>
-      <input id="memory" name="memory" class="form-range" type="range" 
-             min="0" max="5" value="0" step="1" 
-             style="max-width: 500px; padding-top: 10px;" 
-             oninput="updateValue('memory')">
-    </div>
+                                <div class="plan-card" onclick="selectPreset('custom')">
+                                    <input type="radio" name="preset" value="custom" onchange="handlePresetChange()">
+                                    <h4>Custom Configuration</h4>
+                                    <div class="plan-price custom">Variable</div>
+                                    <ul>
+                                        <li>✓ Choose your CPU</li>
+                                        <li>✓ Choose your RAM</li>
+                                        <li>✓ Choose your Storage</li>
+                                        <li>✓ Optional Backups</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
 
-    <div>
-      <label class="form-label" for="disk" style="padding: 10px;">Disk Space (GB): 
-        <span id="diskValue" style="display:inline-block; min-width: 5ch; font-family: monospace;">10</span>
-      </label>
-      <input id="disk" name="disk" class="form-range" type="range" 
-             min="10" max="500" value="10" step="10" 
-             style="max-width: 500px; padding-top: 10px;" 
-             oninput="updateValue('disk')">
-    </div>
+                        <div id="customSliders">
+                            <div class="slider-group">
+                                <label class="form-label" for="cpus">CPUs: 
+                                    <span id="cpusValue" class="slider-value">1</span>
+                                </label>
+                                <input id="cpus" name="cpus" class="form-range" type="range" min="1" max="4" value="1" step="1" oninput="updateValue('cpus')">
+                            </div>
 
-    <div style="padding: 10px;">
-      <label><input type="checkbox" id="backups" onchange="calculateCost()"> Backups ($5/month for up to 150GB)</label>
-    </div>
-  </div>
+                            <div class="slider-group">
+                                <label class="form-label" for="memory">Memory (GB): 
+                                    <span id="memoryValue" class="slider-value">1</span>
+                                </label>
+                                <input id="memory" name="memory" class="form-range" type="range" min="0" max="5" value="0" step="1" oninput="updateValue('memory')">
+                            </div>
 
-  <div style="padding: 10px; font-weight: bold;">
-    Monthly Cost: $<span id="monthlyCost" style="display:inline-block; min-width: 6ch; font-family: monospace; text-align: left;">0.00</span><br>
-    <small>All prices are in AUD</small>
-    <br>
+                            <div class="slider-group">
+                                <label class="form-label" for="disk">Disk Space (GB): 
+                                    <span id="diskValue" class="slider-value">10</span>
+                                </label>
+                                <input id="disk" name="disk" class="form-range" type="range" min="10" max="500" value="10" step="10" oninput="updateValue('disk')">
+                            </div>
 
-    <input type="email" id="email" name="email" class="form-control" placeholder="Your Email" required style="margin-top: 10px;">
-    <!-- Allow message -->
-    <textarea id="message" name="message" class="form-control" placeholder="Your Message" rows="3" style="margin-top: 10px;"></textarea>
+                            <div class="slider-group">
+                                <label><input type="checkbox" id="backups" onchange="calculateCost()"> Backups ($5/month for up to 150GB)</label>
+                            </div>
+                        </div>
 
-    <button type="button" class="btn btn-primary" style="margin-top: 10px;" onclick="sendEnquiry()">Send Enquiry</button>
-    <small id="enquiryStatus" style="display: block; margin-top: 10px;"></small>
-  </div>
+                        <div class="hosting-summary">
+                            Monthly Cost: $<span id="monthlyCost">0.00</span><br>
+                            <small>All prices are in AUD</small>
+                            <br>
+                            <input type="email" id="email" name="email" class="form-control hosting-input" placeholder="Your Email" required>
+                            <textarea id="message" name="message" class="form-control hosting-input" placeholder="Your Message" rows="3"></textarea>
+
+                            <button type="button" class="btn btn-primary hosting-input" onclick="sendEnquiry()">Send Enquiry</button>
+                            <small id="enquiryStatus"></small>
+                        </div>
                     </form>
-
-<script>
-  // Rates
-  const cpuRate = 4;
-  const memoryRate = 5;
-  const diskRate = 0.1;
-  const backupRate = 5;
-
-  // Memory values mapping
-  const memoryValues = [1, 2, 4, 8, 16, 24];
-
-  // Initialize on load
-  document.addEventListener('DOMContentLoaded', () => {
-    // Check if parameters are in the URL
-    const urlParams = new URLSearchParams(window.location.search);
-    
-    // Check for preset parameter
-    if (urlParams.has('preset')) {
-      const presetValue = urlParams.get('preset');
-      const presetRadio = document.querySelector(`input[name="preset"][value="${presetValue}"]`);
-      if (presetRadio) {
-        presetRadio.checked = true;
-        handlePresetChange();
-      }
-    }
-    
-    if (urlParams.has('cpus')) {
-      document.getElementById('cpus').value = urlParams.get('cpus');
-    }
-    if (urlParams.has('memory')) {
-      const memoryParam = parseFloat(urlParams.get('memory'));
-      const memoryIndex = memoryValues.indexOf(memoryParam);
-      document.getElementById('memory').value = memoryIndex >= 0 ? memoryIndex : 0;
-    }
-    if (urlParams.has('disk')) {
-      document.getElementById('disk').value = urlParams.get('disk');
-    }
-    if (urlParams.has('backups')) {
-      document.getElementById('backups').checked = urlParams.get('backups') === 'true';
-    }
-    if (urlParams.has('email')) {
-      document.getElementById('email').value = urlParams.get('email');
-    }
-    if (urlParams.has('message')) {
-      document.getElementById('message').value = urlParams.get('message');
-    }
-    // Update the displayed values
-    updateValue('cpus');
-    updateValue('memory');
-    updateValue('disk');
-    calculateCost();
-    // Send the enquiry if the form is submitted
-    document.getElementById('costForm').addEventListener('submit', function(event) {
-      event.preventDefault();
-      sendEnquiry();
-    });
-    
-    // Initialize preset handling and card styles
-    handlePresetChange();
-    updateCardStyles();
-  });
-
-  function updateValue(field) {
-    let value = document.getElementById(field).value;
-    
-    if (field === 'memory') {
-      value = memoryValues[parseInt(value)];
-    }
-    
-    document.getElementById(field + 'Value').textContent = value;
-    calculateCost();
-  }
-
-  function selectPreset(presetValue) {
-    document.querySelector(`input[name="preset"][value="${presetValue}"]`).checked = true;
-    handlePresetChange();
-    updateCardStyles();
-  }
-
-  function updateCardStyles() {
-    const cards = document.querySelectorAll('.plan-card');
-    const selectedPreset = document.querySelector('input[name="preset"]:checked').value;
-    
-    cards.forEach((card, index) => {
-      const presetValues = ['standard', 'premium', 'custom'];
-      const isSelected = presetValues[index] === selectedPreset;
-      
-      if (isSelected) {
-        card.style.borderColor = '#007bff';
-        card.style.background = '#f8f9fa';
-        card.style.transform = 'translateY(-2px)';
-        card.style.boxShadow = '0 4px 12px rgba(0,123,255,0.15)';
-      } else {
-        card.style.borderColor = '#ddd';
-        card.style.background = 'white';
-        card.style.transform = 'translateY(0)';
-        card.style.boxShadow = 'none';
-      }
-    });
-  }
-
-  function handlePresetChange() {
-    const selectedPreset = document.querySelector('input[name="preset"]:checked').value;
-    const customSliders = document.getElementById('customSliders');
-    
-    updateCardStyles();
-    
-    if (selectedPreset === 'custom') {
-      customSliders.style.display = 'block';
-    } else {
-      customSliders.style.display = 'none';
-      
-      // Set preset values
-      if (selectedPreset === 'standard') {
-        document.getElementById('cpus').value = 1;
-        document.getElementById('memory').value = 0; // 0.5GB
-        document.getElementById('disk').value = 10;
-        document.getElementById('backups').checked = false;
-      } else if (selectedPreset === 'premium') {
-        document.getElementById('cpus').value = 2;
-        document.getElementById('memory').value = 1; // 1GB
-        document.getElementById('disk').value = 50;
-        document.getElementById('backups').checked = true;
-      }
-      
-      // Update displayed values
-      updateValue('cpus');
-      updateValue('memory');
-      updateValue('disk');
-    }
-    
-    calculateCost();
-  }
-
-  function calculateCost() {
-    const selectedPreset = document.querySelector('input[name="preset"]:checked').value;
-    
-    // For presets, use fixed pricing
-    if (selectedPreset === 'standard') {
-      document.getElementById('monthlyCost').textContent = '10.00';
-      return;
-    } else if (selectedPreset === 'premium') {
-      document.getElementById('monthlyCost').textContent = '20.00';
-      return;
-    }
-    
-    // Custom calculation
-    const cpus = parseFloat(document.getElementById('cpus').value);
-    const memoryIndex = parseInt(document.getElementById('memory').value);
-    const memory = memoryValues[memoryIndex];
-    const disk = parseFloat(document.getElementById('disk').value);
-
-    let monthlyCost = (cpus * cpuRate) + (memory * memoryRate) + (disk * diskRate);
-
-    if (document.getElementById('backups').checked) {
-      const backupUnits = Math.ceil(disk / 50);
-      monthlyCost += backupUnits * backupRate;
-    }
-
-    document.getElementById('monthlyCost').textContent = monthlyCost.toFixed(2);
-  }
-
-  function sendEnquiry() {
-    // Ensure that the email field is filled
-    const email = document.getElementById('email').value;
-    if (!email) {
-      document.getElementById('enquiryStatus').textContent = 'Please enter your email address.';
-      document.getElementById('enquiryStatus').style.color = 'red';
-      return;
-    }
-
-    // Collect form data
-    const selectedPreset = document.querySelector('input[name="preset"]:checked').value;
-    const cpus = document.getElementById('cpus').value;
-    const memoryIndex = parseInt(document.getElementById('memory').value);
-    const memory = memoryValues[memoryIndex];
-    const disk = document.getElementById('disk').value;
-    const backups = document.getElementById('backups').checked ? 'Yes' : 'No';
-    const message = document.getElementById('message').value;
-    const enquiryData = {
-      email: email,
-      preset: selectedPreset,
-      cpus: cpus,
-      memory: memory,
-      disk: disk,
-      backups: backups,
-      message: message
-    };
-    // Send the enquiry data to the server
-    fetch('/hosting/send-enquiry', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(enquiryData)
-    })
-    .then(response => {
-      if (response.ok) {
-        document.getElementById('enquiryStatus').textContent = 'Enquiry sent successfully!';
-        document.getElementById('enquiryStatus').style.color = 'green';
-        calculateCost();
-      } else {
-        document.getElementById('enquiryStatus').textContent = 'Failed to send enquiry. Please try again.';
-        document.getElementById('enquiryStatus').style.color = 'red';
-      }
-    })
-    .catch(error => {
-      console.error('Error sending enquiry:', error);
-      document.getElementById('enquiryStatus').textContent = 'Error sending enquiry. Please check your network connection.';
-      document.getElementById('enquiryStatus').style.color = 'red';
-    });
-  }
-</script>
                 </div>
             </div>
         </div>
     </section>
+{% endblock %}
+
+{% block scripts %}
+    <script src="/assets/js/hosting.js"></script>
 {% endblock %}
 
 {% block body_end %}
