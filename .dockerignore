@@ -29,5 +29,8 @@ README.md
 # Development caches
 *.tmp
 *.log
+.lighthouseci/
+lighthouserc.json
+*lighthouse*
 
 
