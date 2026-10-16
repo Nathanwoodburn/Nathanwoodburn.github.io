@@ -701,6 +701,117 @@ def get_resume_pdf(support: bool = False, force: bool = False) -> str:
     return target_pdf
 
 
+def generate_sitemap(base_url: str = "https://nathan.woodburn.au") -> str:
+    """
+    Generate an XML sitemap dynamically covering all static pages,
+    blog posts, and now updates.
+    """
+    base_url = base_url.rstrip("/")
+    entries = []
+
+    # Main site routes: (route, priority, changefreq, source_template)
+    static_routes = [
+        ("/", 1.0, "weekly", "templates/index.html"),
+        ("/blog", 0.9, "weekly", "templates/blog/blog.html"),
+        ("/now", 0.9, "weekly", "templates/now.html"),
+        ("/about", 0.8, "monthly", "templates/about.html"),
+        ("/projects", 0.8, "monthly", "templates/projects.html"),
+        ("/tools", 0.8, "monthly", "templates/tools.html"),
+        ("/resume", 0.8, "monthly", "templates/resume.html"),
+        ("/donate", 0.7, "monthly", "templates/donate.html"),
+        ("/podcast", 0.7, "monthly", "templates/podcast.html"),
+        ("/now/old", 0.5, "monthly", "templates/now/old.html"),
+        ("/pgp", 0.5, "yearly", "templates/pgp.html"),
+        ("/gitpgp", 0.5, "yearly", "templates/gitpgp.html"),
+    ]
+
+    for route, prio, freq, src_file in static_routes:
+        lastmod = None
+        if os.path.exists(src_file):
+            lastmod = datetime.datetime.fromtimestamp(
+                os.path.getmtime(src_file), tz=datetime.UTC
+            ).strftime("%Y-%m-%d")
+        entries.append(
+            {
+                "loc": base_url + ("" if route == "/" else route),
+                "priority": f"{prio:.1f}",
+                "changefreq": freq,
+                "lastmod": lastmod,
+            }
+        )
+
+    # Blog posts from data/blog/
+    blog_dir = "data/blog"
+    if os.path.isdir(blog_dir):
+        for f in sorted(os.listdir(blog_dir)):
+            if f.endswith(".md"):
+                slug = os.path.splitext(f)[0]
+                file_path = os.path.join(blog_dir, f)
+                lastmod = datetime.datetime.fromtimestamp(
+                    os.path.getmtime(file_path), tz=datetime.UTC
+                ).strftime("%Y-%m-%d")
+                entries.append(
+                    {
+                        "loc": f"{base_url}/blog/{slug}",
+                        "priority": "0.7",
+                        "changefreq": "monthly",
+                        "lastmod": lastmod,
+                    }
+                )
+
+    # Now updates from data/now/
+    now_dir = "data/now"
+    if os.path.isdir(now_dir):
+        for f in sorted(os.listdir(now_dir)):
+            if f.endswith(".md"):
+                slug = os.path.splitext(f)[0]
+                parts = slug.split("_")
+                if len(parts) == 3 and all(p.isdigit() for p in parts):
+                    year = f"20{parts[0]}" if len(parts[0]) == 2 else parts[0]
+                    lastmod = f"{year}-{parts[1]}-{parts[2]}"
+                else:
+                    file_path = os.path.join(now_dir, f)
+                    lastmod = datetime.datetime.fromtimestamp(
+                        os.path.getmtime(file_path), tz=datetime.UTC
+                    ).strftime("%Y-%m-%d")
+                entries.append(
+                    {
+                        "loc": f"{base_url}/now/{slug}",
+                        "priority": "0.6",
+                        "changefreq": "yearly",
+                        "lastmod": lastmod,
+                    }
+                )
+
+    xml_lines = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ]
+    for e in entries:
+        xml_lines.append("    <url>")
+        xml_lines.append(f"        <loc>{e['loc']}</loc>")
+        if e.get("lastmod"):
+            xml_lines.append(f"        <lastmod>{e['lastmod']}</lastmod>")
+        xml_lines.append(f"        <changefreq>{e['changefreq']}</changefreq>")
+        xml_lines.append(f"        <priority>{e['priority']}</priority>")
+        xml_lines.append("    </url>")
+    xml_lines.append("</urlset>\n")
+
+    return "\n".join(xml_lines)
+
+
+def build_sitemap_file(
+    output_path: str = "templates/sitemap.xml",
+    base_url: str = "https://nathan.woodburn.au",
+) -> str:
+    """Generate and write sitemap.xml to file."""
+    sitemap_content = generate_sitemap(base_url=base_url)
+    os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(sitemap_content)
+    return output_path
+
+
 if __name__ == "__main__":
     import sys
 
@@ -713,7 +824,10 @@ if __name__ == "__main__":
         print(get_resume_txt(support=support))
     elif "--ascii" in sys.argv or "--cli" in sys.argv:
         print(get_resume_ascii(support=support))
-    elif "--build-resume" in sys.argv or "-b" in sys.argv or len(sys.argv) == 1:
+    elif "--build-sitemap" in sys.argv or "--sitemap" in sys.argv:
+        p = build_sitemap_file()
+        print(f"Generated sitemap at {p}")
+    elif "--build-resume" in sys.argv or "-b" in sys.argv:
         print("Building standard resume PDF...")
         p1 = build_resume_pdf(support=False)
         print(f"Built {p1} ({os.path.getsize(p1)} bytes)")
@@ -721,3 +835,13 @@ if __name__ == "__main__":
         p2 = build_resume_pdf(support=True)
         print(f"Built {p2} ({os.path.getsize(p2)} bytes)")
         print("Resume PDF build finished.")
+    elif len(sys.argv) == 1:
+        print("Building standard resume PDF...")
+        p1 = build_resume_pdf(support=False)
+        print(f"Built {p1} ({os.path.getsize(p1)} bytes)")
+        print("Building technical support resume PDF...")
+        p2 = build_resume_pdf(support=True)
+        print(f"Built {p2} ({os.path.getsize(p2)} bytes)")
+        print("Resume PDF build finished.")
+        p3 = build_sitemap_file()
+        print(f"Built {p3}")
