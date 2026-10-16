@@ -7,8 +7,12 @@
 {% block canonical %}https://nathan.woodburn.au/donate{% endblock %}
 {% block og_url %}https://nathan.woodburn.au/donate{% endblock %}
 
+{% block description %}Support Nathan Woodburn via PayPal, GitHub Sponsors, Stripe, or Cryptocurrency.{% endblock %}
+{% block og_description %}Support Nathan Woodburn via PayPal, GitHub Sponsors, Stripe, or Cryptocurrency.{% endblock %}
+{% block meta_description %}Support Nathan Woodburn via PayPal, GitHub Sponsors, Stripe, or Cryptocurrency.{% endblock %}
+
 {% block extra_css %}
-    <link rel="stylesheet" href="/assets/css/donate.css">
+    <link rel="stylesheet" href="/assets/css/donate.min.css">
 {% endblock %}
 
 {% block body_attrs %}id="page-top" class="donate-page" data-bs-spy="scroll" data-bs-target="#mainNav" data-bs-offset="77"{% endblock %}
@@ -18,14 +22,14 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 mx-auto">
-                    <h2>Donate</h2>
+                    <h1>Donate</h1>
                     <p class="mb-2">Feel free to support me by donating</p>
                     <ul class="list-inline banner-social-buttons">
                         <li class="list-inline-item donate-item-spaced">&nbsp;<a class="btn btn-primary btn-lg btn-default donate-btn-auto" role="button" href="https://paypal.me/nathanwoodburn" target="_blank" rel="noopener"><i class="fab fa-paypal fa-fw"></i><span class="network-name">&nbsp; Paypal</span></a></li>
                         <li class="list-inline-item donate-item-spaced">&nbsp;<a class="btn btn-primary btn-lg btn-default donate-btn-auto" role="button" href="https://github.com/sponsors/Nathanwoodburn" target="_blank" rel="noopener"><i class="fab fa-github fa-fw"></i><span class="network-name">&nbsp; Github</span></a></li>
                         <li class="list-inline-item donate-item-spaced">&nbsp;<a class="btn btn-primary btn-lg btn-default donate-btn-auto" role="button" href="https://donate.stripe.com/8wM6pv0VD08Xe408ww" target="_blank" rel="noopener"><i class="fab fa-stripe-s fa-fw"></i><span class="network-name">&nbsp;Stripe</span></a></li>
                     </ul>
-                    <h4>Crypto Options</h4>
+                    <h2>Crypto Options</h2>
                     <div class="dropdown">
                         <button class="btn btn-primary btn-lg btn-default" aria-expanded="false" data-bs-toggle="dropdown" type="button" id="dropdownButton">Select Crypto</button>
                         <div class="dropdown-menu dropdown-menu-dark">

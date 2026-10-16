@@ -17,7 +17,7 @@ Find something interesting to read. Or maybe check one of my tutorials{% endbloc
 Find something interesting to read. Or maybe check one of my tutorials{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="/assets/css/blog-list.css">
+    <link rel="stylesheet" href="/assets/css/blog-list.min.css">
 {% endblock %}
 
 {% block body_attrs %}class="blog-page"{% endblock %}
@@ -25,33 +25,33 @@ Find something interesting to read. Or maybe check one of my tutorials{% endbloc
 {% block content %}
     <div class="blog-spacer"></div>
     <div class="profile-container blog-profile-container">
-        <img class="profile background blog-profile-img" src="/assets/img/profile.jpg" alt="Profile Background">
-        <img class="profile foreground" src="/assets/img/pfront.webp" alt="Profile Foreground">
+        <img class="profile background blog-profile-img" src="/assets/img/profile.webp" alt="Profile Background" width="300" height="300">
+        <img class="profile foreground" src="/assets/img/pfront.webp" alt="Profile Foreground" width="300" height="300">
     </div>
     <h1 class="nathanwoodburn blog-header-title">Nathan.Woodburn/</h1>
-    <h3 class="blog-header-sub">Blogs</h3>
+    <h2 class="blog-header-sub">Blogs</h2>
     <p class="blog-header-desc">Check out my tutorials, guides, and articles</p>
     <section class="blog-section">
         <div class="blog-container">
-            <ul class="list-group blog-list">
+            <div class="list-group blog-list">
                 {% if posts %}
                     {% for post in posts %}
                     <a href="/blog/{{ post.slug }}" class="blog-item-link">
-                        <li class="list-group-item blog-card">
+                        <div class="list-group-item blog-card">
                             <div class="d-flex w-100 justify-content-between align-items-center mb-1">
-                                <h4 class="blog-card-title">{{ post.title }}</h4>
+                                <h3 class="blog-card-title">{{ post.title }}</h3>
                                 {% if post.date %}<small class="blog-card-date">{{ post.date }}</small>{% endif %}
                             </div>
                             {% if post.description %}
                             <p class="blog-card-desc">{{ post.description }}</p>
                             {% endif %}
-                        </li>
+                        </div>
                     </a>
                     {% endfor %}
                 {% elif blogs %}
                     {{ blogs | safe }}
                 {% endif %}
-            </ul>
+            </div>
         </div>
     </section>
 

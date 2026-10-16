@@ -5,6 +5,14 @@
 {% block canonical %}https://nathan.woodburn.au/spotify{% endblock %}
 {% block og_url %}https://nathan.woodburn.au/spotify{% endblock %}
 
+{% block description %}Live Spotify track and currently playing status for Nathan Woodburn.{% endblock %}
+{% block og_description %}Live Spotify track and currently playing status for Nathan Woodburn.{% endblock %}
+{% block meta_description %}Live Spotify track and currently playing status for Nathan Woodburn.{% endblock %}
+
+{% block extra_css %}
+    <link rel="preload" as="image" href="/assets/img/bg/projects.webp" type="image/webp" fetchpriority="high">
+{% endblock %}
+
 {% block content %}
     <header class="masthead" style="background: url('/assets/img/bg/projects.webp') bottom / cover no-repeat; height: auto; padding-top: 20px;">
         <div style="margin-top: 150px; margin-bottom: 100px;">

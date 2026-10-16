@@ -9,6 +9,27 @@
 {% block og_title %}{{ title }} | Nathan.Woodburn/{% endblock %}
 {% block twitter_title %}{{ title }} | Nathan.Woodburn/{% endblock %}
 
+{% block description %}{{ description if description else title }}{% endblock %}
+{% block og_description %}{{ description if description else title }}{% endblock %}
+{% block meta_description %}{{ description if description else title }}{% endblock %}
+
+{% block json_ld %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": {{ title | tojson }},
+    "description": {{ (description if description else title) | tojson }},
+    "author": {
+        "@type": "Person",
+        "name": "Nathan Woodburn",
+        "url": "https://nathan.woodburn.au"
+    },
+    "url": "https://nathan.woodburn.au/blog/{{ slug if slug else 'template' }}"
+}
+</script>
+{% endblock %}
+
 {% block extra_css %}
     <link rel="stylesheet" href="/assets/css/blog.min.css">
 {% endblock %}
@@ -17,13 +38,13 @@
 
 {% block content %}
     <div style="height: 10em;"></div>
-    <div class="profile-container" style="margin-bottom: 2em;"><img class="profile background" src="/assets/img/profile.jpg" style="border-radius: 50%;"><img class="profile foreground" src="/assets/img/pfront.webp"></div>
-    <h1 class="nathanwoodburn" style="margin-bottom: 0px;">Nathan.Woodburn/</h1>
-    <h3 style="margin-bottom: 0px;margin-top: 25px;">{{ title }}</h3>
+    <div class="profile-container" style="margin-bottom: 2em;"><img class="profile background" src="/assets/img/profile.webp" style="border-radius: 50%;" alt="Nathan Woodburn" width="300" height="300"><img class="profile foreground" src="/assets/img/pfront.webp" alt="Nathan Woodburn Foreground" width="300" height="300"></div>
+    <div class="nathanwoodburn fs-2 fw-bold" style="margin-bottom: 0px;">Nathan.Woodburn/</div>
+    <h1 style="margin-bottom: 0px;margin-top: 25px;">{{ title }}</h1>
     {% if date %}<h6>{{ date }}</h6>{% endif %}
     {% if description %}<p style="font-size: smaller;">{{ description }}</p>{% endif %}
     <section style="margin-bottom: 50px;max-width: 95%;margin-right: auto;margin-left: auto;margin-top: 30px;">
-        <div style="max-width: 700px;margin: auto;">{{ content | safe }}</div>
+        <div class="blog-content" style="max-width: 700px;margin: auto;">{{ content | safe }}</div>
     </section>
 
     {% include "sections/contact_simple.html" %}

@@ -24,15 +24,15 @@ Find out what I've been up to in the last little bit{% endblock %}
 
 {% block content %}
     <div style="height: 10em;"></div>
-    <div class="profile-container" style="margin-bottom: 2em;"><img class="profile background" src="/assets/img/profile.jpg" style="border-radius: 50%;"><img class="profile foreground" src="/assets/img/pfront.webp"></div>
+    <div class="profile-container" style="margin-bottom: 2em;"><img class="profile background" src="/assets/img/profile.webp" style="border-radius: 50%;" alt="Nathan Woodburn" width="300" height="300"><img class="profile foreground" src="/assets/img/pfront.webp" alt="Nathan Woodburn Foreground" width="300" height="300"></div>
     <h1 class="nathanwoodburn" style="margin-bottom: 0px;">Nathan.Woodburn/</h1>
-    <h3 style="margin-bottom: 0px;">What's Happening Now</h3>
+    <h2 style="margin-bottom: 0px;">What's Happening Now</h2>
     <h6>{{ DATE }}</h6>
     {% if sections %}
         {% for section in sections %}
         <section style="margin-bottom: 50px;max-width: 95%;margin-right: auto;margin-left: auto;">
             <div style="max-width: 700px;margin: auto;">
-                {% if section.title %}<h1 style="margin-bottom: 0px;">{{ section.title }}</h1>{% endif %}
+                {% if section.title %}<h3 style="margin-bottom: 0px;">{{ section.title }}</h3>{% endif %}
                 {{ section.content | safe }}
             </div>
         </section>

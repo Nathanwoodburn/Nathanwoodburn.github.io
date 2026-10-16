@@ -7,8 +7,13 @@
 {% block canonical %}https://nathan.woodburn.au/tools{% endblock %}
 {% block og_url %}https://nathan.woodburn.au/tools{% endblock %}
 
+{% block description %}Applications, tools, and developer services used and recommended by Nathan Woodburn.{% endblock %}
+{% block og_description %}Applications, tools, and developer services used and recommended by Nathan Woodburn.{% endblock %}
+{% block meta_description %}Applications, tools, and developer services used and recommended by Nathan Woodburn.{% endblock %}
+
 {% block extra_css %}
-    <link rel="stylesheet" href="/assets/css/tools.css">
+    <link rel="stylesheet" href="/assets/css/tools.min.css">
+    <link rel="preload" as="image" href="/assets/img/bg/projects.webp" type="image/webp" fetchpriority="high">
 {% endblock %}
 
 {% block content %}
@@ -34,7 +39,7 @@
                 <div class="col-md-6 col-lg-4 mb-4">
                     <div class="card h-100 shadow-sm tool-card">
                         <div class="card-body d-flex flex-column">
-                            <h4 class="card-title">{{ tool.name }}</h4>
+                            <h3 class="card-title h4">{{ tool.name }}</h3>
                             <p class="card-text">{{ tool.description }}</p>
                             <div class="btn-group gap-3 mt-auto" role="group">
                                 {% if tool.demo %}

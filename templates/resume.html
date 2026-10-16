@@ -24,9 +24,12 @@
     <link rel="icon" type="image/png" sizes="180x180" href="/assets/img/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicon/android-chrome-192x192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="/assets/img/favicon/android-chrome-512x512.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://umami.woodburn.au">
     <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
     <link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans:400,500,600,700&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap">
     <link rel="stylesheet" href="/assets/css/styles.min.css">
     <link rel="stylesheet" href="/assets/css/resume.min.css">
     <link rel="stylesheet" href="/assets/css/resume-custom.css">
@@ -48,7 +51,7 @@
                 <aside class="col-12 col-md-4 resume-column resume-column-left">
                     <div class="resume-left-inner">
                         <div class="text-center profile-container">
-                            <img class="profile-side" src="{{ resume.profile_image }}" alt="{{ resume.name }}">
+                            <img class="profile-side" src="{{ resume.profile_image }}" alt="{{ resume.name }}" width="160" height="160" loading="lazy">
                         </div>
 
                         <!-- Mobile-only header (shows Name & Title at top on mobile) -->

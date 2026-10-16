@@ -42,12 +42,14 @@
     <link rel="icon" type="image/png" sizes="512x512" href="/assets/img/favicon/android-chrome-512x512.png">
     <link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
 
+    <!-- Preconnect for external resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://umami.woodburn.au">
+
     <!-- Fonts & Core Stylesheets -->
     <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic&amp;display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Cabin:700&amp;display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Anonymous+Pro&amp;display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anonymous+Pro&amp;family=Cabin:wght@700&amp;family=Lora:ital,wght@0,400;0,700;1,400;1,700&amp;family=Roboto:wght@300;400;500;700&amp;display=swap">
     <link rel="stylesheet" href="/assets/fonts/fontawesome-all.min.css">
     <link rel="stylesheet" href="/assets/fonts/font-awesome.min.css">
     <link rel="stylesheet" href="/assets/fonts/ionicons.min.css">
@@ -89,9 +91,9 @@
     {% block body_end %}{% endblock %}
 
     <!-- Core Scripts -->
-    <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
-    <script src="/assets/js/script.min.js"></script>
-    <script src="/assets/js/hacker.min.js"></script>
+    <script defer src="/assets/bootstrap/js/bootstrap.min.js"></script>
+    <script defer src="/assets/js/script.min.js"></script>
+    <script defer src="/assets/js/hacker.min.js"></script>
 
     {% block scripts %}{% endblock %}
 </body>
