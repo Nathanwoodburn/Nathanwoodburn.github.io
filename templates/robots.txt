@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /ascii
+
+Sitemap: https://nathan.woodburn.au/sitemap.xml
