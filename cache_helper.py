@@ -5,10 +5,13 @@ Provides centralized caching with TTL for external API calls.
 
 import datetime
 import json
+import logging
 import os
 from functools import lru_cache
 
 import requests
+
+logger = logging.getLogger(__name__)
 
 # Cache storage for git data
 _git_data_cache = {"data": None, "timestamp": 0}
@@ -47,8 +50,8 @@ def get_git_latest_activity():
                 result = git_data[0]
                 _git_data_cache = {"data": result, "timestamp": current_time}
                 return result
-    except Exception:
-        pass
+    except (requests.RequestException, ValueError) as err:
+        logger.warning("Failed to fetch git latest activity: %s", err)
 
     # Return cached or default
     if _git_data_cache["data"]:
