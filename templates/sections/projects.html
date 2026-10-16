@@ -96,11 +96,13 @@
         display: block;
         margin: 0 0 0.45rem 0;
         font-family: inherit;
-        font-size: 0.92rem;
+        font-size: clamp(0.72rem, 3.2vw, 0.92rem);
         line-height: 1.15 !important;
         white-space: nowrap;
         user-select: none;
         -webkit-user-select: none;
+        padding: 0 0.65rem;
+        box-sizing: border-box;
     }
 
     .omp-line-top,
@@ -300,6 +302,8 @@
         white-space: nowrap;
         max-width: 380px;
         font-size: 0.82rem;
+        min-width: 0;
+        flex-shrink: 1;
     }
 
     .t-action {
@@ -322,7 +326,6 @@
     .term-project-row:hover {
         background: rgba(96, 165, 250, 0.09) !important;
         border-color: rgba(96, 165, 250, 0.25) !important;
-        transform: translateX(4px);
     }
 
     .term-project-row:hover .term-indicator {
@@ -380,11 +383,45 @@
             font-size: 0.9rem;
             margin-bottom: 1.5rem;
         }
+        .t-perm,
+        .t-size,
+        .t-user {
+            display: none !important;
+        }
+        .t-date {
+            width: auto;
+            margin-right: 1.25rem;
+            font-size: 0.82rem;
+        }
+        .term-row {
+            padding: 0.35rem 0.5rem !important;
+            font-size: 0.85rem;
+        }
     }
 
     @media (max-width: 576px) {
         #sites {
             padding: 25px 0.75rem !important;
+        }
+    }
+
+    @media (max-width: 520px) {
+        .t-date {
+            display: none !important;
+        }
+        .term-desc {
+            max-width: 200px;
+            font-size: 0.78rem;
+        }
+    }
+
+    @media (max-width: 400px) {
+        .term-desc {
+            display: none !important;
+        }
+        .term-row {
+            padding: 0.3rem 0.4rem !important;
+            font-size: 0.82rem;
         }
     }
 </style>
@@ -402,7 +439,7 @@
             <!-- Initial Prompt & Command (Matching oh-my-posh on NWLaptop) -->
             <div class="omp-prompt-block">
                 <div class="omp-line-top"><span class="omp-bracket">┌──(</span><span class="omp-userhost">nathan@NWLaptop</span><span class="omp-bracket">)-[</span><span class="omp-path-tilde">~</span><span class="omp-path-slash">/</span><span class="omp-path-dir">git</span><span class="omp-bracket">]</span></div>
-                <div class="omp-line-bottom"><span class="omp-bracket">└─</span><span class="omp-dollar">$</span> <span class="omp-cmd">l</span></div>
+                <div class="omp-line-bottom"><span class="omp-bracket">└─</span><span class="omp-dollar">$</span> <span class="omp-cmd">ls</span></div>
             </div>
 
             <!-- Directory Table (eza ls -lah format) -->

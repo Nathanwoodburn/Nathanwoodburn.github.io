@@ -26,6 +26,18 @@
         color: #ffffff !important;
         font-weight: 700;
         letter-spacing: 0.03em;
+        font-size: clamp(0.95rem, 4.4vw, 1.25rem);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: calc(100% - 56px);
+    }
+
+    #mainNav > .container-fluid {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: space-between;
     }
 
     #mainNav .navbar-nav {
@@ -84,6 +96,7 @@
         padding: 0.4rem 0.7rem;
         background: rgba(255, 255, 255, 0.05);
         transition: all 0.2s ease;
+        flex-shrink: 0;
     }
 
     #mainNav .navbar-toggler:hover {
@@ -100,6 +113,12 @@
     }
 
     @media (max-width: 767.98px) {
+        #mainNav {
+            padding: 0.45rem 0.75rem;
+        }
+        #mainNav > .container-fluid {
+            flex-wrap: wrap;
+        }
         #mainNav .navbar-collapse {
             background: rgba(17, 0, 51, 0.96);
             backdrop-filter: blur(16px);
@@ -109,6 +128,7 @@
             border-radius: 14px;
             border: 1px solid rgba(110, 14, 156, 0.35);
             box-shadow: 0 10px 32px rgba(0, 0, 0, 0.6);
+            width: 100%;
         }
         #mainNav .navbar-nav {
             gap: 0.4rem;
@@ -125,7 +145,7 @@
 <nav class="navbar navbar-expand-md fixed-top navbar-dark" id="mainNav">
     <div class="container-fluid">
         <a class="navbar-brand" href="/#">
-            <div style="padding-right: 1em; display: inline-flex;">
+            <div style="padding-right: 0.35rem; display: inline-flex; align-items: center; max-width: 100%;">
                 <div class="slider"><span>/</span></div>
                 <span class="brand">Nathan.Woodburn</span>
             </div>

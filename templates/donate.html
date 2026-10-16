@@ -7,6 +7,20 @@
 {% block canonical %}https://nathan.woodburn.au/donate{% endblock %}
 {% block og_url %}https://nathan.woodburn.au/donate{% endblock %}
 
+{% block extra_css %}
+<style>
+    #donate code, #donate .address {
+        word-break: break-all;
+        overflow-wrap: anywhere;
+        max-width: 100%;
+        display: inline-block;
+    }
+    #donate .dropdown-menu {
+        max-width: 90vw;
+    }
+</style>
+{% endblock %}
+
 {% block body_attrs %}id="page-top" data-bs-spy="scroll" data-bs-target="#mainNav" data-bs-offset="77" style="background: #110033;"{% endblock %}
 
 {% block content %}

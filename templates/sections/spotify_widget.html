@@ -43,7 +43,8 @@
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     font-family: sans-serif;
-    max-width: 300px;
+    max-width: min(300px, calc(100vw - 32px));
+    box-sizing: border-box;
     z-index: 9999;
     transition: transform 0.3s ease, opacity 0.3s ease;
     opacity: 0.9;
