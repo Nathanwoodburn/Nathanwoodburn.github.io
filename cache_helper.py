@@ -33,18 +33,22 @@ def get_git_latest_activity():
         return _git_data_cache["data"]
 
     # Fetch new data
-    git = requests.get(
-        "https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1",
-        headers={
-            "Authorization": os.getenv("GIT_AUTH") or os.getenv("git_token") or ""
-        },
-        timeout=5,
-    )
-    git_data = git.json()
-    if git_data and len(git_data) > 0:
-        result = git_data[0]
-        _git_data_cache = {"data": result, "timestamp": current_time}
-        return result
+    try:
+        git = requests.get(
+            "https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1",
+            headers={
+                "Authorization": os.getenv("GIT_AUTH") or os.getenv("git_token") or ""
+            },
+            timeout=5,
+        )
+        if git.status_code == 200:
+            git_data = git.json()
+            if git_data and len(git_data) > 0:
+                result = git_data[0]
+                _git_data_cache = {"data": result, "timestamp": current_time}
+                return result
+    except Exception:
+        pass
 
     # Return cached or default
     if _git_data_cache["data"]:

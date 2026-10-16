@@ -29,15 +29,27 @@ jobs:
       - name: Build and Start Site Container
         run: |
           docker build -t site:test .
-          docker run -d --name site-test -p 5000:5000 site:test
+
+          # Determine networking mode: if runner is in a container (act_runner), share network stack
+          NET_MODE="-p 5000:5000"
+          if docker inspect "$(hostname)" > /dev/null 2>&1; then
+            echo "Runner is running in container $(hostname), attaching site container to runner network namespace."
+            NET_MODE="--network container:$(hostname)"
+          else
+            echo "Runner is running on host, using host port mapping."
+          fi
+
+          docker run -d --name site-test $NET_MODE site:test
           echo "Waiting for site to start on port 5000..."
           READY=0
           for i in $(seq 1 30); do
-            if curl -s -f http://127.0.0.1:5000/ > /dev/null 2>&1; then
-              echo "Site is ready!"
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:5000/ || true)
+            if [ "$STATUS" = "200" ]; then
+              echo "Site is ready (HTTP 200)!"
               READY=1
               break
             fi
+            echo "Waiting for site... (status: $STATUS)"
             sleep 1
           done
           if [ "$READY" -ne 1 ]; then
