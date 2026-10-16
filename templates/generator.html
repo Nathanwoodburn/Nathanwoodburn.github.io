@@ -13,7 +13,6 @@
         <meta name="twitter:image" content="https://nathan.woodburn.au/assets/img/profile.webp">
         <meta name="twitter:description" content="Secure, client-side password generator tool by Nathan Woodburn. Generate strong, customizable passwords instantly.">
         <meta name="twitter:card" content="summary">
-        <link rel="preconnect" href="https://cdnjs.cloudflare.com">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="/assets/img/favicon/apple-touch-icon.png">
@@ -22,7 +21,6 @@
         <link rel="icon" type="image/png" sizes="180x180" href="/assets/img/favicon/apple-touch-icon.png">
         <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicon/android-chrome-192x192.png">
         <link rel="icon" type="image/png" sizes="512x512" href="/assets/img/favicon/android-chrome-512x512.png">
-        <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css'>
         <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Montserrat&amp;display=swap'>
         <link rel="stylesheet" href="/assets/css/generator.css">
 </head>
@@ -35,7 +33,7 @@
                 <div class="result__info right">click to copy</div>
                 <div class="result__info left">copied</div>
                 <div class="result__viewbox" id="result"><button class="textgenerate" id="textgenerate">GENERATE PASSWORD</button></div>
-                <button id="copy-btn" aria-label="Copy password to clipboard" style="--x: 0; --y: 0"><i class="far fa-copy" aria-hidden="true"></i></button>
+                <button id="copy-btn" aria-label="Copy password to clipboard" style="--x: 0; --y: 0"><svg class="bi bi-copy" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"><path fill-rule="evenodd" d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z"/></svg></button>
         </div>
         <div class="length range__slider" data-min="4" data-max="32">
                 <div class="length__title field-title" data-length='0'>length:</div>

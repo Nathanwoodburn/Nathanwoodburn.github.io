@@ -42,6 +42,8 @@
     <link rel="icon" type="image/png" sizes="512x512" href="/assets/img/favicon/android-chrome-512x512.png">
     <link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
 
+    {% block head_extra %}{% endblock %}
+
     <!-- Preconnect for external resources -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -49,11 +51,9 @@
 
     <!-- Fonts & Core Stylesheets -->
     <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anonymous+Pro&amp;family=Cabin:wght@700&amp;family=Lora:ital,wght@0,400;0,700;1,400;1,700&amp;family=Roboto:wght@300;400;500;700&amp;display=swap">
-    <link rel="stylesheet" href="/assets/fonts/fontawesome-all.min.css">
-    <link rel="stylesheet" href="/assets/fonts/font-awesome.min.css">
-    <link rel="stylesheet" href="/assets/fonts/ionicons.min.css">
-    <link rel="stylesheet" href="/assets/fonts/fontawesome5-overrides.min.css">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Anonymous+Pro&amp;family=Cabin:wght@700&amp;family=Lora:ital,wght@0,400;0,700;1,400;1,700&amp;family=Roboto:wght@300;400;500;700&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anonymous+Pro&amp;family=Cabin:wght@700&amp;family=Lora:ital,wght@0,400;0,700;1,400;1,700&amp;family=Roboto:wght@300;400;500;700&amp;display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anonymous+Pro&amp;family=Cabin:wght@700&amp;family=Lora:ital,wght@0,400;0,700;1,400;1,700&amp;family=Roboto:wght@300;400;500;700&amp;display=swap"></noscript>
     <link rel="stylesheet" href="/assets/css/styles.min.css">
     <link rel="stylesheet" href="/assets/css/brand-reveal.min.css">
     <link rel="stylesheet" href="/assets/css/profile.min.css">
@@ -65,7 +65,6 @@
     <link rel="stylesheet" href="/assets/css/navbar.css">
 
     {% block extra_css %}{% endblock %}
-    {% block head_extra %}{% endblock %}
 </head>
 
 <body {% block body_attrs %}id="page-top" data-bs-spy="scroll" data-bs-target="#mainNav" data-bs-offset="77"{% endblock %}>

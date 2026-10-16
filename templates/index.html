@@ -4,13 +4,22 @@
 
 {% block title %}Nathan.Woodburn/{% endblock %}
 
+{% block head_extra %}
+    <link rel="preload" as="image" href="/assets/img/bg/BlueMountains.webp" type="image/webp" fetchpriority="high">
+{% endblock %}
+
 {% block extra_css %}
     <link rel="stylesheet" href="/assets/css/index.min.css">
-    <link rel="stylesheet" href="/assets/css/swiper.min.css">
-    <link rel="stylesheet" href="/assets/css/projects.min.css">
-    <link rel="stylesheet" href="/assets/css/spotify-widget.min.css">
-    <link rel="stylesheet" href="/assets/css/donate.min.css">
-    <link rel="preload" as="image" href="/assets/img/bg/BlueMountains.webp" type="image/webp" fetchpriority="high">
+    <link rel="stylesheet" href="/assets/css/swiper.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="/assets/css/projects.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="/assets/css/spotify-widget.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="/assets/css/donate.min.css" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="/assets/css/swiper.min.css">
+        <link rel="stylesheet" href="/assets/css/projects.min.css">
+        <link rel="stylesheet" href="/assets/css/spotify-widget.min.css">
+        <link rel="stylesheet" href="/assets/css/donate.min.css">
+    </noscript>
 {% endblock %}
 
 {% block content %}
