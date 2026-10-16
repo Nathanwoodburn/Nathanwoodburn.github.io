@@ -1,6 +1,5 @@
 import argparse
 import datetime
-import gzip
 import json
 import os
 from zoneinfo import ZoneInfo
@@ -53,45 +52,6 @@ app = Flask(__name__)
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 31536000
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 CORS(app)
-
-
-@app.after_request
-def compress_response(response):
-    if (
-        response.status_code < 200
-        or response.status_code >= 300
-        or "gzip" not in request.headers.get("Accept-Encoding", "")
-        or "Content-Encoding" in response.headers
-    ):
-        return response
-
-    content_type = response.headers.get("Content-Type", "")
-    compressible = any(
-        ct in content_type
-        for ct in (
-            "text/",
-            "application/json",
-            "application/javascript",
-            "image/svg+xml",
-            "application/xml",
-        )
-    )
-    if not compressible:
-        return response
-
-    if response.direct_passthrough:
-        response.direct_passthrough = False
-        data = b"".join(response.response)
-    else:
-        data = response.get_data()
-
-    if len(data) > 500:
-        compressed_data = gzip.compress(data, compresslevel=6)
-        response.set_data(compressed_data)
-        response.headers["Content-Encoding"] = "gzip"
-        response.headers["Content-Length"] = len(compressed_data)
-
-    return response
 
 
 # Register blueprints
