@@ -6,16 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>{{ resume.name }} - Resume</title>
     <meta name="theme-color" content="#6E0E9C">
-    <link rel="canonical" href="https://nathan.woodburn.au/resume">
-    <meta property="og:url" content="https://nathan.woodburn.au/resume">
+    <link rel="canonical" href="{{ canonical_url }}">
+    <meta property="og:url" content="{{ canonical_url }}">
     <meta name="fediverse:creator" content="@nathanwoodburn@mastodon.woodburn.au">
     <meta name="twitter:card" content="summary">
     <meta property="og:type" content="website">
     <meta property="og:description" content="{{ resume.active_summary }}">
     <meta name="twitter:description" content="{{ resume.active_summary }}">
-    <meta property="og:image" content="https://nathan.woodburn.au{{ resume.profile_image }}">
+    <meta property="og:image" content="{{ site_url }}{{ resume.profile_image }}">
     <meta name="description" content="{{ resume.active_summary }}">
-    <meta name="twitter:image" content="https://nathan.woodburn.au{{ resume.profile_image }}">
+    <meta name="twitter:image" content="{{ site_url }}{{ resume.profile_image }}">
     <meta name="twitter:title" content="{{ resume.name }} - Resume">
     <meta property="og:title" content="{{ resume.name }} - Resume">
     <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="/assets/img/favicon/apple-touch-icon.png">

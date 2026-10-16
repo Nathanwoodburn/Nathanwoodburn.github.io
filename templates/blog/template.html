@@ -4,8 +4,6 @@
 
 {% block title %}{{ title }} | Nathan.Woodburn/{% endblock %}
 
-{% block canonical %}https://nathan.woodburn.au/blog/{{ slug if slug else 'template' }}{% endblock %}
-{% block og_url %}https://nathan.woodburn.au/blog/{{ slug if slug else 'template' }}{% endblock %}
 {% block og_title %}{{ title }} | Nathan.Woodburn/{% endblock %}
 {% block twitter_title %}{{ title }} | Nathan.Woodburn/{% endblock %}
 
@@ -23,9 +21,9 @@
     "author": {
         "@type": "Person",
         "name": "Nathan Woodburn",
-        "url": "https://nathan.woodburn.au"
+        "url": "{{ site_url }}"
     },
-    "url": "https://nathan.woodburn.au/blog/{{ slug if slug else 'template' }}"
+    "url": "{{ canonical_url }}"
 }
 </script>
 {% endblock %}

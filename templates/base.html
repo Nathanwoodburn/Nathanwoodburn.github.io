@@ -8,18 +8,18 @@
     <meta name="theme-color" content="{% block theme_color %}#000000{% endblock %}">
 
     {% block meta %}
-    <link rel="canonical" href="{% block canonical %}https://nathan.woodburn.au/{% endblock %}">
-    <meta property="og:url" content="{% block og_url %}https://nathan.woodburn.au/{% endblock %}">
+    <link rel="canonical" href="{% block canonical %}{{ canonical_url }}{% endblock %}">
+    <meta property="og:url" content="{% block og_url %}{{ canonical_url }}{% endblock %}">
     <meta name="fediverse:creator" content="@nathanwoodburn@mastodon.woodburn.au">
     <meta name="twitter:description" content="{% block meta_description %}G'day, this is my personal website. You can find out about me or check out some of my projects.{% endblock %}">
     <meta property="og:title" content="{% block og_title %}Nathan.Woodburn/{% endblock %}">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:image" content="{% block meta_image %}https://nathan.woodburn.au/assets/img/profile.jpg{% endblock %}">
+    <meta name="twitter:image" content="{% block meta_image %}{{ site_url }}/assets/img/profile.jpg{% endblock %}">
     <meta property="og:type" content="website">
     <meta name="twitter:title" content="{% block twitter_title %}Nathan.Woodburn/{% endblock %}">
     <meta property="og:description" content="{% block og_description %}G'day, this is my personal website. You can find out about me or check out some of my projects.{% endblock %}">
     <meta name="description" content="{% block description %}G'day, this is my personal website. You can find out about me or check out some of my projects.{% endblock %}">
-    <meta property="og:image" content="{% block og_image %}https://nathan.woodburn.au/assets/img/profile.jpg{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{{ site_url }}/assets/img/profile.jpg{% endblock %}">
     {% endblock %}
 
     {% block json_ld %}

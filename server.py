@@ -59,6 +59,21 @@ for module in [now, blog, wellknown, api, podcast, acme, spotify]:
     app.register_blueprint(module.app)
 
 
+@app.context_processor
+def inject_site_context():
+    try:
+        root = request.url_root.rstrip("/")
+        path = request.path.rstrip("/")
+        canonical_url = root + "/" if not path else root + path
+    except RuntimeError:
+        root = "https://nathan.woodburn.au"
+        canonical_url = "https://nathan.woodburn.au/"
+    return {
+        "site_url": root,
+        "canonical_url": canonical_url,
+    }
+
+
 dotenv.load_dotenv()
 
 # region Config/Constants
