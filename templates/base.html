@@ -50,19 +50,19 @@
     <link rel="preconnect" href="https://umami.woodburn.au">
 
     <!-- Fonts & Core Stylesheets -->
-    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ asset_url('bootstrap/css/bootstrap.min.css') }}">
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Anonymous+Pro&amp;family=Cabin:wght@700&amp;family=Lora:ital,wght@0,400;0,700;1,400;1,700&amp;family=Roboto:wght@300;400;500;700&amp;display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anonymous+Pro&amp;family=Cabin:wght@700&amp;family=Lora:ital,wght@0,400;0,700;1,400;1,700&amp;family=Roboto:wght@300;400;500;700&amp;display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anonymous+Pro&amp;family=Cabin:wght@700&amp;family=Lora:ital,wght@0,400;0,700;1,400;1,700&amp;family=Roboto:wght@300;400;500;700&amp;display=swap"></noscript>
-    <link rel="stylesheet" href="/assets/css/styles.min.css">
-    <link rel="stylesheet" href="/assets/css/brand-reveal.min.css">
-    <link rel="stylesheet" href="/assets/css/profile.min.css">
-    <link rel="stylesheet" href="/assets/css/Social-Icons.min.css">
+    <link rel="stylesheet" href="{{ asset_url('css/styles.min.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/brand-reveal.min.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/profile.min.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/Social-Icons.min.css') }}">
 
     <link rel="me" href="https://mastodon.woodburn.au/@nathanwoodburn" />
     <script async src="https://umami.woodburn.au/script.js" data-website-id="6a55028e-aad3-481c-9a37-3e096ff75589"></script>
-    <link rel="stylesheet" href="/assets/css/layout.css">
-    <link rel="stylesheet" href="/assets/css/navbar.css">
+    <link rel="stylesheet" href="{{ asset_url('css/layout.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/navbar.css') }}">
 
     {% block extra_css %}{% endblock %}
 </head>
@@ -70,7 +70,9 @@
 <body {% block body_attrs %}id="page-top" data-bs-spy="scroll" data-bs-target="#mainNav" data-bs-offset="77"{% endblock %}>
 <script>
   if (typeof navigator.serviceWorker !== 'undefined') {
-    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker.register('/sw.js').then(function(reg) {
+      reg.update();
+    }).catch(function() {});
   }
 </script>
 {{ handshake_scripts | safe }}
@@ -90,9 +92,9 @@
     {% block body_end %}{% endblock %}
 
     <!-- Core Scripts -->
-    <script defer src="/assets/bootstrap/js/bootstrap.min.js"></script>
-    <script defer src="/assets/js/script.min.js"></script>
-    <script defer src="/assets/js/hacker.min.js"></script>
+    <script defer src="{{ asset_url('bootstrap/js/bootstrap.min.js') }}"></script>
+    <script defer src="{{ asset_url('js/script.min.js') }}"></script>
+    <script defer src="{{ asset_url('js/hacker.min.js') }}"></script>
 
     {% block scripts %}{% endblock %}
 </body>

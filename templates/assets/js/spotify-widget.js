@@ -44,7 +44,7 @@
 
     async function updateSpotifyWidget() {
         try {
-            const res = await fetch('/api/v1/playing');
+            const res = await fetch('/api/v1/playing?_=' + Date.now(), { cache: 'no-store' });
             if (!res.ok) return;
 
             const data = await res.json();

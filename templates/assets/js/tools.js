@@ -10,14 +10,18 @@ document.addEventListener('DOMContentLoaded', function () {
             header.style.scrollMarginTop = navbarHeight + 'px';
         });
 
-        if (window.location.hash) {
+        if (window.location.hash && window.location.hash.length > 1 && window.location.hash !== '#') {
             setTimeout(() => {
-                const target = document.querySelector(window.location.hash);
-                if (target) {
-                    window.scrollTo({
-                        top: target.offsetTop - navbarHeight,
-                        behavior: 'smooth'
-                    });
+                try {
+                    const target = document.querySelector(window.location.hash);
+                    if (target) {
+                        window.scrollTo({
+                            top: target.offsetTop - navbarHeight,
+                            behavior: 'smooth'
+                        });
+                    }
+                } catch {
+                    // Ignore invalid CSS selector
                 }
             }, 0);
         }

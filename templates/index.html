@@ -9,16 +9,16 @@
 {% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="/assets/css/index.min.css">
-    <link rel="stylesheet" href="/assets/css/swiper.min.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="/assets/css/projects.min.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="/assets/css/spotify-widget.min.css" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="/assets/css/donate.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="{{ asset_url('css/index.min.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/swiper.min.css') }}" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="{{ asset_url('css/projects.min.css') }}" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="{{ asset_url('css/spotify-widget.min.css') }}" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="{{ asset_url('css/donate.min.css') }}" media="print" onload="this.media='all'">
     <noscript>
-        <link rel="stylesheet" href="/assets/css/swiper.min.css">
-        <link rel="stylesheet" href="/assets/css/projects.min.css">
-        <link rel="stylesheet" href="/assets/css/spotify-widget.min.css">
-        <link rel="stylesheet" href="/assets/css/donate.min.css">
+        <link rel="stylesheet" href="{{ asset_url('css/swiper.min.css') }}">
+        <link rel="stylesheet" href="{{ asset_url('css/projects.min.css') }}">
+        <link rel="stylesheet" href="{{ asset_url('css/spotify-widget.min.css') }}">
+        <link rel="stylesheet" href="{{ asset_url('css/donate.min.css') }}">
     </noscript>
 {% endblock %}
 
@@ -36,7 +36,7 @@
 {% endblock %}
 
 {% block scripts %}
-    <script defer src="/assets/js/pfp.min.js"></script>
-    <script defer src="/assets/js/sites.min.js"></script>
-    <script defer src="/assets/js/donate.js"></script>
+    <script defer src="{{ asset_url('js/pfp.min.js') }}"></script>
+    <script defer src="{{ asset_url('js/sites.min.js') }}"></script>
+    <script defer src="{{ asset_url('js/donate.js') }}"></script>
 {% endblock %}

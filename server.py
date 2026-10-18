@@ -68,9 +68,20 @@ def inject_site_context():
     except RuntimeError:
         root = "https://nathan.woodburn.au"
         canonical_url = "https://nathan.woodburn.au/"
+
+    def asset_url(path):
+        rel_path = path.lstrip("/").removeprefix("assets/")
+        full_path = os.path.join("templates/assets", rel_path)
+        try:
+            mtime = int(os.path.getmtime(full_path))
+            return f"/assets/{rel_path}?v={mtime}"
+        except OSError:
+            return f"/assets/{rel_path}"
+
     return {
         "site_url": root,
         "canonical_url": canonical_url,
+        "asset_url": asset_url,
     }
 
 
@@ -233,7 +244,36 @@ def manifest():
 
 @app.route("/sw.js")
 def serviceWorker():
-    return send_from_directory("pwa", "sw.js")
+    response = make_response(send_from_directory("pwa", "sw.js"))
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
+
+@app.after_request
+def add_caching_headers(response):
+    if request.path == "/sw.js":
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        return response
+
+    # Spotify now playing and dynamic playback endpoints must never be cached
+    if request.path.startswith(("/api/v1/playing", "/api/playing", "/spotify")):
+        response.headers["Cache-Control"] = (
+            "no-cache, no-store, must-revalidate, max-age=0"
+        )
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        return response
+
+    if response.mimetype == "text/html":
+        response.headers["Cache-Control"] = "no-cache, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        return response
+
+    return response
 
 
 # endregion
