@@ -4,7 +4,6 @@ const CACHE_NAME = "pwabuilder-offline-v3";
 
 const PRECACHE_ASSETS = [
   "/",
-  "/404",
   "/assets/bootstrap/css/bootstrap.min.css",
   "/assets/css/styles.min.css",
   "/assets/css/layout.css",
@@ -66,10 +65,6 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(
       fetch(event.request).catch(async () => {
         const cache = await caches.open(CACHE_NAME);
-        const cached404 = await cache.match("/404");
-        if (cached404) {
-          return cached404;
-        }
         const cachedHome = await cache.match("/");
         if (cachedHome) {
           return cachedHome;
@@ -79,6 +74,21 @@ self.addEventListener("fetch", (event) => {
           statusText: "Service Unavailable",
           headers: { "Content-Type": "text/plain" }
         });
+      })
+    );
+    return;
+  }
+
+  // Fallback to precached static assets when offline
+  if (url.origin === self.location.origin && url.pathname.startsWith("/assets/")) {
+    event.respondWith(
+      fetch(event.request).catch(async () => {
+        const cache = await caches.open(CACHE_NAME);
+        const cachedAsset = await cache.match(event.request, { ignoreSearch: true });
+        if (cachedAsset) {
+          return cachedAsset;
+        }
+        return new Response("", { status: 408, statusText: "Request Timeout" });
       })
     );
   }

@@ -14,7 +14,7 @@
     </url>
     <url>
         <loc>https://nathan.woodburn.au/now</loc>
-        <lastmod>2026-04-12</lastmod>
+        <lastmod>2026-10-16</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
@@ -26,7 +26,7 @@
     </url>
     <url>
         <loc>https://nathan.woodburn.au/projects</loc>
-        <lastmod>2026-10-15</lastmod>
+        <lastmod>2026-10-16</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
@@ -38,7 +38,7 @@
     </url>
     <url>
         <loc>https://nathan.woodburn.au/resume</loc>
-        <lastmod>2026-09-24</lastmod>
+        <lastmod>2026-10-16</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
@@ -50,13 +50,13 @@
     </url>
     <url>
         <loc>https://nathan.woodburn.au/podcast</loc>
-        <lastmod>2026-04-12</lastmod>
+        <lastmod>2026-10-16</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
     <url>
         <loc>https://nathan.woodburn.au/now/old</loc>
-        <lastmod>2026-10-15</lastmod>
+        <lastmod>2026-10-16</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.5</priority>
     </url>
@@ -74,19 +74,19 @@
     </url>
     <url>
         <loc>https://nathan.woodburn.au/blog/Fingertip_on_Linux_Mint</loc>
-        <lastmod>2026-09-24</lastmod>
+        <lastmod>2026-09-01</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
     <url>
         <loc>https://nathan.woodburn.au/blog/Nameserver_Setup_On_BobWallet</loc>
-        <lastmod>2026-09-24</lastmod>
+        <lastmod>2026-09-01</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
     <url>
         <loc>https://nathan.woodburn.au/blog/Software_I_Use</loc>
-        <lastmod>2026-09-24</lastmod>
+        <lastmod>2026-09-01</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
