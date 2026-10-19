@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-bs-theme="light" lang="en-au" style="background: url(&quot;/assets/img/bg/projects.webp&quot;) bottom / cover no-repeat, black;">
+<html data-bs-theme="light" lang="en-au" style="background: url('{{ asset_url('img/bg/projects.webp') }}') bottom / cover no-repeat, black;">
 
 <head>
     <meta charset="utf-8">
@@ -24,7 +24,7 @@
     <link rel="icon" type="image/png" sizes="180x180" href="/assets/img/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicon/android-chrome-192x192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="/assets/img/favicon/android-chrome-512x512.png">
-    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ asset_url('bootstrap/css/bootstrap.min.css') }}">
     <link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
     <!-- Preconnect for external resources -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,19 +33,19 @@
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Anonymous+Pro&amp;family=Cabin:wght@700&amp;family=Lora:ital,wght@0,400;0,700;1,400;1,700&amp;family=Roboto:wght@300;400;500;700&amp;display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anonymous+Pro&amp;family=Cabin:wght@700&amp;family=Lora:ital,wght@0,400;0,700;1,400;1,700&amp;family=Roboto:wght@300;400;500;700&amp;display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anonymous+Pro&amp;family=Cabin:wght@700&amp;family=Lora:ital,wght@0,400;0,700;1,400;1,700&amp;family=Roboto:wght@300;400;500;700&amp;display=swap"></noscript>
-    <link rel="stylesheet" href="/assets/css/styles.min.css">
-    <link rel="stylesheet" href="/assets/css/brand-reveal.min.css">
-    <link rel="stylesheet" href="/assets/css/fixes.min.css">
-    <link rel="stylesheet" href="/assets/css/profile.min.css">
-    <link rel="stylesheet" href="/assets/css/Social-Icons.min.css">
-    <link rel="stylesheet" href="/assets/css/layout.css">
-    <link rel="stylesheet" href="/assets/css/about.css">
+    <link rel="stylesheet" href="{{ asset_url('css/styles.min.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/brand-reveal.min.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/fixes.min.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/profile.min.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/Social-Icons.min.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/layout.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/about.css') }}">
     <link rel="me" href="https://mastodon.woodburn.au/@nathanwoodburn" />
     <script async src="https://umami.woodburn.au/script.js" data-website-id="6a55028e-aad3-481c-9a37-3e096ff75589"></script>
 </head>
 
 <body class="about-body about-page-body">{{handshake_scripts | safe}}
-    <div class="profile-container about-profile-container"><img class="profile background about-profile-img" src="/assets/img/profile.webp" alt="Profile Background" width="300" height="300"><img class="profile foreground" src="/assets/img/pfront.webp" alt="Profile Foreground" width="300" height="300"></div>
+    <div class="profile-container about-profile-container"><img class="profile background about-profile-img" src="{{ asset_url('img/profile.webp') }}" alt="Profile Background" width="300" height="300"><img class="profile foreground" src="{{ asset_url('img/pfront.webp') }}" alt="Profile Foreground" width="300" height="300"></div>
     <h1 class="nathanwoodburn about-title">Nathan.Woodburn/</h1>
     <section class="text-center content-section about-contact-section" id="contact">
         <div class="container">
@@ -109,10 +109,10 @@
     <a href="/#about" class="about-slideout-link" onclick="slideout(); return false;" aria-label="Scroll to about section">
         <svg class="about-slideout-btn bi bi-arrow-down" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1"/></svg>
     </a>
-    <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
-    <script src="/assets/js/script.min.js"></script>
-    <script src="/assets/js/about.min.js"></script>
-    <script src="/assets/js/hacker.min.js"></script>
+    <script src="{{ asset_url('bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset_url('js/script.min.js') }}"></script>
+    <script src="{{ asset_url('js/about.min.js') }}"></script>
+    <script src="{{ asset_url('js/hacker.min.js') }}"></script>
 </body>
 
 </html>

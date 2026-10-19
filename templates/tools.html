@@ -9,8 +9,8 @@
 {% block meta_description %}Applications, tools, and developer services used and recommended by Nathan Woodburn.{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="/assets/css/tools.min.css">
-    <link rel="preload" as="image" href="/assets/img/bg/projects.webp" type="image/webp" fetchpriority="high">
+    <link rel="stylesheet" href="{{ asset_url('css/tools.min.css') }}">
+    <link rel="preload" as="image" href="{{ asset_url('img/bg/projects.webp') }}" type="image/webp" fetchpriority="high">
 {% endblock %}
 
 {% block content %}
@@ -75,5 +75,5 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="/assets/js/tools.js"></script>
+    <script src="{{ asset_url('js/tools.js') }}"></script>
 {% endblock %}

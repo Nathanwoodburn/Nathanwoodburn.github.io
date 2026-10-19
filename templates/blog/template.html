@@ -29,14 +29,14 @@
 {% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="/assets/css/blog.min.css">
+    <link rel="stylesheet" href="{{ asset_url('css/blog.min.css') }}">
 {% endblock %}
 
-{% block body_attrs %}class="text-center" style="background: linear-gradient(rgba(0,0,0,0.80), rgba(0,0,0,0.80)), url(&quot;/assets/img/bg/background.webp&quot;) center / cover no-repeat;"{% endblock %}
+{% block body_attrs %}class="text-center" style="background: linear-gradient(rgba(0,0,0,0.80), rgba(0,0,0,0.80)), url('{{ asset_url('img/bg/background.webp') }}') center / cover no-repeat;"{% endblock %}
 
 {% block content %}
     <div style="height: 10em;"></div>
-    <div class="profile-container" style="margin-bottom: 2em;"><img class="profile background" src="/assets/img/profile.webp" style="border-radius: 50%;" alt="Nathan Woodburn" width="300" height="300"><img class="profile foreground" src="/assets/img/pfront.webp" alt="Nathan Woodburn Foreground" width="300" height="300"></div>
+    <div class="profile-container" style="margin-bottom: 2em;"><img class="profile background" src="{{ asset_url('img/profile.webp') }}" style="border-radius: 50%;" alt="Nathan Woodburn" width="300" height="300"><img class="profile foreground" src="{{ asset_url('img/pfront.webp') }}" alt="Nathan Woodburn Foreground" width="300" height="300"></div>
     <div class="nathanwoodburn fs-2 fw-bold" style="margin-bottom: 0px;">Nathan.Woodburn/</div>
     <h1 style="margin-bottom: 0px;margin-top: 25px;">{{ title }}</h1>
     {% if date %}<h6>{{ date }}</h6>{% endif %}

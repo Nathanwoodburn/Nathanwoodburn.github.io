@@ -1,6 +1,6 @@
 // Service Worker for Nathan.Woodburn/ PWA with network-first navigation and offline fallback
 
-const CACHE_NAME = "pwabuilder-offline-v3";
+const CACHE_NAME = "pwabuilder-offline-v4";
 
 const PRECACHE_ASSETS = [
   "/",

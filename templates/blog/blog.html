@@ -15,7 +15,7 @@ Find something interesting to read. Or maybe check one of my tutorials{% endbloc
 Find something interesting to read. Or maybe check one of my tutorials{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="/assets/css/blog-list.min.css">
+    <link rel="stylesheet" href="{{ asset_url('css/blog-list.min.css') }}">
 {% endblock %}
 
 {% block body_attrs %}class="blog-page"{% endblock %}

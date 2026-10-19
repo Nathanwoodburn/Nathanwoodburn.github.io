@@ -27,12 +27,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://umami.woodburn.au">
-    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ asset_url('bootstrap/css/bootstrap.min.css') }}">
     <link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap">
-    <link rel="stylesheet" href="/assets/css/styles.min.css">
-    <link rel="stylesheet" href="/assets/css/resume.min.css">
-    <link rel="stylesheet" href="/assets/css/resume-custom.css">
+    <link rel="stylesheet" href="{{ asset_url('css/styles.min.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/resume.min.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/resume-custom.css') }}">
     <link rel="me" href="https://mastodon.woodburn.au/@nathanwoodburn" />
     <script async src="https://umami.woodburn.au/script.js" data-website-id="6a55028e-aad3-481c-9a37-3e096ff75589"></script>
     <link rel="alternate" type="application/json" href="/resume.json{% if support %}?support=1{% endif %}" title="Resume (JSON)">
@@ -40,7 +40,7 @@
     <link rel="alternate" type="text/plain" href="/resume.txt{% if support %}?support=1{% endif %}" title="Resume (Plain Text)">
     <link rel="alternate" type="text/plain" href="/resume.ascii{% if support %}?support=1{% endif %}" title="Resume (CLI / ASCII)">
     <link rel="alternate" type="application/pdf" href="/resume.pdf{% if support %}?support=1{% endif %}" title="Resume (PDF)">
-    <link rel="stylesheet" href="/assets/css/resume-print.css" media="print">
+    <link rel="stylesheet" href="{{ asset_url('css/resume-print.css') }}" media="print">
 </head>
 
 <body>
@@ -218,8 +218,8 @@
             </div>
         </div>
     </div>
-    <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
-    <script src="/assets/js/script.min.js"></script>
+    <script src="{{ asset_url('bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset_url('js/script.min.js') }}"></script>
 </body>
 
 </html>

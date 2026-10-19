@@ -642,7 +642,11 @@ def build_resume_pdf(support: bool = False, output_path: str | None = None) -> s
                 css_parts.append(cf.read())
 
     resume_data = get_resume_data(support=support)
-    rendered = jinja2.Template(html).render(resume=resume_data, support=support)
+    rendered = jinja2.Template(html).render(
+        resume=resume_data,
+        support=support,
+        asset_url=lambda p: f"/assets/{p.lstrip('/').removeprefix('assets/')}",
+    )
     rendered = rendered.replace(
         "</head>",
         f"<style>\n{chr(10).join(css_parts)}\n</style>\n</head>",

@@ -9,7 +9,7 @@
 {% block meta_description %}Support Nathan Woodburn via PayPal, GitHub Sponsors, or Cryptocurrency.{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="/assets/css/donate.min.css">
+    <link rel="stylesheet" href="{{ asset_url('css/donate.min.css') }}">
 {% endblock %}
 
 {% block body_attrs %}id="page-top" class="donate-page" data-bs-spy="scroll" data-bs-target="#mainNav" data-bs-offset="77"{% endblock %}
@@ -62,5 +62,5 @@
 
 {% block scripts %}
 <script>window.DEFAULT_COINS = {{ default_coins | tojson }};</script>
-<script src="/assets/js/donate.js"></script>
+<script src="{{ asset_url('js/donate.js') }}"></script>
 {% endblock %}

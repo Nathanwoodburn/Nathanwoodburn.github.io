@@ -15,14 +15,14 @@ Find out what I've been up to in the last little bit{% endblock %}
 Find out what I've been up to in the last little bit{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="/assets/css/now.min.css">
+    <link rel="stylesheet" href="{{ asset_url('css/now.min.css') }}">
 {% endblock %}
 
-{% block body_attrs %}class="text-center" style="background: linear-gradient(rgba(0,0,0,0.80), rgba(0,0,0,0.80)), url(&quot;/assets/img/bg/background.webp&quot;) center / cover no-repeat;"{% endblock %}
+{% block body_attrs %}class="text-center" style="background: linear-gradient(rgba(0,0,0,0.80), rgba(0,0,0,0.80)), url('{{ asset_url('img/bg/background.webp') }}') center / cover no-repeat;"{% endblock %}
 
 {% block content %}
     <div style="height: 10em;"></div>
-    <div class="profile-container" style="margin-bottom: 2em;"><img class="profile background" src="/assets/img/profile.webp" style="border-radius: 50%;" alt="Nathan Woodburn" width="300" height="300"><img class="profile foreground" src="/assets/img/pfront.webp" alt="Nathan Woodburn Foreground" width="300" height="300"></div>
+    <div class="profile-container" style="margin-bottom: 2em;"><img class="profile background" src="{{ asset_url('img/profile.webp') }}" style="border-radius: 50%;" alt="Nathan Woodburn" width="300" height="300"><img class="profile foreground" src="{{ asset_url('img/pfront.webp') }}" alt="Nathan Woodburn Foreground" width="300" height="300"></div>
     <h1 class="nathanwoodburn" style="margin-bottom: 0px;">Nathan.Woodburn/</h1>
     <h2 style="margin-bottom: 0px;">What's Happening Now</h2>
     <h6>{{ DATE }}</h6>

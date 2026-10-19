@@ -15,13 +15,13 @@ Find out what I've been up to in the last week{% endblock %}
 Find out what I've been up to in the last week{% endblock %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="/assets/css/now.min.css">
+    <link rel="stylesheet" href="{{ asset_url('css/now.min.css') }}">
 {% endblock %}
 
-{% block body_attrs %}class="text-center" style="background: linear-gradient(rgba(0,0,0,0.80), rgba(0,0,0,0.80)), url(&quot;/assets/img/bg/background.webp&quot;) center / cover no-repeat;"{% endblock %}
+{% block body_attrs %}class="text-center" style="background: linear-gradient(rgba(0,0,0,0.80), rgba(0,0,0,0.80)), url('{{ asset_url('img/bg/background.webp') }}') center / cover no-repeat;"{% endblock %}
 
 {% block content %}
-    <div class="profile-container" style="margin-bottom: 2em;margin-top: 10em;"><img class="profile background" src="/assets/img/profile.jpg" style="border-radius: 50%;"><img class="profile foreground" src="/assets/img/pfront.webp"></div>
+    <div class="profile-container" style="margin-bottom: 2em;margin-top: 10em;"><img class="profile background" src="{{ asset_url('img/profile.webp') }}" style="border-radius: 50%;"><img class="profile foreground" src="{{ asset_url('img/pfront.webp') }}"></div>
     <h1 class="nathanwoodburn" style="margin-bottom: 0px;">Nathan.Woodburn/</h1>
     <h3>Now History</h3>
     <section style="margin-bottom: 50px;">

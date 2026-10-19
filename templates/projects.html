@@ -9,11 +9,11 @@
 {% block meta_description %}Explore open-source software, web services, and projects created by Nathan Woodburn.{% endblock %}
 
 {% block extra_css %}
-    <link rel="preload" as="image" href="/assets/img/bg/projects.webp" type="image/webp" fetchpriority="high">
+    <link rel="preload" as="image" href="{{ asset_url('img/bg/projects.webp') }}" type="image/webp" fetchpriority="high">
 {% endblock %}
 
 {% block content %}
-    <header class="masthead" style="background: url('/assets/img/bg/projects.webp') bottom / cover no-repeat; height: auto; padding-top: 20px;">
+    <header class="masthead" style="background: url('{{ asset_url('img/bg/projects.webp') }}') bottom / cover no-repeat; height: auto; padding-top: 20px;">
         <div style="margin-top: 150px; margin-bottom: 100px;">
             <div class="container">
                 <div class="row">

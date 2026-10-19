@@ -1,5 +1,6 @@
 import argparse
 import datetime
+import hashlib
 import json
 import os
 from zoneinfo import ZoneInfo
@@ -59,6 +60,32 @@ for module in [now, blog, wellknown, api, podcast, acme, spotify]:
     app.register_blueprint(module.app)
 
 
+_asset_version_cache: dict[str, tuple[float, str]] = {}
+
+
+def get_asset_version(rel_path: str) -> str | None:
+    full_path = os.path.join("templates/assets", rel_path)
+    try:
+        mtime = os.path.getmtime(full_path)
+        cached = _asset_version_cache.get(rel_path)
+        if cached and cached[0] == mtime:
+            return cached[1]
+        with open(full_path, "rb") as f:
+            v = hashlib.sha256(f.read()).hexdigest()[:10]
+        _asset_version_cache[rel_path] = (mtime, v)
+        return v
+    except OSError:
+        return None
+
+
+def asset_url(path: str) -> str:
+    rel_path = path.lstrip("/").removeprefix("assets/").lstrip("/")
+    v = get_asset_version(rel_path)
+    if v:
+        return f"/assets/{rel_path}?v={v}"
+    return f"/assets/{rel_path}"
+
+
 @app.context_processor
 def inject_site_context():
     try:
@@ -68,15 +95,6 @@ def inject_site_context():
     except RuntimeError:
         root = "https://nathan.woodburn.au"
         canonical_url = "https://nathan.woodburn.au/"
-
-    def asset_url(path):
-        rel_path = path.lstrip("/").removeprefix("assets/")
-        full_path = os.path.join("templates/assets", rel_path)
-        try:
-            mtime = int(os.path.getmtime(full_path))
-            return f"/assets/{rel_path}?v={mtime}"
-        except OSError:
-            return f"/assets/{rel_path}"
 
     return {
         "site_url": root,
@@ -268,10 +286,21 @@ def add_caching_headers(response):
         response.headers["Expires"] = "0"
         return response
 
-    if response.mimetype == "text/html":
+    # Static assets: versioned assets can be cached aggressively (1 year, immutable);
+    # unversioned assets must be revalidated so changes on disk are picked up immediately.
+    if request.path.startswith("/assets/"):
+        if request.args.get("v"):
+            response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        else:
+            response.headers["Cache-Control"] = "public, no-cache, must-revalidate"
+            response.headers.pop("Expires", None)
+        return response
+
+    if response.mimetype == "text/html" and response.status_code == 200:
         response.headers["Cache-Control"] = "no-cache, must-revalidate"
         response.headers["Pragma"] = "no-cache"
-        return response
+        response.add_etag()
+        return response.make_conditional(request)
 
     return response
 
