@@ -6,16 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>{{ resume.name }} - Resume</title>
     <meta name="theme-color" content="#6E0E9C">
-    <link rel="canonical" href="https://nathan.woodburn.au/resume">
-    <meta property="og:url" content="https://nathan.woodburn.au/resume">
+    <link rel="canonical" href="{{ canonical_url }}">
+    <meta property="og:url" content="{{ canonical_url }}">
     <meta name="fediverse:creator" content="@nathanwoodburn@mastodon.woodburn.au">
     <meta name="twitter:card" content="summary">
     <meta property="og:type" content="website">
     <meta property="og:description" content="{{ resume.active_summary }}">
     <meta name="twitter:description" content="{{ resume.active_summary }}">
-    <meta property="og:image" content="https://nathan.woodburn.au{{ resume.profile_image }}">
+    <meta property="og:image" content="{{ site_url }}{{ resume.profile_image }}">
     <meta name="description" content="{{ resume.active_summary }}">
-    <meta name="twitter:image" content="https://nathan.woodburn.au{{ resume.profile_image }}">
+    <meta name="twitter:image" content="{{ site_url }}{{ resume.profile_image }}">
     <meta name="twitter:title" content="{{ resume.name }} - Resume">
     <meta property="og:title" content="{{ resume.name }} - Resume">
     <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="/assets/img/favicon/apple-touch-icon.png">
@@ -24,12 +24,15 @@
     <link rel="icon" type="image/png" sizes="180x180" href="/assets/img/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicon/android-chrome-192x192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="/assets/img/favicon/android-chrome-512x512.png">
-    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://umami.woodburn.au">
+    <link rel="stylesheet" href="{{ asset_url('bootstrap/css/bootstrap.min.css') }}">
     <link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans:400,500,600,700&amp;display=swap">
-    <link rel="stylesheet" href="/assets/css/styles.min.css">
-    <link rel="stylesheet" href="/assets/css/resume.min.css">
-    <link rel="stylesheet" href="/assets/css/resume-custom.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&amp;display=swap">
+    <link rel="stylesheet" href="{{ asset_url('css/styles.min.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/resume.min.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/resume-custom.css') }}">
     <link rel="me" href="https://mastodon.woodburn.au/@nathanwoodburn" />
     <script async src="https://umami.woodburn.au/script.js" data-website-id="6a55028e-aad3-481c-9a37-3e096ff75589"></script>
     <link rel="alternate" type="application/json" href="/resume.json{% if support %}?support=1{% endif %}" title="Resume (JSON)">
@@ -37,7 +40,7 @@
     <link rel="alternate" type="text/plain" href="/resume.txt{% if support %}?support=1{% endif %}" title="Resume (Plain Text)">
     <link rel="alternate" type="text/plain" href="/resume.ascii{% if support %}?support=1{% endif %}" title="Resume (CLI / ASCII)">
     <link rel="alternate" type="application/pdf" href="/resume.pdf{% if support %}?support=1{% endif %}" title="Resume (PDF)">
-    <link rel="stylesheet" href="/assets/css/resume-print.css" media="print">
+    <link rel="stylesheet" href="{{ asset_url('css/resume-print.css') }}" media="print">
 </head>
 
 <body>
@@ -48,7 +51,7 @@
                 <aside class="col-12 col-md-4 resume-column resume-column-left">
                     <div class="resume-left-inner">
                         <div class="text-center profile-container">
-                            <img class="profile-side" src="{{ resume.profile_image }}" alt="{{ resume.name }}">
+                            <img class="profile-side" src="{{ resume.profile_image }}" alt="{{ resume.name }}" width="160" height="160" loading="lazy">
                         </div>
 
                         <!-- Mobile-only header (shows Name & Title at top on mobile) -->
@@ -215,8 +218,8 @@
             </div>
         </div>
     </div>
-    <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
-    <script src="/assets/js/script.min.js"></script>
+    <script src="{{ asset_url('bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset_url('js/script.min.js') }}"></script>
 </body>
 
 </html>

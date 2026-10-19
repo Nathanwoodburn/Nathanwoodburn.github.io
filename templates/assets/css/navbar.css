@@ -1,0 +1,159 @@
+/* ==========================================================================
+   Main Navigation Header Styles
+   ========================================================================== */
+#mainNav {
+    background: rgba(10, 10, 10, 0.85) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    padding: 0.6rem 1.25rem;
+    transition: all 0.2s ease;
+}
+
+#mainNav .navbar-brand {
+    color: #ffffff !important;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    font-size: clamp(0.95rem, 4.4vw, 1.25rem);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 56px);
+}
+
+.navbar-brand-inner {
+    padding-right: 0.35rem;
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+}
+
+#mainNav > .container-fluid {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#mainNav .navbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#mainNav .nav-item {
+    list-style: none;
+}
+
+#mainNav .nav-link,
+#mainNav .nav-link:hover,
+#mainNav .nav-link:focus,
+#mainNav .nav-link.active,
+#mainNav .nav-link.active:hover,
+#mainNav .nav-link.active:focus {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+#mainNav .nav-link {
+    color: rgba(255, 255, 255, 0.65) !important;
+    font-size: 0.92rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    padding: 0.45rem 0.65rem !important;
+    position: relative;
+    text-decoration: none;
+    display: inline-block;
+    transition: color 0.15s ease;
+}
+
+#mainNav .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0.65rem;
+    right: 0.65rem;
+    height: 2px;
+    background-color: #ffffff;
+    border-radius: 1px;
+    opacity: 0;
+    transform: scaleX(0);
+    transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#mainNav .nav-link:hover {
+    color: #ffffff !important;
+}
+
+#mainNav .nav-link:hover::after {
+    opacity: 0.45;
+    transform: scaleX(0.7);
+}
+
+#mainNav .nav-link.active {
+    color: #ffffff !important;
+    font-weight: 600;
+}
+
+#mainNav .nav-link.active::after {
+    opacity: 1;
+    transform: scaleX(1);
+}
+
+#mainNav .nav-link:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+
+#mainNav .navbar-toggler {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    padding: 0.35rem 0.65rem;
+    background: transparent;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+#mainNav .navbar-toggler:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+#mainNav .navbar-toggler:focus {
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25);
+}
+
+#mainNav .navbar-toggler i {
+    color: #ffffff;
+}
+
+@media (max-width: 767.98px) {
+    #mainNav {
+        padding: 0.5rem 0.75rem;
+    }
+    #mainNav > .container-fluid {
+        flex-wrap: wrap;
+    }
+    #mainNav .navbar-collapse {
+        width: 100%;
+    }
+    #mainNav .navbar-nav {
+        gap: 0.35rem;
+        align-items: flex-end;
+        margin-top: 0.2rem;
+    }
+    #mainNav .nav-link {
+        text-align: left;
+        padding: 0.45rem 0.5rem !important;
+        width: fit-content;
+        display: inline-block;
+    }
+    #mainNav .nav-link::after {
+        left: 0.5rem;
+        right: 0.5rem;
+        bottom: 2px;
+    }
+}

@@ -1,0 +1,117 @@
+{# ==========================================================================
+   Terminal Directory View - Recent Projects (~/git on NWLaptop)
+   ========================================================================== #}
+<section class="text-center content-section sites" id="sites">
+    <div class="terminal-container">
+        <!-- Section Header -->
+        <div class="terminal-section-heading">
+            <h2 class="terminal-heading">Some recent projects</h2>
+            <p class="terminal-subheading">Exploring repositories and open source work inside <code>~/git</code></p>
+        </div>
+
+        <!-- Frameless & Borderless Terminal Screen -->
+        <div class="terminal-screen" tabindex="0" aria-label="Terminal directory view of ~/git on NWLaptop">
+            <!-- Initial Prompt & Command (Matching oh-my-posh on NWLaptop) -->
+            <div class="omp-prompt-block">
+                <div class="omp-line-top"><span class="omp-bracket">┌──(</span><span class="omp-userhost">nathan@NWLaptop</span><span class="omp-bracket">)-[</span><span class="omp-path-tilde">~</span><span class="omp-path-slash">/</span><span class="omp-path-dir">git</span><span class="omp-bracket">]</span></div>
+                <div class="omp-line-bottom"><span class="omp-bracket">└─</span><span class="omp-dollar">$</span> <span class="omp-cmd">ls</span></div>
+            </div>
+
+            <!-- Directory Table (eza ls -lah format) -->
+            <div class="terminal-table" role="table" aria-label="Directory listing of ~/git">
+                <!-- Underlined Headers Row (eza format) -->
+                <div class="term-row term-header-row" role="row">
+                    <span class="term-col t-perm t-head" role="columnheader">Permissions</span>
+                    <span class="term-col t-size t-head" role="columnheader">Size</span>
+                    <span class="term-col t-user t-head" role="columnheader">User</span>
+                    <span class="term-col t-date t-head" role="columnheader">Date Modified</span>
+                    <div class="term-col t-target" role="columnheader">
+                        <span class="term-indicator" aria-hidden="true">&nbsp;</span>
+                        <span class="t-head">Name</span>
+                    </div>
+                </div>
+
+                <!-- Special directories . and .. -->
+                <div class="term-row term-dir-row term-parent" role="row">
+                    <span class="term-col t-perm" role="cell" aria-label="drwxr-xr-x"><span class="perm-d">d</span><span class="perm-r">r</span><span class="perm-w">w</span><span class="perm-x">x</span><span class="perm-r">r</span><span class="perm-dash">-</span><span class="perm-x">x</span><span class="perm-r">r</span><span class="perm-dash">-</span><span class="perm-x">x</span></span>
+                    <span class="term-col t-size" role="cell"><span class="size-dash">-</span></span>
+                    <span class="term-col t-user" role="cell">nathan</span>
+                    <span class="term-col t-date" role="cell">15 Oct 16:18</span>
+                    <div class="term-col t-target" role="cell">
+                        <span class="term-indicator" aria-hidden="true">&nbsp;</span>
+                        <span class="term-dir-icon" aria-hidden="true">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </span>
+                        <span class="term-dir-color">.</span>
+                    </div>
+                </div>
+
+                <div class="term-row term-dir-row term-parent" role="row">
+                    <span class="term-col t-perm" role="cell" aria-label="drwx------"><span class="perm-d">d</span><span class="perm-r">r</span><span class="perm-w">w</span><span class="perm-x">x</span><span class="perm-dash">------</span></span>
+                    <span class="term-col t-size" role="cell"><span class="size-dash">-</span></span>
+                    <span class="term-col t-user" role="cell">nathan</span>
+                    <span class="term-col t-date" role="cell">15 Oct 15:53</span>
+                    <div class="term-col t-target" role="cell">
+                        <span class="term-indicator" aria-hidden="true">&nbsp;</span>
+                        <span class="term-dir-icon" aria-hidden="true">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </span>
+                        <span class="term-dir-color">..</span>
+                    </div>
+                </div>
+
+                <!-- Projects as git repo directories -->
+                {% for project in projects %}
+                {% set repo_slug = project.slug or project.name.replace(' ', '-') %}
+                <div class="term-row term-dir-row term-project-row site"
+                     role="row"
+                     tabindex="0"
+                     data-url="{{ project.html_url }}"
+                     onclick="window.open('{{ project.html_url }}', '_blank')"
+                     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.open('{{ project.html_url }}','_blank');}"
+                     title="Click to view {{ repo_slug }} on git.woodburn.au">
+                    <span class="term-col t-perm" role="cell" aria-label="drwxr-xr-x"><span class="perm-d">d</span><span class="perm-r">r</span><span class="perm-w">w</span><span class="perm-x">x</span><span class="perm-r">r</span><span class="perm-dash">-</span><span class="perm-x">x</span><span class="perm-r">r</span><span class="perm-dash">-</span><span class="perm-x">x</span></span>
+                    <span class="term-col t-size" role="cell"><span class="size-dash">-</span></span>
+                    <span class="term-col t-user" role="cell">nathan</span>
+                    <span class="term-col t-date" role="cell">{{ project.date_str or '15 Oct 12:00' }}</span>
+                    <div class="term-col t-target" role="cell">
+                        <span class="term-indicator" aria-hidden="true">&rsaquo;</span>
+                        <span class="term-dir-icon" aria-hidden="true">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </span>
+                        <span class="term-name term-dir-link">{{ repo_slug }}/</span>
+                        {% if project.description %}
+                        <span class="term-desc" title="{{ project.description }}">&num; {{ project.description }}</span>
+                        {% endif %}
+                    </div>
+                    <span class="term-col t-action" role="cell" aria-hidden="true">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="7" y1="17" x2="17" y2="7"></line>
+                            <polyline points="7 7 17 7 17 17"></polyline>
+                        </svg>
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Active Shell Prompt with Blinking Cursor -->
+            <div class="omp-prompt-block omp-prompt-active">
+                <div class="omp-line-top"><span class="omp-bracket">┌──(</span><span class="omp-userhost">nathan@NWLaptop</span><span class="omp-bracket">)-[</span><span class="omp-path-tilde">~</span><span class="omp-path-slash">/</span><span class="omp-path-dir">git</span><span class="omp-bracket">]</span></div>
+                <div class="omp-line-bottom"><span class="omp-bracket">└─</span><span class="omp-dollar">$</span> <span class="term-cursor" aria-hidden="true">&#9608;</span></div>
+            </div>
+        </div>
+
+        <!-- Hidden Swiper instance to satisfy sites.min.js without errors -->
+        <div class="swiper d-none" aria-hidden="true">
+            <div class="swiper-wrapper"></div>
+            <div class="swiper-scrollbar"></div>
+        </div>
+    </div>
+</section>
+<img class="no-drag terminal-tilt-divider" src="/assets/img/tilt.svg" alt="" width="1200" height="120">

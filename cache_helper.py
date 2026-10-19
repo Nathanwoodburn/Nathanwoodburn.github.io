@@ -5,10 +5,13 @@ Provides centralized caching with TTL for external API calls.
 
 import datetime
 import json
+import logging
 import os
 from functools import lru_cache
 
 import requests
+
+logger = logging.getLogger(__name__)
 
 # Cache storage for git data
 _git_data_cache = {"data": None, "timestamp": 0}
@@ -33,18 +36,22 @@ def get_git_latest_activity():
         return _git_data_cache["data"]
 
     # Fetch new data
-    git = requests.get(
-        "https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1",
-        headers={
-            "Authorization": os.getenv("GIT_AUTH") or os.getenv("git_token") or ""
-        },
-        timeout=5,
-    )
-    git_data = git.json()
-    if git_data and len(git_data) > 0:
-        result = git_data[0]
-        _git_data_cache = {"data": result, "timestamp": current_time}
-        return result
+    try:
+        git = requests.get(
+            "https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1",
+            headers={
+                "Authorization": os.getenv("GIT_AUTH") or os.getenv("git_token") or ""
+            },
+            timeout=5,
+        )
+        if git.status_code == 200:
+            git_data = git.json()
+            if git_data and len(git_data) > 0:
+                result = git_data[0]
+                _git_data_cache = {"data": result, "timestamp": current_time}
+                return result
+    except (requests.RequestException, ValueError) as err:
+        logger.warning("Failed to fetch git latest activity: %s", err)
 
     # Return cached or default
     if _git_data_cache["data"]:
@@ -108,7 +115,21 @@ def get_projects(limit=3):
     for project in projects:
         if project.get("avatar_url") in ("https://git.woodburn.au/", ""):
             project["avatar_url"] = "/favicon.png"
+        raw_slug = project.get("html_url", "").rstrip("/").split("/")[
+            -1
+        ] or project.get("name", "")
+        project["slug"] = raw_slug
         project["name"] = project["name"].replace("_", " ").replace("-", " ")
+        # Format updated_at to eza ls -lah timestamp (e.g. 15 Oct 16:18 or  7 May 17:12)
+        up_at = project.get("updated_at", "")
+        try:
+            if up_at:
+                dt = datetime.datetime.fromisoformat(up_at)
+                project["date_str"] = f"{dt.day:>2} {dt.strftime('%b %H:%M')}"
+            else:
+                project["date_str"] = "15 Oct 12:00"
+        except (ValueError, TypeError):
+            project["date_str"] = "15 Oct 12:00"
 
     # Sort by last updated
     projects_sorted = sorted(

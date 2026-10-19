@@ -1,12 +1,12 @@
 import argparse
 import datetime
+import hashlib
 import json
 import os
 from zoneinfo import ZoneInfo
 
 import dotenv
 import qrcode
-import requests
 from ansi2html import Ansi2HTMLConverter
 from flask import (
     Flask,
@@ -35,47 +35,86 @@ from cache_helper import (
 from curl import curl_response, finger_response
 from tools import (
     error_response,
+    generate_sitemap,
     get_resume_data,
     get_resume_md,
     get_resume_pdf,
     get_resume_txt,
     get_tools_data,
     getAddress,
-    getClientIP,
     getFilePath,
     getHandshakeScript,
     isCLI,
     isFinger,
-    json_response,
     parse_support_arg,
 )
 
 app = Flask(__name__)
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 31536000
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 CORS(app)
+
 
 # Register blueprints
 for module in [now, blog, wellknown, api, podcast, acme, spotify]:
     app.register_blueprint(module.app)
 
 
+_asset_version_cache: dict[str, tuple[float, str]] = {}
+
+
+def get_asset_version(rel_path: str) -> str | None:
+    full_path = os.path.join("templates/assets", rel_path)
+    try:
+        mtime = os.path.getmtime(full_path)
+        cached = _asset_version_cache.get(rel_path)
+        if cached and cached[0] == mtime:
+            return cached[1]
+        with open(full_path, "rb") as f:
+            v = hashlib.sha256(f.read()).hexdigest()[:10]
+        _asset_version_cache[rel_path] = (mtime, v)
+        return v
+    except OSError:
+        return None
+
+
+def asset_url(path: str) -> str:
+    rel_path = path.lstrip("/").removeprefix("assets/").lstrip("/")
+    v = get_asset_version(rel_path)
+    if v:
+        return f"/assets/{rel_path}?v={v}"
+    return f"/assets/{rel_path}"
+
+
+@app.context_processor
+def inject_site_context():
+    try:
+        root = request.url_root.rstrip("/")
+        path = request.path.rstrip("/")
+        canonical_url = root + "/" if not path else root + path
+    except RuntimeError:
+        root = "https://nathan.woodburn.au"
+        canonical_url = "https://nathan.woodburn.au/"
+
+    return {
+        "site_url": root,
+        "canonical_url": canonical_url,
+        "asset_url": asset_url,
+    }
+
+
 dotenv.load_dotenv()
 
 # region Config/Constants
 
-# Rate limiting for hosting enquiries
-EMAIL_REQUEST_COUNT = {}  # Track requests by email
-IP_REQUEST_COUNT = {}  # Track requests by IP
-EMAIL_RATE_LIMIT = 3  # Max 3 requests per email per hour
-IP_RATE_LIMIT = 5  # Max 5 requests per IP per hour
-RATE_LIMIT_WINDOW = 3600  # 1 hour in seconds
-
+EXCEMPT_ROUTES = ["404", "header", "error"]
 RESTRICTED_ROUTES = ["ascii"]
 REDIRECT_ROUTES = {
     "contact": "/#contact",
-    "/meet": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
-    "/meeting": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
-    "/appointment": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
+    "meet": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
+    "meeting": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
+    "appointment": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
+    "donate/more": "/donate",
 }
 DOWNLOAD_ROUTES = {"pgp": "data/nathanwoodburn.asc"}
 
@@ -155,14 +194,23 @@ def fonts(path):
 @app.route("/sitemap")
 @app.route("/sitemap.xml")
 def sitemap():
-    # Remove all .html from sitemap
-    if not os.path.isfile("templates/sitemap.xml"):
-        return error_response(request)
-    with open("templates/sitemap.xml") as file:
-        sitemap = file.read()
+    sitemap_xml = generate_sitemap(base_url="https://nathan.woodburn.au")
+    return make_response(
+        sitemap_xml, 200, {"Content-Type": "application/xml; charset=utf-8"}
+    )
 
-    sitemap = sitemap.replace(".html", "")
-    return make_response(sitemap, 200, {"Content-Type": "application/xml"})
+
+@app.route("/robots.txt")
+def robots_txt():
+    content = (
+        "User-agent: *\n"
+        "Allow: /\n"
+        "Disallow: /api/\n"
+        "Disallow: /ascii\n"
+        "\n"
+        "Sitemap: https://nathan.woodburn.au/sitemap.xml\n"
+    )
+    return make_response(content, 200, {"Content-Type": "text/plain; charset=utf-8"})
 
 
 @app.route("/favicon.<ext>")
@@ -214,7 +262,47 @@ def manifest():
 
 @app.route("/sw.js")
 def serviceWorker():
-    return send_from_directory("pwa", "sw.js")
+    response = make_response(send_from_directory("pwa", "sw.js"))
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
+
+@app.after_request
+def add_caching_headers(response):
+    if request.path == "/sw.js":
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        return response
+
+    # Spotify now playing and dynamic playback endpoints must never be cached
+    if request.path.startswith(("/api/v1/playing", "/api/playing", "/spotify")):
+        response.headers["Cache-Control"] = (
+            "no-cache, no-store, must-revalidate, max-age=0"
+        )
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        return response
+
+    # Static assets: versioned assets can be cached aggressively (1 year, immutable);
+    # unversioned assets must be revalidated so changes on disk are picked up immediately.
+    if request.path.startswith("/assets/"):
+        if request.args.get("v"):
+            response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        else:
+            response.headers["Cache-Control"] = "public, no-cache, must-revalidate"
+            response.headers.pop("Expires", None)
+        return response
+
+    if response.mimetype == "text/html" and response.status_code == 200:
+        response.headers["Cache-Control"] = "no-cache, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.add_etag()
+        return response.make_conditional(request)
+
+    return response
 
 
 # endregion
@@ -261,7 +349,7 @@ def index():
     repo_description = git["repo"]["description"]
 
     # Use cached projects data
-    projects = get_projects(limit=3)
+    projects = get_projects(limit=8)
 
     # Special names
     if repo_name == "nathanwoodburn.github.io":
@@ -499,114 +587,6 @@ def supersecretpath():
     return render_template("ascii.html", ascii_art=ascii_art_html)
 
 
-@app.route("/hosting/send-enquiry", methods=["POST"])
-def hosting_post():
-    if not request.is_json or not request.json:
-        return json_response(request, "No JSON data provided", 415)
-
-    # Keys
-    # email, cpus, memory, disk, backups, message
-    required_keys = ["email", "cpus", "memory", "disk", "backups", "message"]
-    for key in required_keys:
-        if key not in request.json:
-            return json_response(request, f"Missing key: {key}", 400)
-
-    email = request.json["email"]
-    ip = getClientIP(request)
-    print(f"Hosting enquiry from {email} ({ip})")
-
-    # Check rate limits
-    current_time = datetime.datetime.now(datetime.UTC).timestamp()
-
-    # Check email rate limit
-    if email in EMAIL_REQUEST_COUNT:
-        if (
-            current_time - EMAIL_REQUEST_COUNT[email]["last_reset"]
-        ) > RATE_LIMIT_WINDOW:
-            # Reset counter if the time window has passed
-            EMAIL_REQUEST_COUNT[email] = {"count": 1, "last_reset": current_time}
-        else:
-            # Increment counter
-            EMAIL_REQUEST_COUNT[email]["count"] += 1
-            if EMAIL_REQUEST_COUNT[email]["count"] > EMAIL_RATE_LIMIT:
-                return json_response(
-                    request, "Rate limit exceeded. Please try again later.", 429
-                )
-    else:
-        # First request for this email
-        EMAIL_REQUEST_COUNT[email] = {"count": 1, "last_reset": current_time}
-
-    # Check IP rate limit
-    if ip in IP_REQUEST_COUNT:
-        if (current_time - IP_REQUEST_COUNT[ip]["last_reset"]) > RATE_LIMIT_WINDOW:
-            # Reset counter if the time window has passed
-            IP_REQUEST_COUNT[ip] = {"count": 1, "last_reset": current_time}
-        else:
-            # Increment counter
-            IP_REQUEST_COUNT[ip]["count"] += 1
-            if IP_REQUEST_COUNT[ip]["count"] > IP_RATE_LIMIT:
-                return json_response(
-                    request, "Rate limit exceeded. Please try again later.", 429
-                )
-    else:
-        # First request for this IP
-        IP_REQUEST_COUNT[ip] = {"count": 1, "last_reset": current_time}
-
-    cpus = request.json["cpus"]
-    memory = request.json["memory"]
-    disk = request.json["disk"]
-    backups = request.json["backups"]
-    message = request.json["message"]
-
-    # Try to convert to correct types
-    try:
-        cpus = int(cpus)
-        memory = float(memory)
-        disk = int(disk)
-        backups = backups in [True, "true", "True", 1, "1", "yes", "Yes"]
-        message = str(message)
-        email = str(email)
-    except ValueError:
-        return json_response(request, "Invalid data types", 400)
-
-    # Basic validation
-    if not isinstance(cpus, int) or cpus < 1 or cpus > 64:
-        return json_response(request, "Invalid CPUs", 400)
-    if not isinstance(memory, float) or memory < 0.5 or memory > 512:
-        return json_response(request, "Invalid memory", 400)
-    if not isinstance(disk, int) or disk < 10 or disk > 500:
-        return json_response(request, "Invalid disk", 400)
-    if not isinstance(backups, bool):
-        return json_response(request, "Invalid backups", 400)
-    if not isinstance(message, str) or len(message) > 1000:
-        return json_response(request, "Invalid message", 400)
-    if not isinstance(email, str) or len(email) > 100 or "@" not in email:
-        return json_response(request, "Invalid email", 400)
-
-    # Send to Discord webhook
-    webhook_url = os.getenv("HOSTING_WEBHOOK")
-    if not webhook_url:
-        return json_response(request, "Hosting webhook not set", 500)
-
-    data = {
-        "content": "",
-        "embeds": [
-            {
-                "title": "Hosting Enquiry",
-                "description": f"Email: {email}\nCPUs: {cpus}\nMemory: {memory}GB\nDisk: {disk}GB\nBackups: {backups}\nMessage: {message}",
-                "color": 16711680,  # Red color
-            }
-        ],
-    }
-    headers = {
-        "Content-Type": "application/json",
-    }
-    response = requests.post(webhook_url, json=data, headers=headers)
-    if response.status_code != 204 and response.status_code != 200:
-        return json_response(request, "Failed to send enquiry", 500)
-    return json_response(request, "Enquiry sent", 200)
-
-
 @app.route("/resume")
 def resume():
     if isCLI(request):
@@ -680,6 +660,9 @@ def catch_all(path: str):
     if path.lower().replace(".html", "") in RESTRICTED_ROUTES:
         return error_response(request, message="Restricted route", code=403)
 
+    if path.lower().replace(".html", "") in EXCEMPT_ROUTES:
+        return error_response(request)
+
     # If curl request, return curl response
     if isCLI(request):
         return curl_response(request)
@@ -740,7 +723,7 @@ if __name__ == "__main__":
     # If --host argument is passed, use that as host, otherwise use 127.0.0.1
     parser = argparse.ArgumentParser(description="Run the Flask server.")
     parser.add_argument("--host", type=str, default="127.0.0.1")
-
+    parser.add_argument("--port", type=int, default="5000")
     args = parser.parse_args()
 
-    app.run(debug=True, port=5000, host=args.host)
+    app.run(debug=True, port=args.port, host=args.host)

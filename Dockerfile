@@ -39,9 +39,12 @@ WORKDIR /app
 COPY --from=build /app/.venv /app/.venv
 ENV PATH="/app/.venv/bin:$PATH"
 
-COPY *.py ./
-COPY templates templates
-COPY data data
+# Only copy files required for resume PDF generation to maximize layer caching
+COPY tools.py ./
+COPY data/resume.json data/resume.json
+COPY templates/resume.html templates/resume.html
+COPY templates/resume.ascii templates/resume.ascii
+COPY templates/assets templates/assets
 
 # Generate the PDF files during build
 RUN python3 tools.py --build-resume
@@ -61,15 +64,17 @@ WORKDIR /app
 # Copy the virtual environment from build stage
 COPY --from=build --chown=appuser:appgroup /app/.venv /app/.venv
 
-# Copy all top-level Python files
-COPY --chown=appuser:appgroup *.py ./
-
-# Copy application directories (including pre-built PDFs in data from pdf-builder)
+# Copy application directories and assets
 COPY --chown=appuser:appgroup blueprints blueprints
 COPY --chown=appuser:appgroup templates templates
-COPY --from=pdf-builder --chown=appuser:appgroup /app/data data
+COPY --chown=appuser:appgroup data data
+# Overlay pre-built PDFs from pdf-builder
+COPY --from=pdf-builder --chown=appuser:appgroup /app/data/resume.pdf data/resume.pdf
+COPY --from=pdf-builder --chown=appuser:appgroup /app/data/resume_support.pdf data/resume_support.pdf
 COPY --chown=appuser:appgroup pwa pwa
 COPY --chown=appuser:appgroup .well-known .well-known
+# Copy top-level Python files
+COPY --chown=appuser:appgroup *.py ./
 
 USER appuser
 EXPOSE 5000

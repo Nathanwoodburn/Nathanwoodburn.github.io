@@ -1,0 +1,36 @@
+/* ==========================================================================
+   Global Responsive Layout Boundaries
+   ========================================================================== */
+html {
+    min-height: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-x: clip;
+    scroll-behavior: smooth;
+    scroll-padding-top: 75px;
+}
+
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    height: auto !important;
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-x: clip;
+}
+
+img, svg, video, canvas, audio, iframe, embed, object {
+    max-width: 100%;
+    height: auto;
+}
+
+main {
+    flex: 1 0 auto;
+    max-width: 100%;
+}
+
+footer {
+    margin-top: auto;
+}

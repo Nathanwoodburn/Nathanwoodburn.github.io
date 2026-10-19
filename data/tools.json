@@ -1,11 +1,5 @@
 [
     {
-        "name":"Obsidian", 
-        "type":"Desktop Applications",
-        "url":"https://obsidian.md/",
-        "description":"Note taking app that stores everything in Markdown files"
-    },
-    {
         "name": "Alacritty",
         "type": "Desktop Applications",
         "url": "https://alacritty.org/",
@@ -16,12 +10,6 @@
         "type": "Desktop Applications",
         "url": "https://brave.com/",
         "description": "Privacy-focused web browser"
-    },
-    {
-        "name": "VSCode",
-        "type": "Desktop Applications",
-        "url": "https://code.visualstudio.com/",
-        "description": "Source-code editor developed by Microsoft"
     },
     {
         "name": "Vesktop",
@@ -115,10 +103,10 @@
         "description": "A powerful yet easy to use web interface for managing Nginx proxy hosts"
     },
     {
-        "name": "Tailscale",
+        "name": "Netbird",
         "type": "Server Management",
-        "url": "https://tailscale.com/",
-        "description": "A zero-config VPN that just works"
+        "url": "https://netbird.io/",
+        "description": "Self hosted VPN network"
     },
     {
         "name": "Authentik",
@@ -151,10 +139,10 @@
         "description": "A simple, fast, privacy-focused alternative to Google Analytics"
     },
     {
-        "name": "PhotoPrism",
+        "name": "Immich",
         "type": "Self-Hosting Services",
-        "url": "https://photoprism.app/",
-        "description": "AI-powered app for browsing, organizing & sharing your photo collection"
+        "url": "https://immich.app/",
+        "description": "Self-hosted photo and video management solution"
     },
     {
         "name": "FreeScout",
@@ -167,5 +155,17 @@
         "type": "Miscellaneous",
         "url": "https://github.com/dani-garcia/vaultwarden",
         "description": "Password manager server implementation compatible with Bitwarden clients"
+    },
+    {
+        "name": "NeoVim",
+        "type": "Terminal Tools",
+        "url": "https://neovim.io/",
+        "description": "Vim-based text editor"
+    },
+    {
+        "name": "MailCow",
+        "type": "Self-Hosting Services",
+        "url": "https://docs.mailcow.email/",
+        "description": "All in one email server system"
     }
 ]

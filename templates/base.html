@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="en-au"{% block html_attrs %}{% endblock %}>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>{% block title %}Nathan.Woodburn/{% endblock %}</title>
+    <meta name="theme-color" content="{% block theme_color %}#000000{% endblock %}">
+
+    {% block meta %}
+    <link rel="canonical" href="{% block canonical %}{{ canonical_url }}{% endblock %}">
+    <meta property="og:url" content="{% block og_url %}{{ canonical_url }}{% endblock %}">
+    <meta name="fediverse:creator" content="@nathanwoodburn@mastodon.woodburn.au">
+    <meta name="twitter:description" content="{% block meta_description %}G'day, this is my personal website. You can find out about me or check out some of my projects.{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}Nathan.Woodburn/{% endblock %}">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content="{% block meta_image %}{{ site_url }}/assets/img/profile.jpg{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta name="twitter:title" content="{% block twitter_title %}Nathan.Woodburn/{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}G'day, this is my personal website. You can find out about me or check out some of my projects.{% endblock %}">
+    <meta name="description" content="{% block description %}G'day, this is my personal website. You can find out about me or check out some of my projects.{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{{ site_url }}/assets/img/profile.jpg{% endblock %}">
+    {% endblock %}
+
+    {% block json_ld %}
+    <script type="application/ld+json">
+        {
+            "@context": "http://schema.org",
+            "@type": "WebSite",
+            "name": "Nathan.Woodburn/",
+            "url": "https://nathan.woodburn.au"
+        }
+    </script>
+    {% endblock %}
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="/assets/img/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="180x180" href="/assets/img/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/img/favicon/android-chrome-512x512.png">
+    <link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
+
+    {% block head_extra %}{% endblock %}
+
+    <!-- Preconnect for external resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://umami.woodburn.au">
+
+    <!-- Fonts & Core Stylesheets -->
+    <link rel="stylesheet" href="{{ asset_url('bootstrap/css/bootstrap.min.css') }}">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Anonymous+Pro&amp;family=Cabin:wght@700&amp;family=Lora:ital,wght@0,400;0,700;1,400;1,700&amp;family=Roboto:wght@300;400;500;700&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anonymous+Pro&amp;family=Cabin:wght@700&amp;family=Lora:ital,wght@0,400;0,700;1,400;1,700&amp;family=Roboto:wght@300;400;500;700&amp;display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anonymous+Pro&amp;family=Cabin:wght@700&amp;family=Lora:ital,wght@0,400;0,700;1,400;1,700&amp;family=Roboto:wght@300;400;500;700&amp;display=swap"></noscript>
+    <link rel="stylesheet" href="{{ asset_url('css/styles.min.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/brand-reveal.min.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/profile.min.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/Social-Icons.min.css') }}">
+
+    <link rel="me" href="https://mastodon.woodburn.au/@nathanwoodburn" />
+    <script async src="https://umami.woodburn.au/script.js" data-website-id="6a55028e-aad3-481c-9a37-3e096ff75589"></script>
+    <link rel="stylesheet" href="{{ asset_url('css/layout.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/navbar.css') }}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body {% block body_attrs %}id="page-top" data-bs-spy="scroll" data-bs-target="#mainNav" data-bs-offset="77"{% endblock %}>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js').catch(function() {});
+    });
+  }
+</script>
+{{ handshake_scripts | safe }}
+
+    {% block navbar %}
+        {% include "components/navbar.html" %}
+    {% endblock %}
+
+    <main class="flex-grow-1 d-flex flex-column">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% block footer %}
+        {% include "components/footer.html" %}
+    {% endblock %}
+
+    {% block body_end %}{% endblock %}
+
+    <!-- Core Scripts -->
+    <script defer src="{{ asset_url('bootstrap/js/bootstrap.min.js') }}"></script>
+    <script defer src="{{ asset_url('js/script.min.js') }}"></script>
+    <script defer src="{{ asset_url('js/hacker.min.js') }}"></script>
+
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

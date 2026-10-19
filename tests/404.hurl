@@ -1,0 +1,18 @@
+GET http://127.0.0.1:5000/404
+HTTP 404
+
+GET http://127.0.0.1:5000/404.html
+HTTP 404
+
+GET http://127.0.0.1:5000/hero
+HTTP 404
+
+GET http://127.0.0.1:5000/ascii
+HTTP 403
+
+GET http://127.0.0.1:5000/header
+HTTP 404
+
+GET http://127.0.0.1:5000/footer
+HTTP 404
+

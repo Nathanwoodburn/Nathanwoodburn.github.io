@@ -1,0 +1,36 @@
+{# ==========================================================================
+   Main Navigation Header
+   To add, remove, or edit links across the entire site, simply update the
+   nav_links list below.
+   ========================================================================== #}
+{% set default_nav_links = [
+    ('/', 'Home', 'home'),
+    ('/tools', 'Tools', 'tools'),
+    ('/blog', 'Blog', 'blog'),
+    ('/now', 'Now', 'now'),
+    ('/resume', 'Resume', 'resume')
+] %}
+{% set links_to_render = nav_links or default_nav_links %}
+
+<nav class="navbar navbar-expand-md fixed-top navbar-dark" id="mainNav">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <div class="navbar-brand-inner">
+                <div class="slider"><span>/</span></div>
+                <span class="brand">Nathan.Woodburn</span>
+            </div>
+        </a>
+        <button class="navbar-toggler navbar-toggler-right" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" type="button" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation" value="Menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ms-auto">
+                {% for url, label, page_id in links_to_render %}
+                <li class="nav-item">
+                    <a class="nav-link{% if active_page == page_id %} active{% endif %}" href="{{ url }}">{{ label }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</nav>

@@ -8,9 +8,15 @@ jobs:
     runs-on: [ubuntu-latest, amd]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - name: Build Docker image
-        run : |          
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        run: |
+          docker buildx create --name gitea-builder --driver docker-container --use
+          docker buildx inspect --bootstrap
+
+      - name: Build and push Docker image with caching
+        run: |
           echo "${{ secrets.DOCKERGIT_TOKEN }}" | docker login git.woodburn.au -u nathanwoodburn --password-stdin
           echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
           tag=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
@@ -23,10 +29,15 @@ jobs:
           else
             tag_num="${tag}-${tag_num}"
           fi
-          
 
-          docker build -t nathanwoodburn:$tag_num .
-          docker tag nathanwoodburn:$tag_num git.woodburn.au/nathanwoodburn/nathanwoodburn:$tag_num
-          docker push git.woodburn.au/nathanwoodburn/nathanwoodburn:$tag_num
-          docker tag nathanwoodburn:$tag_num git.woodburn.au/nathanwoodburn/nathanwoodburn:$tag
-          docker push git.woodburn.au/nathanwoodburn/nathanwoodburn:$tag
+          REGISTRY_IMAGE="git.woodburn.au/nathanwoodburn/nathanwoodburn"
+          echo "Building and pushing tags: ${REGISTRY_IMAGE}:${tag_num} and ${REGISTRY_IMAGE}:${tag}"
+
+          docker buildx build \
+            --push \
+            --tag "${REGISTRY_IMAGE}:${tag_num}" \
+            --tag "${REGISTRY_IMAGE}:${tag}" \
+            --cache-from "type=registry,ref=${REGISTRY_IMAGE}:buildcache" \
+            --cache-from "type=registry,ref=${REGISTRY_IMAGE}:latest" \
+            --cache-to "type=registry,ref=${REGISTRY_IMAGE}:buildcache,mode=max" \
+            .
