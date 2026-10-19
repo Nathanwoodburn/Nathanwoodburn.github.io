@@ -69,10 +69,10 @@
 
 <body {% block body_attrs %}id="page-top" data-bs-spy="scroll" data-bs-target="#mainNav" data-bs-offset="77"{% endblock %}>
 <script>
-  if (typeof navigator.serviceWorker !== 'undefined') {
-    navigator.serviceWorker.register('/sw.js').then(function(reg) {
-      reg.update();
-    }).catch(function() {});
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js').catch(function() {});
+    });
   }
 </script>
 {{ handshake_scripts | safe }}
