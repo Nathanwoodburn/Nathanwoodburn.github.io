@@ -21,3 +21,9 @@ HTTP 200
 
 GET http://127.0.0.1:5000/assets/nathan3dprinting.webp
 HTTP 200
+
+GET http://127.0.0.1:5000/about
+HTTP 200
+[Asserts]
+xpath "//a[contains(@class, 'about-slideout-link')]" exists
+xpath "//svg[contains(@class, 'about-slideout-btn')]" exists

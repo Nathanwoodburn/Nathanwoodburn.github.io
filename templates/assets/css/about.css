@@ -1,15 +1,30 @@
 /* ==========================================================================
    About Page Styles
    ========================================================================== */
+body.about-body,
 body.about-page-body {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
     text-align: center;
     color: rgb(255, 255, 255);
     background: transparent;
+    transition: transform 0.8s ease-in-out, top 0.8s ease-in-out;
 }
 
 .about-profile-container {
     margin-bottom: 2em;
     margin-top: 5em;
+    width: 100%;
 }
 
 .about-profile-img {
@@ -18,18 +33,48 @@ body.about-page-body {
 
 .about-title {
     margin-bottom: 0.5em;
+    width: 100%;
 }
 
 .about-contact-section {
     padding-top: 0;
     padding-bottom: 3em;
+    width: 100%;
 }
 
 .about-bio {
     margin-top: 1em;
+    width: 100%;
+}
+
+.about-slideout-link {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 2rem;
+    align-self: center;
+    color: inherit;
+    text-decoration: none;
 }
 
 .about-slideout-btn {
     font-size: 50px;
     cursor: pointer;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    align-self: center;
+    transition: transform 0.2s ease-in-out;
 }
+
+.about-slideout-link:hover .about-slideout-btn,
+.about-slideout-btn:hover {
+    transform: translateY(6px);
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
