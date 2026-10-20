@@ -1,17 +1,14 @@
 import datetime
 import os
-import re
 from zoneinfo import ZoneInfo
 
-import requests
-from dateutil import parser as date_parser
 from flask import Blueprint, jsonify, request
 
 from blueprints import sol
 from blueprints.spotify import get_playing_spotify_track
 from cache_helper import get_git_latest_activity
 from mail import sendEmail
-from tools import get_tools_data, getClientIP, getGitCommit, json_response, parse_date
+from tools import get_tools_data, getClientIP, getGitCommit, json_response
 
 # Constants
 HTTP_OK = 200
@@ -40,7 +37,6 @@ def help():
                 "/timezone": "Get the current timezone",
                 "/project": "Get the current project from git",
                 "/version": "Get the current version of the website",
-                "/page_date?url=URL&verbose=BOOL": "Get the last modified date of a webpage (verbose is optional, default false)",
                 "/tools": "Get a list of tools used by Nathan Woodburn",
                 "/playing": "Get the currently playing Spotify track",
                 "/status": "Just check if the site is up",
@@ -201,140 +197,3 @@ def headers():
         headers.pop(key)
 
     return jsonify({"headers": headers, "ip": getClientIP(request), "status": HTTP_OK})
-
-
-@app.route("/page_date")
-def page_date():
-    url = request.args.get("url")
-    if not url:
-        return json_response(request, "400 Bad Request 'url' missing", HTTP_BAD_REQUEST)
-
-    verbose = request.args.get("verbose", "").lower() in ["true", "1", "yes", "y"]
-
-    if not url.startswith(("https://", "http://")):
-        return json_response(request, "400 Bad Request 'url' invalid", HTTP_BAD_REQUEST)
-
-    try:
-        r = requests.get(url, timeout=5)
-        r.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        return json_response(
-            request, f"400 Bad Request 'url' unreachable: {e}", HTTP_BAD_REQUEST
-        )
-
-    page_text = r.text
-
-    # Remove ordinal suffixes globally
-    page_text = re.sub(r"(\d+)(st|nd|rd|th)", r"\1", page_text, flags=re.IGNORECASE)
-    # Remove HTML comments
-    page_text = re.sub(r"<!--.*?-->", "", page_text, flags=re.DOTALL)
-
-    date_patterns = [
-        r"(\d{4})[/-](\d{1,2})[/-](\d{1,2})",  # YYYY-MM-DD
-        r"(\d{1,2})[/-](\d{1,2})[/-](\d{4})",  # DD-MM-YYYY
-        r"(?:Last updated:|Updated:|Updated last:)?\s*(\d{1,2})\s+([A-Za-z]{3,9})[, ]?\s*(\d{4})",  # DD Month YYYY
-        r"(?:\b\w+\b\s+){0,3}([A-Za-z]{3,9})\s+(\d{1,2}),?\s*(\d{4})",  # Month DD, YYYY with optional words
-        r"\b(\d{4})(\d{2})(\d{2})\b",  # YYYYMMDD
-        r"(?:Last updated:|Updated:|Last update)?\s*([A-Za-z]{3,9})\s+(\d{4})",  # Month YYYY only
-    ]
-
-    # Structured data patterns
-    json_date_patterns = {
-        r'"datePublished"\s*:\s*"([^"]+)"': "published",
-        r'"dateModified"\s*:\s*"([^"]+)"': "modified",
-        r'<meta\s+(?:[^>]*?)property\s*=\s*"article:published_time"\s+content\s*=\s*"([^"]+)"': "published",
-        r'<meta\s+(?:[^>]*?)property\s*=\s*"article:modified_time"\s+content\s*=\s*"([^"]+)"': "modified",
-        r'<time\s+datetime\s*=\s*"([^"]+)"': "published",
-    }
-
-    found_dates = []
-
-    # Extract content dates
-    for idx, pattern in enumerate(date_patterns):
-        for match in re.findall(pattern, page_text):
-            if not match:
-                continue
-            groups = match[-3:]  # last three elements
-            found_dates.append([groups, idx, "content"])
-
-    # Extract structured data dates
-    for pattern, date_type in json_date_patterns.items():
-        for match in re.findall(pattern, page_text):
-            try:
-                dt = date_parser.isoparse(match)
-                formatted_date = dt.strftime("%Y-%m-%d")
-                found_dates.append([[formatted_date], -1, date_type])
-            except (ValueError, TypeError):
-                continue
-
-    if not found_dates:
-        return json_response(request, "Date not found on page", HTTP_BAD_REQUEST)
-
-    today = datetime.datetime.now(tz=datetime.UTC).date()
-    tolerance_date = today + datetime.timedelta(
-        days=1
-    )  # Allow for slight future dates (e.g., time zones)
-    # When processing dates
-    processed_dates = []
-    for date_groups, pattern_format, date_type in found_dates:
-        if pattern_format == -1:
-            # Already formatted date
-            try:
-                dt = (
-                    datetime.datetime.strptime(date_groups[0], "%Y-%m-%d")
-                    .replace(tzinfo=datetime.UTC)
-                    .date()
-                )
-            except ValueError:
-                continue
-        else:
-            parsed_date = parse_date(date_groups)
-            if not parsed_date:
-                continue
-            dt = (
-                datetime.datetime.strptime(parsed_date, "%Y-%m-%d")
-                .replace(tzinfo=datetime.UTC)
-                .date()
-            )
-
-        # Only keep dates in the past (with tolerance)
-        if dt <= tolerance_date:
-            date_obj = {"date": dt.strftime("%Y-%m-%d"), "type": date_type}
-            if verbose:
-                if pattern_format == -1:
-                    date_obj.update(
-                        {
-                            "source": "metadata",
-                            "pattern_used": pattern_format,
-                            "raw": date_groups[0],
-                        }
-                    )
-                else:
-                    date_obj.update(
-                        {
-                            "source": "content",
-                            "pattern_used": pattern_format,
-                            "raw": " ".join(date_groups),
-                        }
-                    )
-            processed_dates.append(date_obj)
-
-    if not processed_dates:
-        if verbose:
-            return jsonify(
-                {
-                    "message": "No valid dates found on page",
-                    "found_dates": found_dates,
-                    "processed_dates": processed_dates,
-                }
-            ), HTTP_BAD_REQUEST
-        return json_response(request, "No valid dates found on page", HTTP_BAD_REQUEST)
-    # Sort dates and return latest
-    processed_dates.sort(key=lambda x: x["date"])
-    latest = processed_dates[-1]
-
-    response = {"latest": latest["date"], "type": latest["type"]}
-    if verbose:
-        response["dates"] = processed_dates
-
-    return json_response(request, response, HTTP_OK)
