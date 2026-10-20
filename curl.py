@@ -7,16 +7,26 @@ from blueprints.spotify import get_playing_spotify_track
 from cache_helper import get_git_latest_activity
 from cache_helper import get_projects as get_projects_cached
 from tools import (
+    MAX_WIDTH,
     get_resume_data,
     get_resume_md,
     get_resume_txt,
+    get_terminal_width,
     get_tools_data,
     getAddress,
     getClientIP,
     parse_support_arg,
+    wrap_ascii_text,
 )
 
-MAX_WIDTH = 80
+
+def ascii_response(content: str, code: int = 200, width: int = MAX_WIDTH):
+    """Return plain-text HTTP response with automated terminal line wrapping."""
+    return (
+        wrap_ascii_text(content, width=width),
+        code,
+        {"Content-Type": "text/plain; charset=utf-8"},
+    )
 
 
 def clean_path(path: str):
@@ -61,33 +71,32 @@ def get_projects():
 def curl_response(request):
     # Check if <path>.ascii exists
     path = clean_path(request.path)
+    width = get_terminal_width(request)
 
     # Handle special cases
     if path == "index":
         # Get current project
-        return (
+        return ascii_response(
             render_template(
                 "index.ascii",
                 repo=get_current_project(),
                 ip=getClientIP(request),
                 spotify=get_playing_spotify_track(),
             ),
-            200,
-            {"Content-Type": "text/plain; charset=utf-8"},
+            width=width,
         )
     if path == "projects":
         # Get projects
-        return (
+        return ascii_response(
             render_template(
                 "projects.ascii", header=get_header(), projects=get_projects()
             ),
-            200,
-            {"Content-Type": "text/plain; charset=utf-8"},
+            width=width,
         )
 
     if path == "donate":
         # Get donation info
-        return (
+        return ascii_response(
             render_template(
                 "donate.ascii",
                 header=get_header(),
@@ -96,18 +105,16 @@ def curl_response(request):
                 SOL=getAddress("SOL"),
                 ETH=getAddress("ETH"),
             ),
-            200,
-            {"Content-Type": "text/plain; charset=utf-8"},
+            width=width,
         )
 
     if path == "donate/more":
         coinList = os.listdir(".well-known/wallets")
         coinList = [file for file in coinList if file[0] != "."]
         coinList.sort()
-        return (
+        return ascii_response(
             render_template("donate_more.ascii", header=get_header(), coins=coinList),
-            200,
-            {"Content-Type": "text/plain; charset=utf-8"},
+            width=width,
         )
 
     # For other donation pages, fall back to ascii if it exists
@@ -115,37 +122,34 @@ def curl_response(request):
         coin = path.split("/")[1]
         address = getAddress(coin)
         if address != "":
-            return (
+            return ascii_response(
                 render_template(
                     "donate_coin.ascii",
                     header=get_header(),
                     coin=coin.upper(),
                     address=address,
                 ),
-                200,
-                {"Content-Type": "text/plain; charset=utf-8"},
+                width=width,
             )
 
     if path == "tools":
         tools = get_tools_data()
-        return (
+        return ascii_response(
             render_template("tools.ascii", header=get_header(), tools=tools),
-            200,
-            {"Content-Type": "text/plain; charset=utf-8"},
+            width=width,
         )
 
     if path in ("resume", "resume.ascii"):
         support = parse_support_arg(request)
         resume_data = get_resume_data(support=support)
-        return (
+        return ascii_response(
             render_template(
                 "resume.ascii",
                 header=get_header(),
                 resume=resume_data,
                 support=support,
             ),
-            200,
-            {"Content-Type": "text/plain; charset=utf-8"},
+            width=width,
         )
 
     if path == "resume.json":
@@ -163,7 +167,7 @@ def curl_response(request):
     if path == "resume.txt":
         support = parse_support_arg(request)
         return (
-            get_resume_txt(support=support),
+            get_resume_txt(support=support, width=width),
             200,
             {"Content-Type": "text/plain; charset=utf-8"},
         )
@@ -171,10 +175,9 @@ def curl_response(request):
     if path == "pgp" or path == "gpg":
         return send_file("data/nathanwoodburn.asc")
     if os.path.exists(f"templates/{path}.ascii"):
-        return (
+        return ascii_response(
             render_template(f"{path}.ascii", header=get_header()),
-            200,
-            {"Content-Type": "text/plain; charset=utf-8"},
+            width=width,
         )
     # Fallback to html if it exists
     if os.path.exists(f"templates/{path}.html"):
@@ -185,10 +188,10 @@ def curl_response(request):
         "code": 404,
         "message": "The requested resource was not found on this server.",
     }
-    return (
+    return ascii_response(
         render_template("error.ascii", header=get_header(), error=error),
-        404,
-        {"Content-Type": "text/plain; charset=utf-8"},
+        code=404,
+        width=width,
     )
 
 

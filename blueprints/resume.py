@@ -6,8 +6,10 @@ from tools import (
     get_resume_md,
     get_resume_pdf,
     get_resume_txt,
+    get_terminal_width,
     isCLI,
     parse_support_arg,
+    wrap_ascii_text,
 )
 
 app = Blueprint("resume", __name__)
@@ -51,7 +53,8 @@ def resume_md():
 @app.route("/resume.txt")
 def resume_txt():
     support = parse_support_arg(request)
-    txt_content = get_resume_txt(support=support)
+    width = get_terminal_width(request)
+    txt_content = get_resume_txt(support=support, width=width)
     return txt_content, 200, {"Content-Type": "text/plain; charset=utf-8"}
 
 
@@ -59,13 +62,15 @@ def resume_txt():
 def resume_ascii():
     support = parse_support_arg(request)
     resume_data = get_resume_data(support=support)
+    width = get_terminal_width(request)
+    output = render_template(
+        "resume.ascii",
+        header=get_header(),
+        resume=resume_data,
+        support=support,
+    )
     return (
-        render_template(
-            "resume.ascii",
-            header=get_header(),
-            resume=resume_data,
-            support=support,
-        ),
+        wrap_ascii_text(output, width=width),
         200,
         {"Content-Type": "text/plain; charset=utf-8"},
     )

@@ -1,3 +1,4 @@
+import contextlib
 import datetime
 import json
 import os
@@ -31,6 +32,91 @@ CRAWLERS = [
 ]
 
 CLI_AGENTS = ["curl", "hurl", "xh", "Posting", "HTTPie", "nushell"]
+
+MAX_WIDTH = 80
+ANSI_REGEX = re.compile(r"\x1b\[[0-9;]*[a-zA-Z]")
+
+
+def visible_len(s: str) -> int:
+    """Calculate visible character length of a string, ignoring ANSI escape codes."""
+    return len(ANSI_REGEX.sub("", s))
+
+
+def get_terminal_width(request=None, default: int = MAX_WIDTH) -> int:
+    """Determine terminal column width from request query param or local terminal size."""
+    if request is not None:
+        val = request.args.get("width") or request.args.get("cols")
+        if val and val.isdigit():
+            w = int(val)
+            if 40 <= w <= 240:
+                return w
+        return default
+
+    with contextlib.suppress(OSError, ValueError):
+        cols = shutil.get_terminal_size((default, 24)).columns
+        if 40 <= cols <= 240:
+            return cols
+
+    return default
+
+
+def wrap_line(line: str, width: int = MAX_WIDTH) -> list[str]:
+    """Wrap a single line of text (preserving ANSI codes and bullet indentations) to width."""
+    if visible_len(line) <= width:
+        return [line]
+
+    # Detect bullet or indented list prefix
+    match_bullet = re.match(r"^(\s*[•\*\-]\s+)(.*)$", line)
+    if match_bullet:
+        prefix = match_bullet.group(1)
+        content = match_bullet.group(2)
+        subsequent_indent = " " * visible_len(prefix)
+    else:
+        match_spaces = re.match(r"^(\s+)(.*)$", line)
+        if match_spaces:
+            prefix = match_spaces.group(1)
+            content = match_spaces.group(2)
+            subsequent_indent = prefix
+        else:
+            prefix = ""
+            content = line
+            subsequent_indent = ""
+
+    words = content.split(" ")
+    wrapped_lines: list[str] = []
+    current_line = prefix
+
+    for word in words:
+        if not word and current_line != prefix and current_line != subsequent_indent:
+            cand = current_line + " "
+        elif current_line == prefix or current_line == subsequent_indent:
+            cand = current_line + word
+        else:
+            cand = current_line + " " + word
+
+        if visible_len(cand) <= width:
+            current_line = cand
+        else:
+            if current_line.strip():
+                wrapped_lines.append(current_line)
+            current_line = subsequent_indent + word
+
+    if current_line.strip():
+        wrapped_lines.append(current_line)
+
+    return wrapped_lines or [line]
+
+
+def wrap_ascii_text(text: str, width: int = MAX_WIDTH) -> str:
+    """Wrap multi-line text (preserving ANSI codes) to a maximum terminal column width."""
+    lines = text.splitlines()
+    wrapped: list[str] = []
+    for line in lines:
+        wrapped.extend(wrap_line(line, width=width))
+    result = "\n".join(wrapped)
+    if text.endswith("\n"):
+        result += "\n"
+    return result
 
 
 def getClientIP(request: Request) -> str:
@@ -459,13 +545,17 @@ def get_resume_md(support: bool = False, resume_data: dict | None = None) -> str
     return "\n".join(lines).strip() + "\n"
 
 
-def get_resume_txt(support: bool = False, resume_data: dict | None = None) -> str:
+def get_resume_txt(
+    support: bool = False,
+    resume_data: dict | None = None,
+    width: int = MAX_WIDTH,
+) -> str:
     """Generate a clean plain text representation of the resume."""
     if resume_data is None:
         resume_data = get_resume_data(support=support)
 
-    divider = "=" * 80
-    sub_divider = "-" * 80
+    divider = "=" * width
+    sub_divider = "-" * width
 
     lines = [divider]
     lines.append(resume_data.get("name", "Nathan Woodburn").upper())
@@ -489,7 +579,7 @@ def get_resume_txt(support: bool = False, resume_data: dict | None = None) -> st
                 if (not url or url.startswith(("tel:", "mailto:")))
                 else (f"{label} ({url})" if label != url else url)
             )
-            lines.append(f"{c_type + ':':<11} {val}")
+            lines.extend(wrap_line(f"{c_type + ':':<11} {val}", width=width))
         lines.append("")
 
     # Summary
@@ -497,7 +587,7 @@ def get_resume_txt(support: bool = False, resume_data: dict | None = None) -> st
     if summary:
         lines.append("SUMMARY")
         lines.append(sub_divider)
-        lines.append(summary)
+        lines.extend(wrap_line(summary, width=width))
         lines.append("")
 
     # Experience
@@ -513,11 +603,11 @@ def get_resume_txt(support: bool = False, resume_data: dict | None = None) -> st
 
             role_company = f"{role} — {company}" if company else role
             meta = " | ".join([p for p in [dates, location] if p])
-            lines.append(role_company)
+            lines.extend(wrap_line(role_company, width=width))
             if meta:
                 lines.append(meta)
             for bullet in job.get("bullets", []):
-                lines.append(f"  * {bullet}")
+                lines.extend(wrap_line(f"  * {bullet}", width=width))
             lines.append("")
 
     # Projects
@@ -528,12 +618,10 @@ def get_resume_txt(support: bool = False, resume_data: dict | None = None) -> st
         for proj in projects:
             name = proj.get("name", "")
             tech = proj.get("technologies")
-            if tech:
-                lines.append(f"{name} ({tech})")
-            else:
-                lines.append(name)
+            p_header = f"{name} ({tech})" if tech else name
+            lines.extend(wrap_line(p_header, width=width))
             for bullet in proj.get("bullets", []):
-                lines.append(f"  * {bullet}")
+                lines.extend(wrap_line(f"  * {bullet}", width=width))
             lines.append("")
 
     # Education
@@ -548,11 +636,11 @@ def get_resume_txt(support: bool = False, resume_data: dict | None = None) -> st
             desc = edu.get("description")
 
             deg_inst = f"{degree} — {inst}" if inst else degree
-            lines.append(deg_inst)
+            lines.extend(wrap_line(deg_inst, width=width))
             if dates:
                 lines.append(dates)
             if desc:
-                lines.append(f"  * {desc}")
+                lines.extend(wrap_line(f"  * {desc}", width=width))
             lines.append("")
 
     # Skills
@@ -572,6 +660,7 @@ def get_resume_ascii(
     support: bool = False,
     header: str | None = None,
     resume_data: dict | None = None,
+    width: int | None = None,
 ) -> str:
     """Generate the CLI ASCII/ANSI terminal representation of the resume."""
     if resume_data is None:
@@ -584,14 +673,18 @@ def get_resume_ascii(
         else:
             header = ""
 
+    if width is None:
+        width = get_terminal_width()
+
     if os.path.exists("templates/resume.ascii"):
         with open("templates/resume.ascii", "r", encoding="utf-8") as f:
             template_str = f.read()
-        return jinja2.Template(template_str).render(
+        raw_output = jinja2.Template(template_str).render(
             header=header, resume=resume_data, support=support
         )
+        return wrap_ascii_text(raw_output, width=width)
 
-    return get_resume_txt(support=support, resume_data=resume_data)
+    return get_resume_txt(support=support, resume_data=resume_data, width=width)
 
 
 def get_resume_source_mtime() -> float:
