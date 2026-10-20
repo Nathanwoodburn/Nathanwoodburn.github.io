@@ -24,7 +24,7 @@ from qrcode.constants import ERROR_CORRECT_H, ERROR_CORRECT_L
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 # Import blueprints
-from blueprints import acme, api, blog, now, podcast, spotify, wellknown
+from blueprints import acme, api, blog, now, podcast, resume, spotify, wellknown
 from cache_helper import (
     get_coin_names,
     get_git_latest_activity,
@@ -36,17 +36,12 @@ from curl import curl_response, finger_response
 from tools import (
     error_response,
     generate_sitemap,
-    get_resume_data,
-    get_resume_md,
-    get_resume_pdf,
-    get_resume_txt,
     get_tools_data,
     getAddress,
     getFilePath,
     getHandshakeScript,
     isCLI,
     isFinger,
-    parse_support_arg,
 )
 
 app = Flask(__name__)
@@ -56,7 +51,7 @@ CORS(app)
 
 
 # Register blueprints
-for module in [now, blog, wellknown, api, podcast, acme, spotify]:
+for module in [now, blog, wellknown, api, podcast, acme, spotify, resume]:
     app.register_blueprint(module.app)
 
 
@@ -585,62 +580,6 @@ def supersecretpath():
     converter = Ansi2HTMLConverter()
     ascii_art_html = converter.convert(ascii_art)
     return render_template("ascii.html", ascii_art=ascii_art_html)
-
-
-@app.route("/resume")
-def resume():
-    if isCLI(request):
-        return curl_response(request)
-    support = parse_support_arg(request)
-    resume_data = get_resume_data(support=support)
-    return render_template("resume.html", resume=resume_data, support=support)
-
-
-@app.route("/resume.json")
-def resume_json():
-    support = parse_support_arg(request)
-    resume_data = get_resume_data(support=support)
-    return jsonify(resume_data)
-
-
-@app.route("/resume.md")
-def resume_md():
-    support = parse_support_arg(request)
-    md_content = get_resume_md(support=support)
-    return md_content, 200, {"Content-Type": "text/markdown; charset=utf-8"}
-
-
-@app.route("/resume.txt")
-def resume_txt():
-    support = parse_support_arg(request)
-    txt_content = get_resume_txt(support=support)
-    return txt_content, 200, {"Content-Type": "text/plain; charset=utf-8"}
-
-
-@app.route("/resume.ascii")
-def resume_ascii():
-    support = parse_support_arg(request)
-    resume_data = get_resume_data(support=support)
-    from curl import get_header
-
-    return (
-        render_template(
-            "resume.ascii",
-            header=get_header(),
-            resume=resume_data,
-            support=support,
-        ),
-        200,
-        {"Content-Type": "text/plain; charset=utf-8"},
-    )
-
-
-@app.route("/resume.pdf")
-def resume_pdf():
-    support = parse_support_arg(request)
-    force = bool(request.args.get("force") or request.args.get("rebuild"))
-    pdf_path = get_resume_pdf(support=support, force=force)
-    return send_file(pdf_path, mimetype="application/pdf")
 
 
 @app.route("/tools")

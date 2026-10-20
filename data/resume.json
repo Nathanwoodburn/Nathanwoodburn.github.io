@@ -6,7 +6,7 @@
     "support": "Technical Support Specialist"
   },
   "summaries": {
-    "default": "System Administrator specializing in Linux, Docker, and server deployments. Experienced in managing Proxmox, networks, and CI/CD pipelines. Implementing Python automations to optimize system operations. Ability to deploy and maintain server environments, self-hosted services, and web applications while ensuring reliability, scalability, and security.",
+    "default": "Systems Administrator specializing in Linux, containerization (Docker & Kubernetes), and server infrastructure. Experienced in managing Proxmox virtualization, secure networks, and CI/CD pipelines. Skilled at building Python automations to optimize operations and maintaining reliable, scalable, and secure self-hosted and web environments.",
     "support": "Technical Support Specialist with expertise in Linux, DNS, and network troubleshooting. Experienced in resolving critical domain and network issues, supporting end-users, and collaborating with engineering teams to ensure stable and secure systems. Skilled in Python automation to streamline repetitive tasks and improve operational efficiency."
   },
   "contact": [
@@ -52,7 +52,7 @@
       "degree": "Bachelor of Computing",
       "institution": "Australian National University",
       "dates": "2022 - 2026",
-      "description": null
+      "description": "Focused on computer systems, networks, operating systems, and software engineering. Applied computing theory to hands-on software development and Linux-based infrastructure projects."
     },
     {
       "degree": "Discovering Engineering",
@@ -69,11 +69,15 @@
   ],
   "skills": [
     "Python 3",
-    "Git",
+    "Bash / Shell Scripting",
+    "Linux Administration",
+    "Kubernetes",
     "Docker Containerization",
+    "Virtualization",
     "DNS",
-    "Linux administration",
-    "Technical troubleshooting"
+    "Networking & VLANs",
+    "CI/CD Pipelines",
+    "Technical Troubleshooting"
   ],
   "experience": [
     {
@@ -82,9 +86,10 @@
       "location": "Canberra",
       "dates": "Dec 2025 - Present",
       "bullets": [
-        "Configure and manage web services",
-        "Managing Kubernetes services",
-        "Building tools to assist with internal processes"
+        "Configure and administer web hosting infrastructure, web servers, and services across enterprise Linux environments.",
+        "Deploy and manage containerized workloads and services using Kubernetes, ensuring uptime, reliability, and security compliance.",
+        "Develop Python and shell automation tooling to eliminate repetitive administrative workflows, assist internal teams, and streamline deployments.",
+        "Troubleshoot complex infrastructure, networking, and DNS issues to ensure continuous availability of critical web services."
       ]
     },
     {
@@ -103,7 +108,7 @@
     {
       "role": "Small Business Owner",
       "company": "Nathan 3D Printing Service",
-      "location": null,
+      "location": "Canberra",
       "dates": "Feb 2020 - Dec 2023",
       "bullets": [
         "Operated a custom 3D printing and CAD design business independently.",
@@ -120,7 +125,7 @@
         "Maintain a personal physical server running Proxmox hypervisor.",
         "Host multiple virtual machines across three VLANs with isolated firewalls for enhanced security.",
         "Provide DNS and recursive resolver hosting services for external users.",
-        "Host a suite of self-hosted services such as Gitea, Authentik, Vaultwarden and Nextcloud."
+        "Host a suite of self-hosted services such as Gitea, Authentik, Vaultwarden, Nextcloud and MailCow."
       ]
     },
     {
