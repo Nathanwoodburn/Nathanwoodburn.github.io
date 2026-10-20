@@ -5,13 +5,13 @@ GET http://127.0.0.1:5000/resume.json
 HTTP 200
 [Asserts]
 jsonpath "$.name" == "Nathan Woodburn"
-jsonpath "$.active_title" == "Linux Systems Administrator"
+jsonpath "$.title" == "Linux Systems Administrator"
 
 GET http://127.0.0.1:5000/resume.json?support=1
 HTTP 200
 [Asserts]
 jsonpath "$.name" == "Nathan Woodburn"
-jsonpath "$.active_title" == "Technical Support Specialist"
+jsonpath "$.title" == "Technical Support Specialist"
 
 GET http://127.0.0.1:5000/resume.md
 HTTP 200
@@ -40,8 +40,11 @@ body contains "Technical Support Specialist"
 GET http://127.0.0.1:5000/resume.ascii
 HTTP 200
 [Asserts]
-body contains "RESUME: NATHAN WOODBURN"
+body contains "NATHAN WOODBURN"
 body contains "Linux Systems Administrator"
+body contains "SKILLS"
+body contains "EXPERIENCE"
+body contains "EDUCATION"
 
 GET http://127.0.0.1:5000/resume.pdf
 HTTP 200
