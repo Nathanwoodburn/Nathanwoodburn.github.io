@@ -2,11 +2,14 @@ import base64
 import os
 import time
 
+import dotenv
 import requests
 from flask import Blueprint, redirect, render_template, request, url_for
 
 from ascii_art import image_url_to_ascii
 from tools import isCLI, json_response
+
+dotenv.load_dotenv()
 
 app = Blueprint("spotify", __name__, url_prefix="/spotify")
 
@@ -28,22 +31,27 @@ TOKEN_EXPIRES = 0
 
 def refresh_access_token():
     """Refresh Spotify access token when expired."""
-    global ACCESS_TOKEN, TOKEN_EXPIRES
+    global ACCESS_TOKEN, TOKEN_EXPIRES, REFRESH_TOKEN
+
+    refresh_token = REFRESH_TOKEN or os.getenv("SPOTIFY_REFRESH_TOKEN")
+    REFRESH_TOKEN = refresh_token
+    client_id = CLIENT_ID or os.getenv("SPOTIFY_CLIENT_ID")
+    client_secret = CLIENT_SECRET or os.getenv("SPOTIFY_CLIENT_SECRET")
 
     # If no refresh token, cannot proceed
-    if not REFRESH_TOKEN:
+    if not refresh_token:
         return None
 
     # If still valid, reuse it
     if ACCESS_TOKEN and time.time() < TOKEN_EXPIRES - 60:
         return ACCESS_TOKEN
 
-    auth_str = f"{CLIENT_ID}:{CLIENT_SECRET}"
+    auth_str = f"{client_id}:{client_secret}"
     b64_auth = base64.b64encode(auth_str.encode()).decode()
 
     data = {
         "grant_type": "refresh_token",
-        "refresh_token": REFRESH_TOKEN,
+        "refresh_token": refresh_token,
     }
     headers = {"Authorization": f"Basic {b64_auth}"}
 
@@ -60,8 +68,9 @@ def refresh_access_token():
 
 @app.route("/login")
 def login():
+    client_id = CLIENT_ID or os.getenv("SPOTIFY_CLIENT_ID")
     auth_query = (
-        f"{SPOTIFY_AUTH_URL}?response_type=code&client_id={CLIENT_ID}"
+        f"{SPOTIFY_AUTH_URL}?response_type=code&client_id={client_id}"
         f"&redirect_uri={url_for('spotify.callback', _external=True)}&scope={SCOPE}"
     )
     return redirect(auth_query)
@@ -73,12 +82,16 @@ def callback():
     if not code:
         return "Authorization failed.", 400
 
+    client_id = CLIENT_ID or os.getenv("SPOTIFY_CLIENT_ID")
+    client_secret = CLIENT_SECRET or os.getenv("SPOTIFY_CLIENT_SECRET")
+    allowed_id = ALLOWED_SPOTIFY_USER_ID or os.getenv("SPOTIFY_USER_ID")
+
     data = {
         "grant_type": "authorization_code",
         "code": code,
         "redirect_uri": url_for("spotify.callback", _external=True),
-        "client_id": CLIENT_ID,
-        "client_secret": CLIENT_SECRET,
+        "client_id": client_id,
+        "client_secret": client_secret,
     }
     response = requests.post(SPOTIFY_TOKEN_URL, data=data)
     token_info = response.json()
@@ -93,7 +106,7 @@ def callback():
         headers={"Authorization": f"Bearer {access_token}"},
     ).json()
 
-    if me.get("id") != ALLOWED_SPOTIFY_USER_ID:
+    if me.get("id") != allowed_id:
         return json_response(request, {"error": "Unauthorized user"}, 403)
 
     global REFRESH_TOKEN

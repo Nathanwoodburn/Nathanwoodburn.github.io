@@ -26,3 +26,6 @@ jsonpath "$.tools" count > 5
 
 GET http://127.0.0.1:5000/api/v1/playing
 HTTP 200
+
+GET http://127.0.0.1:5000/api/v1/headers
+HTTP 200

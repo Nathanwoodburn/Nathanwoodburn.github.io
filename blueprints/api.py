@@ -2,7 +2,10 @@ import datetime
 import os
 from zoneinfo import ZoneInfo
 
+import dotenv
 from flask import Blueprint, jsonify, request
+
+dotenv.load_dotenv()
 
 from blueprints import sol
 from blueprints.spotify import get_playing_spotify_track

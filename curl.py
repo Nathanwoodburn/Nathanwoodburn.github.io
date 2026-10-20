@@ -33,6 +33,7 @@ def clean_path(path: str):
     path = path.strip("/ ").lower()
     # Strip any .html extension
     path = path.removesuffix(".html")
+    path = path.removesuffix(".ascii")
 
     # If the path is empty, set it to "index"
     if path == "":
@@ -174,6 +175,7 @@ def curl_response(request):
 
     if path == "pgp" or path == "gpg":
         return send_file("data/nathanwoodburn.asc")
+
     if os.path.exists(f"templates/{path}.ascii"):
         return ascii_response(
             render_template(f"{path}.ascii", header=get_header()),

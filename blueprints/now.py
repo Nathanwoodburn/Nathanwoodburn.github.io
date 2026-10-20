@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 from flask import Blueprint, jsonify, make_response, render_template, request
 
 from curl import MAX_WIDTH, get_header
-from tools import error_response, getHandshakeScript, isCLI
+from tools import error_response, getHandshakeScript, isCLI, render_ascii_terminal
 
 # Create blueprint
 app = Blueprint("now", __name__, url_prefix="/")
@@ -415,3 +415,16 @@ def json_endpoint():
         )
 
     return jsonify(formatted_pages)
+
+
+@app.route("/now.ascii")
+def ascii_endpoint():
+    resp = render_curl()
+    if isCLI(request) or request.args.get("raw") == "1":
+        return resp, 200, {"Content-Type": "text/plain; charset=utf-8"}
+    return render_ascii_terminal(
+        resp,
+        title="now - Terminal",
+        filename="now.ascii",
+        web_link="/now",
+    )

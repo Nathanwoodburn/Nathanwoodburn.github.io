@@ -31,7 +31,7 @@ CRAWLERS = [
     "Twitterbot",
 ]
 
-CLI_AGENTS = ["curl", "hurl", "xh", "Posting", "HTTPie", "nushell"]
+CLI_AGENTS = ["curl", "xh", "Posting", "HTTPie", "nushell"]
 
 MAX_WIDTH = 80
 ANSI_REGEX = re.compile(r"\x1b\[[0-9;]*[a-zA-Z]")
@@ -117,6 +117,34 @@ def wrap_ascii_text(text: str, width: int = MAX_WIDTH) -> str:
     if text.endswith("\n"):
         result += "\n"
     return result
+
+
+def render_ascii_terminal(
+    ascii_text: str,
+    title: str = "Terminal",
+    filename: str = "terminal.ascii",
+    web_link: str | None = None,
+) -> str:
+    """Render ANSI terminal text as an interactive, styled HTML terminal screen."""
+    from ansi2html import Ansi2HTMLConverter
+
+    converter = Ansi2HTMLConverter(inline=True, linkify=True, dark_bg=True)
+    html_content = converter.convert(ascii_text, full=False)
+
+    # Linkify internal paths in brackets like [/resume], [/projects], [/now]
+    html_content = re.sub(
+        r"\[(/(?:[a-zA-Z0-9_\-/]*))\]",
+        r'[<a class="terminal-link" href="\1.ascii">\1</a>]',
+        html_content,
+    )
+
+    return render_template(
+        "ascii.html",
+        ascii_art=html_content,
+        title=title,
+        filename=filename,
+        web_link=web_link,
+    )
 
 
 def getClientIP(request: Request) -> str:

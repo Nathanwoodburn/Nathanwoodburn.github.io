@@ -9,6 +9,7 @@ from tools import (
     get_terminal_width,
     isCLI,
     parse_support_arg,
+    render_ascii_terminal,
     wrap_ascii_text,
 )
 
@@ -69,10 +70,18 @@ def resume_ascii():
         resume=resume_data,
         support=support,
     )
-    return (
-        wrap_ascii_text(output, width=width),
-        200,
-        {"Content-Type": "text/plain; charset=utf-8"},
+    ascii_text = wrap_ascii_text(output, width=width)
+    if isCLI(request) or request.args.get("raw") == "1":
+        return (
+            ascii_text,
+            200,
+            {"Content-Type": "text/plain; charset=utf-8"},
+        )
+    return render_ascii_terminal(
+        ascii_text,
+        title=f"{resume_data.get('name', 'Nathan Woodburn')} - Resume (Terminal)",
+        filename="resume.ascii",
+        web_link="/resume" + ("?support=1" if support else ""),
     )
 
 

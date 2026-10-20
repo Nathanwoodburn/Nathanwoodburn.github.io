@@ -39,3 +39,9 @@ GET http://127.0.0.1:5000/assets/css/about.css?v=test12345
 HTTP 200
 [Asserts]
 header "Cache-Control" == "public, max-age=31536000, immutable"
+
+GET http://127.0.0.1:5000/index
+HTTP 302
+
+GET http://127.0.0.1:5000/index.ascii
+HTTP 302

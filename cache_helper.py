@@ -40,7 +40,12 @@ def get_git_latest_activity():
         git = requests.get(
             "https://git.woodburn.au/api/v1/users/nathanwoodburn/activities/feeds?only-performed-by=true&limit=1",
             headers={
-                "Authorization": os.getenv("GIT_AUTH") or os.getenv("git_token") or ""
+                "Authorization": (
+                    os.getenv("GIT_AUTH")
+                    or os.getenv("GIT_TOKEN")
+                    or os.getenv("git_token")
+                    or ""
+                )
             },
             timeout=5,
         )

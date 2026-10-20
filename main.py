@@ -1,6 +1,9 @@
 import os
 
+import dotenv
 from gunicorn.app.base import BaseApplication
+
+dotenv.load_dotenv()
 
 from server import app
 

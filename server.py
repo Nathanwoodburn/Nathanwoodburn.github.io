@@ -7,7 +7,6 @@ from zoneinfo import ZoneInfo
 
 import dotenv
 import qrcode
-from ansi2html import Ansi2HTMLConverter
 from flask import (
     Flask,
     jsonify,
@@ -22,6 +21,8 @@ from flask_cors import CORS
 from PIL import Image
 from qrcode.constants import ERROR_CORRECT_H, ERROR_CORRECT_L
 from werkzeug.middleware.proxy_fix import ProxyFix
+
+dotenv.load_dotenv()
 
 # Import blueprints
 from blueprints import acme, api, blog, now, podcast, resume, spotify, wellknown
@@ -42,6 +43,7 @@ from tools import (
     getHandshakeScript,
     isCLI,
     isFinger,
+    render_ascii_terminal,
 )
 
 app = Flask(__name__)
@@ -98,11 +100,9 @@ def inject_site_context():
     }
 
 
-dotenv.load_dotenv()
-
 # region Config/Constants
 
-EXCEMPT_ROUTES = ["404", "header", "error"]
+EXCEMPT_ROUTES = ["404", "header", "error", "403", "500"]
 RESTRICTED_ROUTES = ["ascii"]
 REDIRECT_ROUTES = {
     "contact": "/#contact",
@@ -110,6 +110,8 @@ REDIRECT_ROUTES = {
     "meeting": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
     "appointment": "https://cloud.woodburn.au/apps/calendar/appointment/PamrmmspWJZr",
     "donate/more": "/donate",
+    "index": "/",
+    "index.ascii": "/",
 }
 DOWNLOAD_ROUTES = {"pgp": "data/nathanwoodburn.asc"}
 
@@ -577,9 +579,14 @@ def supersecretpath():
         with open("data/ascii.txt") as file:
             ascii_art = file.read()
 
-    converter = Ansi2HTMLConverter()
-    ascii_art_html = converter.convert(ascii_art)
-    return render_template("ascii.html", ascii_art=ascii_art_html)
+    if isCLI(request) or request.args.get("raw") == "1":
+        return ascii_art, 200, {"Content-Type": "text/plain; charset=utf-8"}
+    return render_ascii_terminal(
+        ascii_art,
+        title="ASCII Art - Terminal",
+        filename="ascii.txt",
+        web_link="/",
+    )
 
 
 @app.route("/tools")
@@ -596,10 +603,13 @@ def tools():
 # Catch all for GET requests
 @app.route("/<path:path>")
 def catch_all(path: str):
-    if path.lower().replace(".html", "") in RESTRICTED_ROUTES:
+    if path.lower().endswith(".html"):
+        return redirect(path.lower().removesuffix(".html"), code=302)
+
+    if path.lower() in RESTRICTED_ROUTES:
         return error_response(request, message="Restricted route", code=403)
 
-    if path.lower().replace(".html", "") in EXCEMPT_ROUTES:
+    if path.lower() in EXCEMPT_ROUTES:
         return error_response(request)
 
     # If curl request, return curl response
@@ -608,6 +618,21 @@ def catch_all(path: str):
 
     if path in REDIRECT_ROUTES:
         return redirect(REDIRECT_ROUTES[path], code=302)
+
+    # If an ascii file is requested directly in a browser
+    if path.endswith(".ascii"):
+        resp = curl_response(request)
+        if isinstance(resp, tuple) and len(resp) >= 1:
+            raw_text = resp[0]
+            if isCLI(request) or request.args.get("raw") == "1":
+                return resp
+            stem = path.removesuffix(".ascii")
+            return render_ascii_terminal(
+                raw_text,
+                title=f"{path} - Terminal",
+                filename=path,
+                web_link=f"/{stem}" if stem != "index" else "/",
+            )
 
     # If file exists, load it
     if os.path.isfile("templates/" + path):
@@ -653,6 +678,11 @@ def not_found(e):
 @app.errorhandler(500)
 def server_error(e):
     return error_response(request, message="Internal Server Error", code=500)
+
+
+@app.route("/test")
+def test_route_broken():
+    return
 
 
 # endregion

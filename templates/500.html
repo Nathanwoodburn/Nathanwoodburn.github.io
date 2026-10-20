@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>500 Internal Server Error | Nathan.Woodburn/</title>
+    <meta name="theme-color" content="#000000">
+    <link rel="canonical" href="{{ canonical_url }}">
+    <meta property="og:url" content="{{ canonical_url }}">
+    <meta name="fediverse:creator" content="@nathanwoodburn@mastodon.woodburn.au">
+    <meta name="twitter:description" content="500 Internal Server Error - Something went wrong on our end.">
+    <meta property="og:title" content="500 Internal Server Error | Nathan.Woodburn/">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:image" content="{{ site_url }}/assets/img/profile.jpg">
+    <meta property="og:image" content="{{ site_url }}/assets/img/profile.jpg">
+    <meta property="og:type" content="website">
+    <meta name="twitter:title" content="500 Internal Server Error | Nathan.Woodburn/">
+    <meta property="og:description" content="500 Internal Server Error - Something went wrong on our end.">
+    <meta name="description" content="500 Internal Server Error - Something went wrong on our end.">
+    <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="/assets/img/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicon/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/img/favicon/android-chrome-512x512.png">
+    <link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Cabin:700&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Anonymous+Pro&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&amp;display=swap">
+    <link rel="stylesheet" href="{{ asset_url('bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/styles.min.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/404.min.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/brand-reveal.min.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/profile.min.css') }}">
+    <link rel="stylesheet" href="{{ asset_url('css/Social-Icons.min.css') }}">
+    <link rel="me" href="https://mastodon.woodburn.au/@nathanwoodburn" />
+    <script async src="https://umami.woodburn.au/script.js" data-website-id="6a55028e-aad3-481c-9a37-3e096ff75589"></script>
+</head>
+
+<body>
+    <p>HTTP:&nbsp;<span>500</span></p>
+    <div class="text-center">
+        <div class="text-start" style="display: inline-block;">
+            <code><span>try</span>&nbsp;{<br><span class="tab-space"></span><em>server</em>.<b>handle_request</b>(<em>this_page</em>);<br>}&nbsp;<span>catch</span>&nbsp;(<em>InternalServerError</em>&nbsp;<em>err</em>) {<br><span class="tab-space"></span><em>server</em>.<b>log_exception</b>(<em>err</em>);<br><span class="tab-space"></span><em>admin</em>.<b>notify</b>('<i>Something went wrong on our end!</i>');<br><span class="tab-space"></span><b>return</b>&nbsp;<a href="javascript:location.reload()">retry()</a>&nbsp;||&nbsp;<a href="/">return_home()</a>;<br>}</code>
+        </div>
+    </div>
+    <script src="{{ asset_url('bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset_url('js/script.min.js') }}"></script>
+    <script>
+        function type(e, t) {
+            var elem = document.getElementsByTagName("code")[e];
+            if (!elem) return;
+            var n = elem.innerHTML.toString(), o = 0;
+            elem.innerHTML = "";
+            setTimeout(function() {
+                var timer = setInterval(function() {
+                    o++;
+                    elem.innerHTML = n.slice(0, o) + "|";
+                    if (o == n.length) {
+                        clearInterval(timer);
+                        elem.innerHTML = n;
+                    }
+                }, 10);
+            }, t);
+        }
+        type(0, 0);
+        type(1, 500);
+    </script>
+</body>
+
+</html>
