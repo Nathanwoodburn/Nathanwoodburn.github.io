@@ -112,6 +112,7 @@ REDIRECT_ROUTES = {
     "donate/more": "/donate",
     "index": "/",
     "index.ascii": "/",
+    "security.txt": "/.well-known/security.txt",
 }
 DOWNLOAD_ROUTES = {"pgp": "data/nathanwoodburn.asc"}
 

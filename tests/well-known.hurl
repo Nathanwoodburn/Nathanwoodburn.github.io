@@ -23,3 +23,14 @@ HTTP 200
 header "Content-Type" contains "text/plain"
 body contains "Sitemap: https://nathan.woodburn.au/sitemap.xml"
 
+GET http://127.0.0.1:5000/.well-known/security.txt
+HTTP 200
+[Asserts]
+body contains "BEGIN PGP SIGNED MESSAGE"
+body contains "contact@nathan.woodburn.au"
+
+GET http://127.0.0.1:5000/security.txt
+HTTP 302
+[Asserts]
+header "Location" contains "/.well-known/security.txt"
+

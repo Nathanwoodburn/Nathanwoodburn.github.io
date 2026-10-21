@@ -1,0 +1,26 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Contact: mailto:contact@nathan.woodburn.au
+Expires: 2027-10-21T06:04:27.000Z
+Encryption: https://nathan.woodburn.au/download/pgp
+Encryption: openpgp4fpr:1C7AAF75F5333B3E484940B7203B000478AD0EF1
+Canonical: https://nathan.woodburn.au/.well-known/security.txt
+Preferred-Languages: en
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEHHqvdfUzOz5ISUC3IDsABHitDvEFAmrYVesACgkQIDsABHit
+DvGSZA//TIbpWhLmgNlOrYl0Cps7UhaLP8+2vVW3ZnnJl7pdDWEbskV83tGboo28
+Jagt5gJCQ/FJ7lpVTeIMNvnZWiwOIy0wMI6tORa1D3fOY10GvRR/J9N7kCgLHjl7
+XLhFVuYA55Eu6knGFqjZbQ/Whx6ggveRoQk6dtSUBmXJNc+gUoMTgk/4in6hYVJa
+C6G/t0q/TQxzaf2BQzaympsshQv7SP2harCK/4+28LjKG2H25Ki4qFXj9CRMFQiM
+Uuvm9R75WfY0Z2uNYd4OKGZnFo3YQjZTKCQEyH/h6pmg69yc+6gTextC53owzwFY
+7x0YXmeXNJPWtNKXw5aOgE8v8plzJac/e0edcLU2yyJThsyMUmNtXTVI4hCwQx+z
+0C/A1FVPpipTKy/taWyguoyUSGDCtlDyqDTa/55Tc0oWx333aoaLzwj6GPlqpMUD
+nxjk8t9gRXo3qs9o6nxUCZ0DoPUO+pOuAKcCzvP9pwr9ytb7nZINkyuj2tLxos85
+luCJUNWsf+3/jqZIDnAbo+RZfecvQsSN4MbjXvsucDOfdzP3vtpDdWgda/CSkYGj
+eG1b4wIDfMjGbUp6Hd0sGSju8T72aW2huj6RnFPLrM+XSVw8UyhdpIP49AdAmRNj
+Kj4aaiNTQUCa+Mjbi5OkGLRENnmMv+3W6Z28yVxLHcQKPlmlme0=
+=cDRo
+-----END PGP SIGNATURE-----
