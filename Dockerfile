@@ -1,53 +1,41 @@
 # syntax=docker/dockerfile:1
 
-### Build stage ###
+### Dependency build stage ###
 FROM python:3.13-alpine AS build
-
-# Install build dependencies for Pillow and other native wheels
-# Kept in case source builds are needed, though wheels are preferred
-RUN apk add --no-cache \
-    build-base \
-    jpeg-dev zlib-dev freetype-dev
 
 # Copy uv (fast Python package manager)
 COPY --from=ghcr.io/astral-sh/uv:0.8.21 /uv /uvx /bin/
 
 WORKDIR /app
 
-# Copy dependency files
-COPY pyproject.toml uv.lock ./
-
 # Install dependencies into a virtual environment
-# - --frozen: strict lockfile usage
-# - --no-dev: exclude development dependencies
-# - --no-install-project: avoid installing app as package
-# - --compile-bytecode: ensuring .pyc files for startup speed (optional, omit if size is critical but usually worth it)
-# We omit --compile-bytecode here to save space as requested
+# Pre-built musllinux wheels are available for all dependencies
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --frozen --no-dev --no-install-workspace
 
-### PDF Build stage (isolated so chromium is not in final image) ###
+### PDF Build stage (completely independent from build stage, runs in parallel) ###
 FROM python:3.13-alpine AS pdf-builder
 
 # Install chromium and fonts only for PDF generation in this intermediate stage
 RUN apk add --no-cache chromium font-noto
 
+# Install only jinja2 needed for rendering resume templates
+COPY --from=ghcr.io/astral-sh/uv:0.8.21 /uv /bin/uv
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv pip install --system jinja2
+
 WORKDIR /app
 
-COPY --from=build /app/.venv /app/.venv
-ENV PATH="/app/.venv/bin:$PATH"
-
-# Only copy files required for resume PDF generation to maximize layer caching
-COPY tools.py ./
+# Only copy files strictly required for resume PDF generation to maximize layer caching
+COPY build_resume.py ./
 COPY data/resume.json data/resume.json
 COPY templates/resume.html templates/resume.html
-COPY templates/resume.ascii templates/resume.ascii
 COPY templates/assets templates/assets
 
 # Generate the PDF files during build
-RUN python3 tools.py --build-resume
+RUN python3 build_resume.py
 
 ### Runtime stage ###
 FROM python:3.13-alpine AS runtime
@@ -61,20 +49,20 @@ RUN addgroup -g 1001 appgroup && \
 
 WORKDIR /app
 
-# Copy the virtual environment from build stage
-COPY --from=build --chown=appuser:appgroup /app/.venv /app/.venv
+# Copy the virtual environment from build stage using --link for independent caching
+COPY --link --from=build --chown=1001:1001 /app/.venv /app/.venv
 
-# Copy application directories and assets
-COPY --chown=appuser:appgroup blueprints blueprints
-COPY --chown=appuser:appgroup templates templates
-COPY --chown=appuser:appgroup data data
+# Copy application directories and assets using --link
+COPY --link --chown=1001:1001 blueprints blueprints
+COPY --link --chown=1001:1001 templates templates
+COPY --link --chown=1001:1001 data data
 # Overlay pre-built PDFs from pdf-builder
-COPY --from=pdf-builder --chown=appuser:appgroup /app/data/resume.pdf data/resume.pdf
-COPY --from=pdf-builder --chown=appuser:appgroup /app/data/resume_support.pdf data/resume_support.pdf
-COPY --chown=appuser:appgroup pwa pwa
-COPY --chown=appuser:appgroup .well-known .well-known
+COPY --link --from=pdf-builder --chown=1001:1001 /app/data/resume.pdf data/resume.pdf
+COPY --link --from=pdf-builder --chown=1001:1001 /app/data/resume_support.pdf data/resume_support.pdf
+COPY --link --chown=1001:1001 pwa pwa
+COPY --link --chown=1001:1001 .well-known .well-known
 # Copy top-level Python files
-COPY --chown=appuser:appgroup *.py ./
+COPY --link --chown=1001:1001 *.py ./
 
 USER appuser
 EXPOSE 5000

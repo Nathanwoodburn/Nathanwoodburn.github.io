@@ -6,6 +6,7 @@ __pycache__/
 .vscode/
 .vs/
 .ruff_check/
+.ruff_cache/
 .env
 
 # Pycache in subdirectories
