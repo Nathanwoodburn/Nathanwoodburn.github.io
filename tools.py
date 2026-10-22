@@ -157,14 +157,7 @@ def getClientIP(request: Request) -> str:
     Returns:
         str: The client's IP address
     """
-    x_forwarded_for = request.headers.get("X-Forwarded-For")
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(",")[0]
-    else:
-        ip = request.remote_addr
-    if ip is None:
-        ip = "unknown"
-    return ip
+    return request.remote_addr or "unknown"
 
 
 @lru_cache(maxsize=1)
